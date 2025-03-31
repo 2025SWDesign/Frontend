@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   LayoutWrapper,
   Header,
@@ -15,6 +17,9 @@ import {
 } from "./MainLayout.styled";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
+
+  const navigate = useNavigate();
+
   return (
     <LayoutWrapper>
       <Header>
@@ -119,7 +124,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         </SideBar>
         <MainArea>
           <TabArea>
-            <TabButton>
+            <TabButton onClick={() => navigate("/studentInfo")}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
