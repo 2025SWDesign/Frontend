@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import MainPage from "./page/MainPage";
 import StudentInfo from "./page/StudentInfoPage";
+import CounselingPage from "./page/CounselingPage";
 
 const App: React.FC = () => {
   return (
@@ -21,6 +22,14 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <StudentInfo />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/counseling"
+          element={
+            <MainLayout>
+              <CounselingPage />
             </MainLayout>
           }
         />
