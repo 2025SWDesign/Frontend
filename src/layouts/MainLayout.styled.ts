@@ -121,7 +121,7 @@ export const StudentList = styled.div`
   margin-top: 1.5rem;
   max-height: 10rem;
   width: 20rem;
-  overflow-y: auto;
+  overflow-y: scroll;
 
   table {
     width: 20rem;
