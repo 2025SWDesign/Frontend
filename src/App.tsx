@@ -22,7 +22,7 @@ const App: React.FC = () => {
         />
         <Route path="/sign" element={<SignInPage />} />
         <Route
-          path="/studentInfo"
+          path="/student-info"
           element={
             <MainLayout>
               <StudentInfo />

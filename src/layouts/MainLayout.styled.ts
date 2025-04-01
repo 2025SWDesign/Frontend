@@ -332,18 +332,21 @@ export const TabArea = styled.div`
   flex-direction: row;
 `;
 
-export const TabButton = styled.button`
+export const TabButton = styled.button<{ isActive: boolean }>`
   width: 13.75rem;
   border-radius: 1.25rem 1.25rem 0rem 0rem;
   border: 1px solid #fff;
-  background: #146c94;
+
   display: flex;
   align-items: center;
   justify-content: space-around;
 
-  &:active {
-    background: #004260;
-    cursor: pointer;
+  cursor: pointer;
+  background-color: ${({ isActive }) => (isActive ? "#004260" : "#146C94")};
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: ${({ isActive }) => (isActive ? "#004260" : "#146C94")};
   }
 
   svg {
