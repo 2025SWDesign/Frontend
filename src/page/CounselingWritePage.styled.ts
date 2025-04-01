@@ -48,7 +48,7 @@ export const TitleInput = styled.input`
 `;
 
 export const PrivacySection = styled.div`
-  padding-left: 2rem;
+  padding-left: 1.5rem;
   display: flex;
   align-items: center;
 `;
@@ -76,7 +76,6 @@ export const ContentArea = styled.textarea`
   width: 82rem;
   height: 33.8125rem;
   padding: 0.625rem 0.75rem;
-  color: #fff;
   font-family: Inter;
   font-size: 1.25rem;
   font-style: normal;
@@ -102,9 +101,29 @@ export const ButtonGroup = styled.div`
   margin-top: 0.5rem;
 `;
 
-export const Button = styled.button`
+export const SaveButton = styled.button`
   padding: 0.4rem 2.5rem;
   background-color: #146c94;
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #0d5270;
+  }
+`;
+
+export const CancelButton = styled.button`
+  padding: 0.4rem 2.5rem;
+  background-color: #424242;
   color: #fff;
   text-align: center;
   font-family: Inter;

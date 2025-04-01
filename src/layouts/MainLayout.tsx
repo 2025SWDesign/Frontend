@@ -206,7 +206,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </svg>
               <p>학생 정보</p>
             </TabButton>
-            <TabButton>
+            <TabButton onClick={() => navigate("/studentManagement")}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
