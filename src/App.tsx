@@ -6,6 +6,7 @@ import StudentInfo from "./page/StudentInfoPage";
 import CounselingPage from "./page/CounselingPage";
 import CounselingWritePage from "./page/CounselingWritePage";
 import FeedbackPage from "./page/FeedbackPage";
+import SignInPage from "./page/SignInPage";
 import StudentManagementPage from "./page/StudentManagementPage";
 
 const App: React.FC = () => {
@@ -20,8 +21,9 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+        <Route path="/sign" element={<SignInPage />} />
         <Route
-          path="/studentInfo"
+          path="/student-info"
           element={
             <MainLayout>
               <StudentInfo />
@@ -50,7 +52,7 @@ const App: React.FC = () => {
             <MainLayout>
               <FeedbackPage />
             </MainLayout>
-          } 
+          }
         />
         <Route
           path="/studentManagement"
