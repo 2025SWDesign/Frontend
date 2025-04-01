@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Logo from "/assets/img/Logo.png";
 
 import {
   LayoutWrapper,
@@ -14,17 +15,66 @@ import {
   UserArea,
   NotificationArea,
   StudentList,
+  StudentImg,
+  StudentClass,
+  StudentName,
 } from "./MainLayout.styled";
+
+interface Student {
+  name: string;
+  grade: number;
+  class: number;
+  number: number;
+  img: string;
+}
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
   const navigate = useNavigate();
+  
+  //Table 
+  const initialStudents = [
+    { name: "OOO", grade: 1, class: 3, number: 15, img: "/assets/img/photo.png" },
+    { name: "AAA", grade: 1, class: 3, number: 1, img: "/assets/img/photo.png" },
+    { name: "AAA", grade: 1, class: 3, number: 2, img: "/assets/img/photo.png" },
+    { name: "CCC", grade: 1, class: 3, number: 3, img: "/assets/img/photo.png" },
+    { name: "DDD", grade: 2, class: 1, number: 4, img: "/assets/img/photo.png" },
+    { name: "EEE", grade: 2, class: 1, number: 5, img: "/assets/img/photo.png" },
+    { name: "FFF", grade: 2, class: 1, number: 6, img: "/assets/img/photo.png" },
+    { name: "GGG", grade: 2, class: 2, number: 7, img: "/assets/img/photo.png" },
+    { name: "HHH", grade: 2, class: 2, number: 8, img: "/assets/img/photo.png" },
+    { name: "III", grade: 3, class: 1, number: 9, img: "/assets/img/photo.png" },
+  ];
+  
+  const [selectedStudent, setSelectedStudent] = useState<{
+    name: string;
+    grade: number;
+    class: number;
+    number: number;
+    img: string;
+  } | null>(null);
+
+  const [students, setStudents] = useState<Student[]>([]); // 초기에는 빈 배열
+  const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태
+
+  const handleSearch = () => {
+    const filteredStudents = initialStudents.filter(student =>
+      student.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setStudents(filteredStudents);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => { 
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <LayoutWrapper>
       <Header>
         <a href="/">
-          <img src="src\img\Logo.png" alt="logo" />
+          <img src={Logo} alt="logo" />
         </a>
         <UserArea>
           <div>
@@ -62,6 +112,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       </Header>
       <MainContainer>
         <SideBar>
+          {selectedStudent && (
+            <>
+              <StudentImg src={selectedStudent.img} alt="image" />
+              <StudentClass>{selectedStudent.grade}학년 {selectedStudent.class}반</StudentClass>
+              <StudentName>{selectedStudent.name} 학생</StudentName>
+            </>
+          )}
           <SearchBox>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -75,49 +132,59 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                 fill="white"
               />
             </svg>
-            <input type="text" placeholder="학생 이름을 검색하세요" />
+            <input type="text" placeholder="학생 이름을 검색하세요" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}/>
           </SearchBox>
           <StudentList>
             <table>
               <thead>
                 <tr>
-                  <th> </th>
+                  <th>이름</th>
                   <th>학년</th>
                   <th>반</th>
                   <th>번호</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>OOO</td>
-                  <td>2</td>
-                  <td>1</td>
-                  <td>1</td>
-                </tr>
-                <tr>
-                  <td>OOO</td>
-                  <td>3</td>
-                  <td>1</td>
-                  <td>4</td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
+              {students.length > 0 ? (
+                students.map((student, index) => (
+                  <tr key={index} onClick={() => setSelectedStudent(student)} style={{ cursor: "pointer" }}>
+                    <td>{student.name}</td>
+                    <td>{student.grade}</td>
+                    <td>{student.class}</td>
+                    <td>{student.number}</td>
+                  </tr>
+                ))
+              ) : (
+                <>
+                  <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                  </tr>
+                  <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                  </tr>
+                  <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                  </tr>
+                  <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                  </tr>
+                </>
+              )}
               </tbody>
             </table>
           </StudentList>
