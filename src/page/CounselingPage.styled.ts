@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import searchButton from "../img/searchButton.png";
+import searchButton from "/assets/img/searchButton.png";
 
 export const CounselingContainer = styled.div``;
 

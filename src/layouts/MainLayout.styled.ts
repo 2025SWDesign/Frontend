@@ -66,6 +66,30 @@ export const SideBar = styled.aside`
   align-items: center;
 `;
 
+export const StudentImg =styled.img`
+  margin-top: 5.5rem;
+  width: 17rem;
+  height: 22rem;
+`;
+
+export const StudentClass =styled.p`
+  margin: 2rem 0 0 0;
+  color: #000;
+  text-align: center;
+  font-family: Inter;
+  font-size: 2rem;
+  font-weight: 700;
+`;
+
+export const StudentName =styled.p`
+  margin: 1rem 0 -1.5rem 0;
+  color: #000;
+  text-align: center;
+  font-family: Inter;
+  font-size: 2.5rem;
+  font-weight: 700;
+`;
+
 export const SearchBox = styled.div`
   width: 20rem;
   height: 2.5rem;
