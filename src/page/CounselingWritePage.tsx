@@ -11,7 +11,8 @@ import {
   Checkbox,
   ContentArea,
   ButtonGroup,
-  Button,
+  SaveButton,
+  CancelButton,
 } from "./CounselingWritePage.styled";
 
 const CounselingWritePage: React.FC = () => {
@@ -46,7 +47,7 @@ const CounselingWritePage: React.FC = () => {
           />
           <PrivacySection>
             <CheckboxLabel>
-              <strong>같은 과목에게만 공개</strong>
+              <strong>동일 과목 교사에게 공개</strong>
               <Checkbox
                 type="checkbox"
                 checked={isPrivate}
@@ -63,8 +64,8 @@ const CounselingWritePage: React.FC = () => {
         />
 
         <ButtonGroup>
-          <Button onClick={handleGoBack}>뒤로가기</Button>
-          <Button onClick={handleSubmit}>저장</Button>
+          <CancelButton onClick={handleGoBack}>취소</CancelButton>
+          <SaveButton onClick={handleSubmit}>저장</SaveButton>
         </ButtonGroup>
       </Container>
     </CounselingWriteContainer>

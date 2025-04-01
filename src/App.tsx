@@ -7,6 +7,7 @@ import CounselingPage from "./page/CounselingPage";
 import CounselingWritePage from "./page/CounselingWritePage";
 import FeedbackPage from "./page/FeedbackPage";
 import SignInPage from "./page/SignInPage";
+import StudentManagementPage from "./page/StudentManagementPage";
 
 const App: React.FC = () => {
   return (
@@ -50,6 +51,14 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <FeedbackPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/studentManagement"
+          element={
+            <MainLayout>
+              <StudentManagementPage />
             </MainLayout>
           }
         />
