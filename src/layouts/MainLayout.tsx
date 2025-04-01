@@ -431,7 +431,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                   students.map((student, index) => (
                     <tr
                       key={index}
-                      onClick={() => setSelectedStudent(student)}
+                      onClick={() => {
+                        setSelectedStudent(student);
+                        navigate("/student-info");
+                      }}
                       style={{ cursor: "pointer" }}
                     >
                       <td>{student.name}</td>
@@ -474,7 +477,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         </SideBar>
         <MainArea>
           <TabArea>
-            <TabButton onClick={() => navigate("/studentInfo")}>
+            <TabButton
+              isActive={location.pathname === "/student-info"}
+              onClick={() => navigate("/student-info")}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -489,7 +495,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </svg>
               <p>학생 정보</p>
             </TabButton>
-            <TabButton>
+            <TabButton isActive={location.pathname === "/student-manage"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -504,7 +510,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </svg>
               <p>학생부 관리</p>
             </TabButton>
-            <TabButton>
+            <TabButton isActive={location.pathname === "/grade"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -519,7 +525,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </svg>
               <p>학생 성적 관리</p>
             </TabButton>
-            <TabButton onClick={() => navigate("/counseling")}>
+            <TabButton
+              isActive={location.pathname === "/counseling"}
+              onClick={() => navigate("/counseling")}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -540,7 +549,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </svg>
               <p>상담 내역</p>
             </TabButton>
-            <TabButton onClick={() => navigate("/feedback")}>
+            <TabButton
+              isActive={location.pathname === "/feedback"}
+              onClick={() => navigate("/feedback")}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -555,7 +567,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </svg>
               <p>피드백 내역</p>
             </TabButton>
-            <TabButton>
+            <TabButton isActive={location.pathname === "/report"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
