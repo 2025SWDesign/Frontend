@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   CounselingContainer,
@@ -28,6 +29,7 @@ interface Post {
 }
 
 const CounselingPage: React.FC = () => {
+  const navigate = useNavigate();
   const posts: Post[] = [
     {
       id: 1,
@@ -216,7 +218,7 @@ const CounselingPage: React.FC = () => {
 
   const handleWrite = () => {
     console.log("글 작성 페이지로 이동");
-    // 예: navigate('/write');
+    navigate("/counseling/write");
   };
 
   return (
@@ -226,7 +228,7 @@ const CounselingPage: React.FC = () => {
       <BoardTable>
         <thead>
           <TableRow>
-            <TableHeader width="3rem" >번호</TableHeader>
+            <TableHeader width="3rem">번호</TableHeader>
             <TableHeader width="40rem">제목</TableHeader>
             <TableHeader width="10rem">작성자</TableHeader>
             <TableHeader width="5rem">담당과목</TableHeader>

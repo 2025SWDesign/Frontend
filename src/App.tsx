@@ -4,6 +4,7 @@ import MainLayout from "./layouts/MainLayout";
 import MainPage from "./page/MainPage";
 import StudentInfo from "./page/StudentInfoPage";
 import CounselingPage from "./page/CounselingPage";
+import CounselingWritePage from "./page/CounselingWritePage";
 
 const App: React.FC = () => {
   return (
@@ -30,6 +31,14 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <CounselingPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/counseling/write"
+          element={
+            <MainLayout>
+              <CounselingWritePage />
             </MainLayout>
           }
         />
