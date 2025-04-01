@@ -98,7 +98,7 @@ export const SearchContainer = styled.div`
 `;
 
 export const SearchSelect = styled.select`
-  padding: 0.8rem;
+  padding: 0.6rem;
   margin-right: 0.5rem;
   border-radius: 0.625rem;
   border: 0.0625rem solid #000;
@@ -141,7 +141,7 @@ export const SearchInput = styled.input`
 
 export const SearchButton = styled.button`
   width: 3.75rem;
-  height: 2.625rem;
+  height: 2.925rem;
   flex-shrink: 0;
   border-radius: 0.625rem;
   background: #004260 url(${searchButton}) no-repeat center;

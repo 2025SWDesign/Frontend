@@ -97,7 +97,7 @@ export const ContentArea = styled.textarea`
 
 export const ButtonGroup = styled.div`
   width: 84rem;
-  display: flex;
+  display: flex;  
   justify-content: space-between;
   margin-top: 0.5rem;
 `;
