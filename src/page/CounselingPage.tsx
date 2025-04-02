@@ -20,6 +20,10 @@ import {
   WriteButton,
 } from "./CounselingPage.styled";
 
+interface CounselingPageProps {
+  identity: string;
+}
+
 interface Post {
   id: number;
   title: string;
@@ -28,7 +32,7 @@ interface Post {
   counselingDate: string;
 }
 
-const CounselingPage: React.FC = () => {
+const CounselingPage: React.FC<CounselingPageProps> = ({identity}) => {
   const navigate = useNavigate();
   const posts: Post[] = [
     {
@@ -264,7 +268,7 @@ const CounselingPage: React.FC = () => {
           />
           <SearchButton onClick={handleSearch}></SearchButton>
         </SearchContainer>
-        <WriteButton onClick={handleWrite}>글 작성</WriteButton>
+        { identity === "teacher" && <WriteButton onClick={handleWrite}>글 작성</WriteButton>}
       </Footer>
       <Pagination>
         <PageButton

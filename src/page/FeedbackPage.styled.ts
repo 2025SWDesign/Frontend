@@ -1,5 +1,9 @@
 import styled from "styled-components";
 
+interface FeedbackPageProps {
+  identity: string;
+}
+
 export const FeedbackContainer = styled.div``;
 
 export const FeedbackHeader = styled.p`
@@ -30,12 +34,16 @@ export const FeedbackContentContainer = styled.div`
   margin-left: 3rem;
 `;
 
-export const ContentBox = styled.div`
+export const ContentBox = styled.div<FeedbackPageProps>`
   display: flex;
   flex-direction: column;
   width: 100%;
   border: 1px solid #e0e0e0;
   border-radius: 0.5rem;
+
+  ${(props) => props.identity !== "teacher" && `
+    margin-bottom: 0.6rem;
+  `}
 `;
 
 export const ContentTitle = styled.div`
@@ -52,7 +60,7 @@ export const ContentTitle = styled.div`
   line-height: 40%;
 `;
 
-export const ContentForm = styled.textarea`
+export const ContentForm = styled.textarea<FeedbackPageProps>`
   width: 100%;
   height: 4.4rem;
   padding: 1rem;
@@ -89,6 +97,10 @@ export const ContentForm = styled.textarea`
     background-color: #ffffff;
     cursor: not-allowed;
   }
+
+  ${(props) => props.identity !== "teacher" && `
+    height: 5rem;
+  `}
 `;
 export const ButtonContainer = styled.div`
   margin-left: auto;

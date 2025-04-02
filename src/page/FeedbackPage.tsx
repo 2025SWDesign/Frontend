@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   FeedbackContainer,
   FeedbackHeader,
@@ -12,7 +13,11 @@ import {
   EditButton
 } from "./FeedbackPage.styled";
 
-const FeedbackPage = () => {
+interface FeedbackPageProps {
+  identity: string;
+}
+
+const FeedbackPage : React.FC<FeedbackPageProps> = ({ identity }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [feedbacks, setFeedbacks] = useState({
     academic: "",
@@ -47,49 +52,53 @@ const FeedbackPage = () => {
       <FeedbackHeader>피드백 내역</FeedbackHeader>
       <Line />
       
-      <FeedbackContentContainer>
-        <ContentBox>
+      <FeedbackContentContainer>  
+        <ContentBox identity={identity}>
           <ContentTitle>성적</ContentTitle>
           <ContentForm 
             value={feedbacks.academic}
             onChange={handleChange("academic")}
             disabled={!isEditing}
             placeholder={isEditing ? "성적에 대한 피드백을 입력하세요" : ""}
+            identity={identity}
           />
         </ContentBox>
 
-        <ContentBox>
+        <ContentBox identity={identity}>
           <ContentTitle>행동</ContentTitle>
           <ContentForm 
             value={feedbacks.behavior}
             onChange={handleChange("behavior")}
             disabled={!isEditing}
             placeholder={isEditing ? "행동에 대한 피드백을 입력하세요" : ""}
+            identity={identity}
           />
         </ContentBox>
 
-        <ContentBox>
+        <ContentBox identity={identity}>
           <ContentTitle>출결</ContentTitle>
           <ContentForm 
             value={feedbacks.attendance}
             onChange={handleChange("attendance")}
             disabled={!isEditing}
             placeholder={isEditing ? "출결에 대한 피드백을 입력하세요" : ""}
+            identity={identity}
           />
         </ContentBox>
 
-        <ContentBox>
+        <ContentBox identity={identity}>
           <ContentTitle>태도</ContentTitle>
           <ContentForm 
             value={feedbacks.attitude}
             onChange={handleChange("attitude")}
             disabled={!isEditing}
             placeholder={isEditing ? "태도에 대한 피드백을 입력하세요" : ""}
+            identity={identity}
           />
         </ContentBox>
       </FeedbackContentContainer>
 
-      <ButtonContainer>
+      {identity === "teacher" && <ButtonContainer>
         <div>
           <SendButton 
             onClick={handleSendToStudent} 
@@ -107,7 +116,7 @@ const FeedbackPage = () => {
         <EditButton onClick={toggleEditMode}>
           {isEditing ? "저장" : "수정"}
         </EditButton>
-      </ButtonContainer>
+      </ButtonContainer>}
     </FeedbackContainer>
   );
 };
