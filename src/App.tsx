@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import MainPage from "./page/MainPage";
@@ -10,6 +10,8 @@ import SignInPage from "./page/SignInPage";
 import StudentManagementPage from "./page/StudentManagementPage";
 
 const App: React.FC = () => {
+  const [identity] = useState("student"); // "student" or "teacher"
+
   return (
     <Router>
       <Routes>
@@ -34,7 +36,7 @@ const App: React.FC = () => {
           path="/counseling"
           element={
             <MainLayout>
-              <CounselingPage />
+              <CounselingPage identity={identity} />
             </MainLayout>
           }
         />
@@ -50,15 +52,15 @@ const App: React.FC = () => {
           path="/feedback"
           element={
             <MainLayout>
-              <FeedbackPage />
+              <FeedbackPage identity={identity} />
             </MainLayout>
           }
         />
         <Route
-          path="/studentManagement"
+          path="/student-manage"
           element={
             <MainLayout>
-              <StudentManagementPage />
+              <StudentManagementPage identity={identity} />
             </MainLayout>
           }
         />

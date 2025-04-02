@@ -1,5 +1,9 @@
 import styled from "styled-components";
 
+interface StudentManagementPageProps {
+  identity: string;
+}
+
 export const StudentManagementContainer = styled.div``;
 
 export const StudentManagementHeader = styled.p`
@@ -79,9 +83,14 @@ export const UpdateButton = styled.button`
 `;
 
 // 해당 학기 출석 섹션
-export const SemesterAttendanceSection = styled.section`
+export const SemesterAttendanceSection = styled.section<StudentManagementPageProps>`
   margin-left: 2.5rem;
   width: 78rem;
+
+  ${(props) => props.identity !== "teacher" && `
+    margin-bottom: 2rem;
+    margin-top: 1.5rem;
+  `}
 `;
 
 export const AttendanceTableWrapper = styled.div`
@@ -159,6 +168,7 @@ export const AttendanceCell = styled.td`
 export const StudentAttendanceSection = styled.section`
   margin-left: 2.5rem;
   margin-bottom: 1rem;
+
 `;
 
 export const AttendanceSummaryTable = styled.table`
@@ -193,14 +203,18 @@ export const SummaryCell = styled.td`
 `;
 
 // 특기 사항 섹션
-export const SpecialNotesSection = styled.section`
+export const SpecialNotesSection = styled.section<StudentManagementPageProps>`
   flex-direction: column;
   display: flex;
   margin-left: 2.5rem;
   margin-bottom: 1rem;
+
+  ${(props) => props.identity !== "teacher" && `  
+    margin-top: 2rem;
+  `}
 `;
 
-export const NotesForm = styled.textarea`
+export const NotesForm = styled.textarea<StudentManagementPageProps>`
   width: 76rem;
   height: 5rem;
   padding: 1rem;
@@ -218,6 +232,10 @@ export const NotesForm = styled.textarea`
     background-color: #f9f9f9;
     cursor: not-allowed;
   }
+
+  ${(props) => props.identity !== "teacher" && `
+    height: 8rem;
+  `}
 `;
 
 export const EditButton = styled.button`

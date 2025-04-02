@@ -26,7 +26,11 @@ import {
   EditButton,
 } from "./StudentManagementPage.styled";
 
-const StudentManagementPage = () => {
+interface StudentManagementPageProps {
+  identity: string;
+}
+
+const StudentManagementPage: React.FC<StudentManagementPageProps> = ({ identity }) => {
   // 학생 기본 정보 상태
   const [basicInfo, setBasicInfo] = useState({
     name: "홍길동",
@@ -172,7 +176,7 @@ const StudentManagementPage = () => {
       <Line />
 
       {/* 학생 기본정보 수정 섹션 수정 */}
-      <BasicInfoSection>
+      {identity === "teacher" && <BasicInfoSection>
         <SectionTitle>학생 기본정보 수정</SectionTitle>
         <InfoRow>
           <InfoContent>
@@ -187,10 +191,10 @@ const StudentManagementPage = () => {
             <UpdateButton onClick={handleUpdateBasicInfo}>적용</UpdateButton>
           </InfoContent>
         </InfoRow>
-      </BasicInfoSection>
+      </BasicInfoSection>}
 
       {/* 해당 학기 출석 섹션 */}
-      <SemesterAttendanceSection>
+      <SemesterAttendanceSection identity={identity}>
         <SectionTitle>해당 학기 출석</SectionTitle>
         {/* 해당 학기 출석 테이블의 "총" 열 추가 */}
         <AttendanceTableWrapper>
@@ -213,7 +217,7 @@ const StudentManagementPage = () => {
                     <AttendanceCell
                       key={`${category}-${date}`}
                       contentEditable={isAttendanceEditing}
-                      onInput={(e) => updateTotalAttendance(category)}
+                      onInput={() => updateTotalAttendance(category)}
                     ></AttendanceCell>
                   ))}
                 </tr>
@@ -221,9 +225,9 @@ const StudentManagementPage = () => {
             </tbody>
           </AttendanceTable>
         </AttendanceTableWrapper>
-        <AttendanceEditButton onClick={toggleAttendanceEditMode}>
+        {identity === "teacher" && <AttendanceEditButton onClick={toggleAttendanceEditMode}>
           {isAttendanceEditing ? "저장" : "수정"}
-        </AttendanceEditButton>
+        </AttendanceEditButton>}
       </SemesterAttendanceSection>
 
       {/* 출결 정보 테이블 구조 수정 */}
@@ -269,7 +273,7 @@ const StudentManagementPage = () => {
       </StudentAttendanceSection>
 
       {/* 특기 사항 섹션 */}
-      <SpecialNotesSection>
+      <SpecialNotesSection identity={identity}>
         <SectionTitle>특기 사항</SectionTitle>
         <NotesForm
           value={specialNotes}
@@ -278,10 +282,11 @@ const StudentManagementPage = () => {
           placeholder={
             isSpecialNotesEditing ? "학생의 특기 사항을 입력하세요" : ""
           }
+          identity={identity}
         />
-        <EditButton onClick={toggleSpecialNotesEditMode}>
+        {identity === "teacher" && <EditButton onClick={toggleSpecialNotesEditMode}>
           {isSpecialNotesEditing ? "저장" : "수정"}
-        </EditButton>
+        </EditButton>}
       </SpecialNotesSection>
     </StudentManagementContainer>
   );
