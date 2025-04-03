@@ -23,14 +23,38 @@ export const Line = styled.div`
   margin-bottom: 1rem;
 `;
 
+export const GradeSelect = styled.select`
+  padding: 0.6rem;
+  margin-left: 3rem;
+  margin-bottom: 1rem;
+  border-radius: 0.625rem;
+  border: 0.0625rem solid #000;
+  appearance: none;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="black"><path d="M12 16l-6-6h12z"/></svg>')
+    no-repeat left 0.625rem center;
+  padding-left: 2rem;
+  color: #424242;
+  font-family: "Noto Sans";
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 600;
+
+  &:option {
+    color: #424242;
+    font-family: "Noto Sans";
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 600;
+  }
+`;
+
 export const FeedbackContentContainer = styled.div`
   width: 82rem;
-  height: 37rem;
+  height: 36.5rem;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 2rem;
   margin-left: 3rem;
 `;
 
@@ -42,7 +66,7 @@ export const ContentBox = styled.div<FeedbackPageProps>`
   border-radius: 0.5rem;
 
   ${(props) => props.identity !== "teacher" && `
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.3rem;
   `}
 `;
 
@@ -62,7 +86,7 @@ export const ContentTitle = styled.div`
 
 export const ContentForm = styled.textarea<FeedbackPageProps>`
   width: 100%;
-  height: 4.4rem;
+  height: 3.8rem;
   padding: 1rem;
   border: none;
   resize: none;
@@ -99,7 +123,7 @@ export const ContentForm = styled.textarea<FeedbackPageProps>`
   }
 
   ${(props) => props.identity !== "teacher" && `
-    height: 5rem;
+    height: 4.4rem;
   `}
 `;
 export const ButtonContainer = styled.div`
@@ -108,7 +132,6 @@ export const ButtonContainer = styled.div`
   width: 84rem;
   display: flex;
   justify-content: space-between;
-  margin-top: 1rem;
 
   & > div {
     display: flex;

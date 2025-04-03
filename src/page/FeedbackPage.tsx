@@ -10,28 +10,32 @@ import {
   ContentForm,
   ButtonContainer,
   SendButton,
-  EditButton
+  EditButton,
+  GradeSelect,
 } from "./FeedbackPage.styled";
 
 interface FeedbackPageProps {
   identity: string;
 }
 
-const FeedbackPage : React.FC<FeedbackPageProps> = ({ identity }) => {
+const FeedbackPage: React.FC<FeedbackPageProps> = ({ identity }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [feedbacks, setFeedbacks] = useState({
     academic: "",
     behavior: "",
     attendance: "",
-    attitude: ""
+    attitude: "",
   });
+  const [grade, setGrade] = useState("1");
 
-  const handleChange = (field: keyof typeof feedbacks) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFeedbacks({
-      ...feedbacks,
-      [field]: e.target.value
-    });
-  };
+  const handleChange =
+    (field: keyof typeof feedbacks) =>
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setFeedbacks({
+        ...feedbacks,
+        [field]: e.target.value,
+      });
+    };
 
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
@@ -51,11 +55,19 @@ const FeedbackPage : React.FC<FeedbackPageProps> = ({ identity }) => {
     <FeedbackContainer>
       <FeedbackHeader>피드백 내역</FeedbackHeader>
       <Line />
-      
-      <FeedbackContentContainer>  
+      <GradeSelect
+        value={grade}
+        onChange={(e) => setGrade(e.target.value)}
+      >
+        <option value="1">1학년</option>
+        <option value="2">2학년</option>
+        <option value="3">3학년</option>
+      </GradeSelect>
+
+      <FeedbackContentContainer>
         <ContentBox identity={identity}>
           <ContentTitle>성적</ContentTitle>
-          <ContentForm 
+          <ContentForm
             value={feedbacks.academic}
             onChange={handleChange("academic")}
             disabled={!isEditing}
@@ -66,7 +78,7 @@ const FeedbackPage : React.FC<FeedbackPageProps> = ({ identity }) => {
 
         <ContentBox identity={identity}>
           <ContentTitle>행동</ContentTitle>
-          <ContentForm 
+          <ContentForm
             value={feedbacks.behavior}
             onChange={handleChange("behavior")}
             disabled={!isEditing}
@@ -77,7 +89,7 @@ const FeedbackPage : React.FC<FeedbackPageProps> = ({ identity }) => {
 
         <ContentBox identity={identity}>
           <ContentTitle>출결</ContentTitle>
-          <ContentForm 
+          <ContentForm
             value={feedbacks.attendance}
             onChange={handleChange("attendance")}
             disabled={!isEditing}
@@ -88,7 +100,7 @@ const FeedbackPage : React.FC<FeedbackPageProps> = ({ identity }) => {
 
         <ContentBox identity={identity}>
           <ContentTitle>태도</ContentTitle>
-          <ContentForm 
+          <ContentForm
             value={feedbacks.attitude}
             onChange={handleChange("attitude")}
             disabled={!isEditing}
@@ -98,25 +110,21 @@ const FeedbackPage : React.FC<FeedbackPageProps> = ({ identity }) => {
         </ContentBox>
       </FeedbackContentContainer>
 
-      {identity === "teacher" && <ButtonContainer>
-        <div>
-          <SendButton 
-            onClick={handleSendToStudent} 
-            disabled={isEditing}
-          >
-            학생 전송
-          </SendButton>
-          <SendButton 
-            onClick={handleSendToParent} 
-            disabled={isEditing}
-          >
-            학부모 전송
-          </SendButton>
-        </div>
-        <EditButton onClick={toggleEditMode}>
-          {isEditing ? "저장" : "수정"}
-        </EditButton>
-      </ButtonContainer>}
+      {identity === "teacher" && (
+        <ButtonContainer>
+          <div>
+            <SendButton onClick={handleSendToStudent} disabled={isEditing}>
+              학생 전송
+            </SendButton>
+            <SendButton onClick={handleSendToParent} disabled={isEditing}>
+              학부모 전송
+            </SendButton>
+          </div>
+          <EditButton onClick={toggleEditMode}>
+            {isEditing ? "저장" : "수정"}
+          </EditButton>
+        </ButtonContainer>
+      )}
     </FeedbackContainer>
   );
 };
