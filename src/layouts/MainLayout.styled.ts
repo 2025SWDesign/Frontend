@@ -269,11 +269,12 @@ export const SearchBox = styled.div`
 `;
 
 export const StudentList = styled.div`
-  margin-top: 1.5rem;
-  max-height: 10rem;
+  margin-top: 1rem;
+  min-height: 10rem;
+  max-height: 46rem;
   width: 20rem;
   overflow-y: scroll;
-
+  overflow-x: none;
   table {
     width: 20rem;
     border: 1px solid #b9b9b9;

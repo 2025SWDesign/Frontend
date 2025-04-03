@@ -10,7 +10,8 @@ import SignInPage from "./page/SignInPage";
 import StudentManagementPage from "./page/StudentManagementPage";
 
 const App: React.FC = () => {
-  const [identity] = useState("student"); // "student" or "teacher"
+  type IdentityType = "student" | "parent" | "teacher";
+  const [identity, setIdentity] = useState<IdentityType>("student");
 
   return (
     <Router>
@@ -18,8 +19,11 @@ const App: React.FC = () => {
         <Route
           path="/"
           element={
-            <MainLayout>
-              <MainPage />
+            <MainLayout identity={identity}>
+              <MainPage identity={identity} />
+              <button onClick={() => setIdentity("student")}>학생</button>
+              <button onClick={() => setIdentity("parent")}>학부모</button>
+              <button onClick={() => setIdentity("teacher")}>교사</button>
             </MainLayout>
           }
         />
@@ -27,7 +31,7 @@ const App: React.FC = () => {
         <Route
           path="/student-info"
           element={
-            <MainLayout>
+            <MainLayout identity={identity}>
               <StudentInfo />
             </MainLayout>
           }
@@ -35,7 +39,7 @@ const App: React.FC = () => {
         <Route
           path="/counseling"
           element={
-            <MainLayout>
+            <MainLayout identity={identity}>
               <CounselingPage identity={identity} />
             </MainLayout>
           }
@@ -43,7 +47,7 @@ const App: React.FC = () => {
         <Route
           path="/counseling/write"
           element={
-            <MainLayout>
+            <MainLayout identity={identity}>
               <CounselingWritePage />
             </MainLayout>
           }
@@ -51,7 +55,7 @@ const App: React.FC = () => {
         <Route
           path="/feedback"
           element={
-            <MainLayout>
+            <MainLayout identity={identity}>
               <FeedbackPage identity={identity} />
             </MainLayout>
           }
@@ -59,7 +63,7 @@ const App: React.FC = () => {
         <Route
           path="/student-manage"
           element={
-            <MainLayout>
+            <MainLayout identity={identity}>
               <StudentManagementPage identity={identity} />
             </MainLayout>
           }
