@@ -1,9 +1,13 @@
 import React from "react";
 
-const MainPage: React.FC = () => {
+interface MainPageProps {
+  identity: string;
+}
+
+const MainPage: React.FC<MainPageProps> = ({ identity }) => {
   return (
     <div>
-      <div></div>
+      <div>{identity}</div>
     </div>
   );
 };

@@ -39,83 +39,51 @@ interface Student {
   img: string;
 }
 
-const MainLayout = ({ children }: { children: React.ReactNode }) => {
+interface MainLayoutProps {
+  identity: string;
+  children: React.ReactNode;
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
   const navigate = useNavigate();
-
-  //Table
-  const initialStudents = [
-    {
-      name: "OOO",
-      grade: 1,
-      class: 3,
-      number: 15,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "AAA",
-      grade: 1,
-      class: 3,
-      number: 1,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "AAA",
-      grade: 1,
-      class: 3,
-      number: 2,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "CCC",
-      grade: 1,
-      class: 3,
-      number: 3,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "DDD",
-      grade: 2,
-      class: 1,
-      number: 4,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "EEE",
-      grade: 2,
-      class: 1,
-      number: 5,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "FFF",
-      grade: 2,
-      class: 1,
-      number: 6,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "GGG",
-      grade: 2,
-      class: 2,
-      number: 7,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "HHH",
-      grade: 2,
-      class: 2,
-      number: 8,
-      img: "/assets/img/photo.png",
-    },
-    {
-      name: "III",
-      grade: 3,
-      class: 1,
-      number: 9,
-      img: "/assets/img/photo.png",
-    },
-  ];
-
+  const initialStudents = Array.from({ length: 30 }, (_, i) => ({
+    grade: 2,
+    class: 2,
+    number: i + 1,
+    name: [
+      "강민수",
+      "고준영",
+      "김다은",
+      "김민재",
+      "김서윤",
+      "김수현",
+      "김지훈",
+      "남궁우진",
+      "노지현",
+      "문태영",
+      "박가영",
+      "박도윤",
+      "박민지",
+      "박서준",
+      "박지훈",
+      "서예린",
+      "신윤서",
+      "안도현",
+      "양지우",
+      "오하늘",
+      "유진호",
+      "이도윤",
+      "이서진",
+      "이영훈",
+      "임수빈",
+      "장우석",
+      "전예진",
+      "정민규",
+      "조하람",
+      "최다온",
+    ][i],
+    img: "/assets/img/photo.png",
+  }));
   const [selectedStudent, setSelectedStudent] = useState<{
     name: string;
     grade: number;
@@ -139,6 +107,12 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       handleSearch();
     }
   };
+
+  useEffect(() => {
+    if (identity === "teacher" && students.length === 0) {
+      setStudents(initialStudents);
+    }
+  }, [identity, initialStudents, students.length]);
 
   //유저 드롭다운 메뉴
   const [isUserDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -495,10 +469,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </svg>
               <p>학생 정보</p>
             </TabButton>
-            <TabButton
-              isActive={location.pathname === "/student-manage"}
-              onClick={() => navigate("/student-manage")}
-            >
+            <TabButton isActive={location.pathname === "/student-manage"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
