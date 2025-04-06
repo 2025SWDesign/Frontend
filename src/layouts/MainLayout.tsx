@@ -41,10 +41,17 @@ interface Student {
 
 interface MainLayoutProps {
   identity: string;
+  selectedStudent: Student | null;
+  setSelectedStudent: (student: Student | null) => void;
   children: React.ReactNode;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({
+  identity,
+  selectedStudent,
+  setSelectedStudent,
+  children,
+}) => {
   const navigate = useNavigate();
   const initialStudents = Array.from({ length: 30 }, (_, i) => ({
     grade: 2,
@@ -84,13 +91,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
     ][i],
     img: "/assets/img/photo.png",
   }));
-  const [selectedStudent, setSelectedStudent] = useState<{
-    name: string;
-    grade: number;
-    class: number;
-    number: number;
-    img: string;
-  } | null>(null);
 
   const [students, setStudents] = useState<Student[]>([]); // 초기에는 빈 배열
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태
@@ -488,7 +488,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
             </TabButton>
             <TabButton
               $isActive={location.pathname === "/grade"}
-              onClick={() => navigate("/grade")}
+              onClick={() => {
+                navigate("/grade");
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

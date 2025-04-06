@@ -23,6 +23,17 @@ export const Line = styled.div`
   border-bottom: 0.0625rem solid black;
 `;
 
+export const GuideMessage = styled.div`
+  height: 42.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-family: "Noto Sans";
+  font-size: 1.5rem;
+  font-weight: 400;
+`;
+
 export const GradeContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -30,6 +41,15 @@ export const GradeContainer = styled.div`
 
 export const TableArea = styled.div`
   width: 57.5rem;
+  height: 44.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  padding-left: 3rem;
+`;
+
+export const StudentsTableArea = styled.div`
+  width: 86rem;
   height: 44.75rem;
   display: flex;
   flex-direction: column;
@@ -125,6 +145,59 @@ export const ScoreInput = styled.input`
   font-size: 0.75rem;
   width: 16.25rem;
   height: 1.3rem;
+`;
+
+export const StudentGradeTable = styled.div`
+  border-radius: 0.5rem;
+  max-height: 30rem;
+  overflow-y: auto;
+  overflow-x: none;
+
+  table {
+    width: 83rem;
+    border: 1px solid #b9b9b9;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0.5rem;
+    table-layout: fixed;
+  }
+
+  tr {
+    height: 2rem;
+  }
+
+  th,
+  td {
+    border: 1px solid #b9b9b9;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    font-size: 0.75rem;
+  }
+  thead {
+    position: sticky;
+    top: 0px;
+    margin: 0;
+  }
+  th {
+    background: #146c94;
+    color: #fff;
+  }
+
+  table tr:first-child th:first-child {
+    border-top-left-radius: 0.5rem;
+  }
+
+  table tr:first-child th:last-child {
+    border-top-right-radius: 0.5rem;
+  }
+
+  table tr:last-child td:first-child {
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  table tr:last-child td:last-child {
+    border-bottom-right-radius: 0.5rem;
+  }
 `;
 
 export const ToggleWrapper = styled.div`
