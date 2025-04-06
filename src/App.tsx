@@ -12,7 +12,18 @@ import GradePage from "./page/GradePage";
 
 const App: React.FC = () => {
   type IdentityType = "student" | "parent" | "teacher";
-  const [identity, setIdentity] = useState<IdentityType>("student");
+  const [identity, setIdentity] = useState<IdentityType>("teacher");
+  const isHomeroom = true;
+  //const isHomeroom = false;
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+
+  interface Student {
+    name: string;
+    grade: number;
+    class: number;
+    number: number;
+    img: string;
+  }
 
   return (
     <Router>
@@ -20,7 +31,11 @@ const App: React.FC = () => {
         <Route
           path="/"
           element={
-            <MainLayout identity={identity}>
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
               <MainPage identity={identity} />
               <button onClick={() => setIdentity("student")}>학생</button>
               <button onClick={() => setIdentity("parent")}>학부모</button>
@@ -32,7 +47,11 @@ const App: React.FC = () => {
         <Route
           path="/student-info"
           element={
-            <MainLayout identity={identity}>
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
               <StudentInfo />
             </MainLayout>
           }
@@ -40,7 +59,11 @@ const App: React.FC = () => {
         <Route
           path="/counseling"
           element={
-            <MainLayout identity={identity}>
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
               <CounselingPage identity={identity} />
             </MainLayout>
           }
@@ -48,7 +71,11 @@ const App: React.FC = () => {
         <Route
           path="/counseling/write"
           element={
-            <MainLayout identity={identity}>
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
               <CounselingWritePage />
             </MainLayout>
           }
@@ -56,7 +83,11 @@ const App: React.FC = () => {
         <Route
           path="/feedback"
           element={
-            <MainLayout identity={identity}>
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
               <FeedbackPage identity={identity} />
             </MainLayout>
           }
@@ -64,7 +95,11 @@ const App: React.FC = () => {
         <Route
           path="/student-manage"
           element={
-            <MainLayout identity={identity}>
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
               <StudentManagementPage identity={identity} />
             </MainLayout>
           }
@@ -72,8 +107,16 @@ const App: React.FC = () => {
         <Route
           path="/grade"
           element={
-            <MainLayout identity={identity}>
-              <GradePage identity={identity} />
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
+              <GradePage
+                identity={identity}
+                isHomeroom={isHomeroom}
+                selectedStudent={selectedStudent}
+              />
             </MainLayout>
           }
         />
