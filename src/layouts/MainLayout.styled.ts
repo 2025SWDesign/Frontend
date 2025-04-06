@@ -268,11 +268,10 @@ export const SearchBox = styled.div`
   }
 `;
 
-export const StudentList = styled.div`
+export const StudentList = styled.div<{ $isStudentSelected: boolean }>`
   margin-top: 1rem;
-  min-height: 10rem;
   max-height: 46rem;
-  width: 20rem;
+  ${({ $isStudentSelected }) => $isStudentSelected && `max-height: 10rem;`}
   overflow-y: scroll;
   overflow-x: none;
   table {
@@ -333,7 +332,7 @@ export const TabArea = styled.div`
   flex-direction: row;
 `;
 
-export const TabButton = styled.button<{ isActive: boolean }>`
+export const TabButton = styled.button<{ $isActive: boolean }>`
   width: 13.75rem;
   border-radius: 1.25rem 1.25rem 0rem 0rem;
   border: 1px solid #fff;
@@ -343,11 +342,11 @@ export const TabButton = styled.button<{ isActive: boolean }>`
   justify-content: space-around;
 
   cursor: pointer;
-  background-color: ${({ isActive }) => (isActive ? "#004260" : "#146C94")};
+  background-color: ${({ $isActive }) => ($isActive ? "#004260" : "#146C94")};
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: ${({ isActive }) => (isActive ? "#004260" : "#146C94")};
+    background-color: ${({ $isActive }) => ($isActive ? "#004260" : "#146C94")};
   }
 
   svg {

@@ -65,7 +65,9 @@ export const ContentBox = styled.div<FeedbackPageProps>`
   border: 1px solid #e0e0e0;
   border-radius: 0.5rem;
 
-  ${(props) => props.identity !== "teacher" && `
+  ${(props) =>
+    props.identity !== "teacher" &&
+    `
     margin-bottom: 0.3rem;
   `}
 `;
@@ -99,7 +101,7 @@ export const ContentForm = styled.textarea<FeedbackPageProps>`
   line-height: 1.5;
   outline: none;
   overflow-y: scroll;
-  
+
   &::-webkit-scrollbar {
     width: 8px;
     display: block; /* 스크롤바 강제 표시 */
@@ -122,7 +124,9 @@ export const ContentForm = styled.textarea<FeedbackPageProps>`
     cursor: not-allowed;
   }
 
-  ${(props) => props.identity !== "teacher" && `
+  ${(props) =>
+    props.identity !== "teacher" &&
+    `
     height: 4.4rem;
   `}
 `;
