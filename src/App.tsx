@@ -8,6 +8,7 @@ import CounselingWritePage from "./page/CounselingWritePage";
 import FeedbackPage from "./page/FeedbackPage";
 import SignInPage from "./page/SignInPage";
 import StudentManagementPage from "./page/StudentManagementPage";
+import GradePage from "./page/GradePage";
 
 const App: React.FC = () => {
   type IdentityType = "student" | "parent" | "teacher";
@@ -65,6 +66,14 @@ const App: React.FC = () => {
           element={
             <MainLayout identity={identity}>
               <StudentManagementPage identity={identity} />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/grade"
+          element={
+            <MainLayout identity={identity}>
+              <GradePage identity={identity} />
             </MainLayout>
           }
         />
