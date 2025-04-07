@@ -95,9 +95,10 @@ export const SemesterAttendanceSection = styled.section<StudentManagementPagePro
 
 export const AttendanceTableWrapper = styled.div`
   overflow-x: auto;
+  overflow-y: hidden; 
   max-width: 100%;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border-radius: 0.5rem; 
 `;
 
 export const AttendanceTable = styled.table`
@@ -166,6 +167,7 @@ export const AttendanceCell = styled.td`
 
 // 학생 출결 정보 섹션
 export const StudentAttendanceSection = styled.section`
+
   margin-left: 2.5rem;
   margin-bottom: 1rem;
 
@@ -174,6 +176,8 @@ export const StudentAttendanceSection = styled.section`
 export const AttendanceSummaryTable = styled.table`
   border-collapse: collapse;
   width: 78rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
 `;
 
 // 출결 정보 테이블의 컬러 스타일 추가
@@ -185,6 +189,16 @@ export const SummaryHeaderCell = styled.th`
   text-align: center;
   font-weight: bold;
   white-space: nowrap;
+  
+  /* 첫 번째 행의 첫 번째 셀 (왼쪽 상단) */
+  &:first-child:nth-last-child(n+1):first-child {
+    border-top-left-radius: 0.5rem;
+  }
+  
+  /* 첫 번째 행의 마지막 셀 (오른쪽 상단) */
+  &:last-child:nth-child(n+1):first-child {
+    border-top-right-radius: 0.5rem;
+  }
 `;
 
 export const SummarySubHeaderCell = styled.th`
@@ -200,6 +214,14 @@ export const SummaryCell = styled.td`
   padding: 0.15rem;
   border: 1px solid #e0e0e0;
   text-align: center;
+  
+  tr:last-child &:first-child {
+    border-bottom-left-radius: 0.5rem;
+  }
+  
+  tr:last-child &:last-child {
+    border-bottom-right-radius: 0.5rem;
+  }
 `;
 
 // 특기 사항 섹션
@@ -215,11 +237,12 @@ export const SpecialNotesSection = styled.section<StudentManagementPageProps>`
 `;
 
 export const NotesForm = styled.textarea<StudentManagementPageProps>`
+  
   width: 76rem;
   height: 5rem;
   padding: 1rem;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border-radius: 0.5rem;
 
   font-family: "Noto Sans", sans-serif;
   font-size: 1rem;
@@ -255,4 +278,100 @@ export const EditButton = styled.button`
   &:hover {
     opacity: 0.9;
   }
+`;
+
+export const ClassAttendanceTableWrapper = styled.div`
+  overflow-y: scroll;
+  max-height: 37rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  width: 55rem;
+  margin-left : 3rem;
+`;
+
+export const ClassAttendanceTable = styled.table`
+  border-collapse: collapse;
+  
+  width: 100%;
+`;
+
+export const ClassAttendanceHeaderCell = styled.th`
+  padding: 0.15rem;
+  background-color: #146c94;
+  color: white;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  &:first-child {
+    width: 2rem;
+  }
+  &:nth-child(2) {
+    width: 4rem;
+  }
+  &:nth-child(3) {
+    width: 3rem;
+  }
+  &:nth-child(4) {
+    width: 3rem;
+  }
+  &:nth-child(5) {
+    width: 3rem;
+  }
+  &:nth-child(6) {
+    width: 3rem;
+  }
+`;
+
+export const ClassAttendanceCell = styled.td`
+  padding: 0.35rem;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+
+`;
+export const ClassAttendanceEditButton = styled.button`
+  margin-left: 53rem;
+  background-color: #146c94;
+  width: 5rem;
+  height: 2rem;
+  color: white;
+
+  border: none;
+  border-radius: 0.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  margin-top: 0.5rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+export const ClassSectionTitle = styled.div`
+  margin-left: 2.5rem;
+  margin-top: 1rem;
+  height: 2rem;
+  width: 30rem;
+  color: #000;
+  font-family: "Noto Sans";
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: 600;
+`;
+
+export const GuideMessage = styled.div`
+  height: 42.75rem;
+  display: flex;
+
+  justify-content: center;
+  color: #000;
+  font-family: "Noto Sans";
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-top: 20.3rem;
 `;

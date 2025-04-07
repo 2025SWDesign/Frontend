@@ -18,12 +18,21 @@ import {
   SearchInput,
   SearchButton,
   WriteButton,
-  Comment,
+  GuideMessage,
 } from "./CounselingPage.styled";
+
+interface Student {
+  name: string;
+  grade: number;
+  class: number;
+  number: number;
+  img: string;
+}
 
 interface CounselingPageProps {
   identity: string;
-  isPersonalized: boolean;
+  isHomeroom: boolean;
+  selectedStudent: Student | null;
 }
 
 interface Post {
@@ -36,7 +45,8 @@ interface Post {
 
 const CounselingPage: React.FC<CounselingPageProps> = ({
   identity,
-  isPersonalized,
+  //isHomeroom,
+  selectedStudent,
 }) => {
   const navigate = useNavigate();
   const posts: Post[] = [
@@ -234,7 +244,7 @@ const CounselingPage: React.FC<CounselingPageProps> = ({
     <CounselingContainer>
       <CounselingHeader>상담 내역</CounselingHeader>
       <Line />
-      {isPersonalized ? (
+      {selectedStudent || !(identity == "teacher") ? (
         <>
           <BoardTable>
             <thead>
@@ -305,7 +315,9 @@ const CounselingPage: React.FC<CounselingPageProps> = ({
           </Pagination>
         </>
       ) : (
-        <Comment> 현재 선택된 학생이 없습니다. 선택하시려면 좌측 학생생을 클릭하세요.</Comment>
+        <GuideMessage>
+                  좌측 검색창에서 성적을 조회할 학생을 검색하세요.
+        </GuideMessage>
       )}
     </CounselingContainer>
   );

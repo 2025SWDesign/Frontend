@@ -21,6 +21,8 @@ export const Line = styled.div`
 
 export const BoardTable = styled.table`
   width: 82.25rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
   border-collapse: collapse;
   margin: 1.25rem auto;
   font-size: 1rem;
@@ -163,14 +165,13 @@ export const WriteButton = styled.button`
   border-radius: 0.625rem;
 `;
 
-export const Comment = styled.div`
-  width: 82.25rem;
-  height: 5rem;
-  margin: 1.25rem auto;
-  font-family: "Noto Sans";
-  font-size: 1.25rem;
-  font-style: normal;
-  font-weight: bold;
+export const GuideMessage = styled.div`
+  height: 42.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #000;
-  text-align: center;
+  font-family: "Noto Sans";
+  font-size: 1.5rem;
+  font-weight: 400;
 `;

@@ -12,15 +12,28 @@ import {
   SendButton,
   EditButton,
   GradeSelect,
-  Comment,
+  GuideMessage,
 } from "./FeedbackPage.styled";
+
+interface Student {
+  name: string;
+  grade: number;
+  class: number;
+  number: number;
+  img: string;
+}
 
 interface FeedbackPageProps {
   identity: string;
-  isPersonalized: boolean;
+  isHomeroom: boolean;
+  selectedStudent: Student | null;
 }
 
-const FeedbackPage: React.FC<FeedbackPageProps> = ({ identity, isPersonalized }) => {
+const FeedbackPage: React.FC<FeedbackPageProps> = ({
+  identity,
+  //isHomeroom,
+  selectedStudent,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [feedbacks, setFeedbacks] = useState({
     academic: "",
@@ -57,82 +70,81 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({ identity, isPersonalized })
     <FeedbackContainer>
       <FeedbackHeader>피드백 내역</FeedbackHeader>
       <Line />
-      {isPersonalized ? (
+      {selectedStudent || !(identity == "teacher") ? (
         <>
-          <GradeSelect
-        value={grade}
-        onChange={(e) => setGrade(e.target.value)}
-      >
-        <option value="1">1학년</option>
-        <option value="2">2학년</option>
-        <option value="3">3학년</option>
-      </GradeSelect>
+          <GradeSelect value={grade} onChange={(e) => setGrade(e.target.value)}>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+          </GradeSelect>
 
-      <FeedbackContentContainer>
-        <ContentBox identity={identity}>
-          <ContentTitle>성적</ContentTitle>
-          <ContentForm
-            value={feedbacks.academic}
-            onChange={handleChange("academic")}
-            disabled={!isEditing}
-            placeholder={isEditing ? "성적에 대한 피드백을 입력하세요" : ""}
-            identity={identity}
-          />
-        </ContentBox>
+          <FeedbackContentContainer>
+            <ContentBox identity={identity}>
+              <ContentTitle>성적</ContentTitle>
+              <ContentForm
+                value={feedbacks.academic}
+                onChange={handleChange("academic")}
+                disabled={!isEditing}
+                placeholder={isEditing ? "성적에 대한 피드백을 입력하세요" : ""}
+                identity={identity}
+              />
+            </ContentBox>
 
-        <ContentBox identity={identity}>
-          <ContentTitle>행동</ContentTitle>
-          <ContentForm
-            value={feedbacks.behavior}
-            onChange={handleChange("behavior")}
-            disabled={!isEditing}
-            placeholder={isEditing ? "행동에 대한 피드백을 입력하세요" : ""}
-            identity={identity}
-          />
-        </ContentBox>
+            <ContentBox identity={identity}>
+              <ContentTitle>행동</ContentTitle>
+              <ContentForm
+                value={feedbacks.behavior}
+                onChange={handleChange("behavior")}
+                disabled={!isEditing}
+                placeholder={isEditing ? "행동에 대한 피드백을 입력하세요" : ""}
+                identity={identity}
+              />
+            </ContentBox>
 
-        <ContentBox identity={identity}>
-          <ContentTitle>출결</ContentTitle>
-          <ContentForm
-            value={feedbacks.attendance}
-            onChange={handleChange("attendance")}
-            disabled={!isEditing}
-            placeholder={isEditing ? "출결에 대한 피드백을 입력하세요" : ""}
-            identity={identity}
-          />
-        </ContentBox>
+            <ContentBox identity={identity}>
+              <ContentTitle>출결</ContentTitle>
+              <ContentForm
+                value={feedbacks.attendance}
+                onChange={handleChange("attendance")}
+                disabled={!isEditing}
+                placeholder={isEditing ? "출결에 대한 피드백을 입력하세요" : ""}
+                identity={identity}
+              />
+            </ContentBox>
 
-        <ContentBox identity={identity}>
-          <ContentTitle>태도</ContentTitle>
-          <ContentForm
-            value={feedbacks.attitude}
-            onChange={handleChange("attitude")}
-            disabled={!isEditing}
-            placeholder={isEditing ? "태도에 대한 피드백을 입력하세요" : ""}
-            identity={identity}
-          />
-        </ContentBox>
-      </FeedbackContentContainer>
+            <ContentBox identity={identity}>
+              <ContentTitle>태도</ContentTitle>
+              <ContentForm
+                value={feedbacks.attitude}
+                onChange={handleChange("attitude")}
+                disabled={!isEditing}
+                placeholder={isEditing ? "태도에 대한 피드백을 입력하세요" : ""}
+                identity={identity}
+              />
+            </ContentBox>
+          </FeedbackContentContainer>
 
-      {identity === "teacher" && (
-        <ButtonContainer>
-          <div>
-            <SendButton onClick={handleSendToStudent} disabled={isEditing}>
-              학생 전송
-            </SendButton>
-            <SendButton onClick={handleSendToParent} disabled={isEditing}>
-              학부모 전송
-            </SendButton>
-          </div>
-          <EditButton onClick={toggleEditMode}>
-            {isEditing ? "저장" : "수정"}
-          </EditButton>
-        </ButtonContainer>
-      )}
+          {identity === "teacher" && (
+            <ButtonContainer>
+              <div>
+                <SendButton onClick={handleSendToStudent} disabled={isEditing}>
+                  학생 전송
+                </SendButton>
+                <SendButton onClick={handleSendToParent} disabled={isEditing}>
+                  학부모 전송
+                </SendButton>
+              </div>
+              <EditButton onClick={toggleEditMode}>
+                {isEditing ? "저장" : "수정"}
+              </EditButton>
+            </ButtonContainer>
+          )}
         </>
-      ) :(
-        <Comment> 현재 선택된 학생이 없습니다. 선택하시려면 좌측 학생생을 클릭하세요.</Comment>
-      )}   
+      ) : (
+        <GuideMessage>
+          좌측 검색창에서 성적을 조회할 학생을 검색하세요.
+        </GuideMessage>
+      )}
     </FeedbackContainer>
   );
 };
