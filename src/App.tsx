@@ -17,6 +17,14 @@ const App: React.FC = () => {
   //const isHomeroom = false;
   const [isPersonalized, setIsPersonalized] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  
+  useEffect(() => {
+    if(identity === 'teacher') {
+      setIsPersonalized(false);
+    } else {
+      setIsPersonalized(true);
+    }
+  }, [identity]); 
 
   interface Student {
     name: string;
@@ -65,7 +73,7 @@ const App: React.FC = () => {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             >
-              <CounselingPage identity={identity} />
+              <CounselingPage identity={identity} isPersonalized={isPersonalized}/>
             </MainLayout>
           }
         />
@@ -89,7 +97,7 @@ const App: React.FC = () => {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             >
-              <FeedbackPage identity={identity} />
+              <FeedbackPage identity={identity} isPersonalized={isPersonalized}/>
             </MainLayout>
           }
         />

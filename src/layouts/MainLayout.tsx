@@ -472,7 +472,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               <p>학생 정보</p>
             </TabButton>
             <TabButton 
-              isActive={location.pathname === "/student-manage"}
+              $isActive={location.pathname === "/student-manage"}
               onClick={() => navigate("/student-manage")}
               >
               <svg
