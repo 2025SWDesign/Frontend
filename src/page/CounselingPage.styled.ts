@@ -162,3 +162,15 @@ export const WriteButton = styled.button`
   border: none;
   border-radius: 0.625rem;
 `;
+
+export const Comment = styled.div`
+  width: 82.25rem;
+  height: 5rem;
+  margin: 1.25rem auto;
+  font-family: "Noto Sans";
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+`;

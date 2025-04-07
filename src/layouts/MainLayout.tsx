@@ -469,7 +469,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
               </svg>
               <p>학생 정보</p>
             </TabButton>
-            <TabButton isActive={location.pathname === "/student-manage"}>
+            <TabButton 
+              isActive={location.pathname === "/student-manage"}
+              onClick={() => navigate("/student-manage")}
+              >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
