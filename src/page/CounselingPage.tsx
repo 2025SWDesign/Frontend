@@ -18,10 +18,12 @@ import {
   SearchInput,
   SearchButton,
   WriteButton,
+  Comment,
 } from "./CounselingPage.styled";
 
 interface CounselingPageProps {
   identity: string;
+  isPersonalized: boolean;
 }
 
 interface Post {
@@ -32,7 +34,10 @@ interface Post {
   counselingDate: string;
 }
 
-const CounselingPage: React.FC<CounselingPageProps> = ({identity}) => {
+const CounselingPage: React.FC<CounselingPageProps> = ({
+  identity,
+  isPersonalized,
+}) => {
   const navigate = useNavigate();
   const posts: Post[] = [
     {
@@ -229,71 +234,79 @@ const CounselingPage: React.FC<CounselingPageProps> = ({identity}) => {
     <CounselingContainer>
       <CounselingHeader>상담 내역</CounselingHeader>
       <Line />
-      <BoardTable>
-        <thead>
-          <TableRow>
-            <TableHeader width="3rem">번호</TableHeader>
-            <TableHeader width="40rem">제목</TableHeader>
-            <TableHeader width="10rem">작성자</TableHeader>
-            <TableHeader width="5rem">담당과목</TableHeader>
-            <TableHeader width="13rem">상담일자</TableHeader>
-          </TableRow>
-        </thead>
-        <tbody>
-          {currentPosts.map((post) => (
-            <TableRow key={post.id} onClick={() => handleRowClick(post.id)}>
-              <TableCell isBold>{post.id}</TableCell>
-              <TitleCell>{post.title}</TitleCell>
-              <TableCell>{post.author}</TableCell>
-              <TableCell>{post.subject}</TableCell>
-              <TableCell>{post.counselingDate}</TableCell>
-            </TableRow>
-          ))}
-        </tbody>
-      </BoardTable>
-      <Footer>
-        <SearchContainer>
-          <SearchSelect
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value)}
-          >
-            <option value="title">제목</option>
-            <option value="author">작성자</option>
-            <option value="subject">담당과목</option>
-          </SearchSelect>
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="검색할 내용을 입력하세요。"
-          />
-          <SearchButton onClick={handleSearch}></SearchButton>
-        </SearchContainer>
-        { identity === "teacher" && <WriteButton onClick={handleWrite}>글 작성</WriteButton>}
-      </Footer>
-      <Pagination>
-        <PageButton
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          style={{ backgroundColor: "#919EAB", color: "white" }}
-        >
-          &lt;
-        </PageButton>
-        {Array.from({ length: totalPages }, (_, index) => (
-          <PageButton
-            key={index + 1}
-            active={currentPage === index + 1}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </PageButton>
-        ))}
-        <PageButton
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          &gt;
-        </PageButton>
-      </Pagination>
+      {isPersonalized ? (
+        <>
+          <BoardTable>
+            <thead>
+              <TableRow>
+                <TableHeader width="3rem">번호</TableHeader>
+                <TableHeader width="40rem">제목</TableHeader>
+                <TableHeader width="10rem">작성자</TableHeader>
+                <TableHeader width="5rem">담당과목</TableHeader>
+                <TableHeader width="13rem">상담일자</TableHeader>
+              </TableRow>
+            </thead>
+            <tbody>
+              {currentPosts.map((post) => (
+                <TableRow key={post.id} onClick={() => handleRowClick(post.id)}>
+                  <TableCell isBold>{post.id}</TableCell>
+                  <TitleCell>{post.title}</TitleCell>
+                  <TableCell>{post.author}</TableCell>
+                  <TableCell>{post.subject}</TableCell>
+                  <TableCell>{post.counselingDate}</TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </BoardTable>
+          <Footer>
+            <SearchContainer>
+              <SearchSelect
+                value={searchType}
+                onChange={(e) => setSearchType(e.target.value)}
+              >
+                <option value="title">제목</option>
+                <option value="author">작성자</option>
+                <option value="subject">담당과목</option>
+              </SearchSelect>
+              <SearchInput
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="검색할 내용을 입력하세요。"
+              />
+              <SearchButton onClick={handleSearch}></SearchButton>
+            </SearchContainer>
+            {identity === "teacher" && (
+              <WriteButton onClick={handleWrite}>글 작성</WriteButton>
+            )}
+          </Footer>
+          <Pagination>
+            <PageButton
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              style={{ backgroundColor: "#919EAB", color: "white" }}
+            >
+              &lt;
+            </PageButton>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <PageButton
+                key={index + 1}
+                active={currentPage === index + 1}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </PageButton>
+            ))}
+            <PageButton
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              &gt;
+            </PageButton>
+          </Pagination>
+        </>
+      ) : (
+        <Comment> 현재 선택된 학생이 없습니다. 선택하시려면 좌측 학생생을 클릭하세요.</Comment>
+      )}
     </CounselingContainer>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import MainPage from "./page/MainPage";
@@ -15,7 +15,16 @@ const App: React.FC = () => {
   const [identity, setIdentity] = useState<IdentityType>("teacher");
   const isHomeroom = true;
   //const isHomeroom = false;
+  const [isPersonalized, setIsPersonalized] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  
+  useEffect(() => {
+    if(identity === 'teacher') {
+      setIsPersonalized(false);
+    } else {
+      setIsPersonalized(true);
+    }
+  }, [identity]); 
 
   interface Student {
     name: string;
@@ -64,7 +73,7 @@ const App: React.FC = () => {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             >
-              <CounselingPage identity={identity} />
+              <CounselingPage identity={identity} isPersonalized={isPersonalized}/>
             </MainLayout>
           }
         />
@@ -88,7 +97,7 @@ const App: React.FC = () => {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             >
-              <FeedbackPage identity={identity} />
+              <FeedbackPage identity={identity} isPersonalized={isPersonalized}/>
             </MainLayout>
           }
         />

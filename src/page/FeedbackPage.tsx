@@ -12,13 +12,15 @@ import {
   SendButton,
   EditButton,
   GradeSelect,
+  Comment,
 } from "./FeedbackPage.styled";
 
 interface FeedbackPageProps {
   identity: string;
+  isPersonalized: boolean;
 }
 
-const FeedbackPage: React.FC<FeedbackPageProps> = ({ identity }) => {
+const FeedbackPage: React.FC<FeedbackPageProps> = ({ identity, isPersonalized }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [feedbacks, setFeedbacks] = useState({
     academic: "",
@@ -55,7 +57,9 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({ identity }) => {
     <FeedbackContainer>
       <FeedbackHeader>피드백 내역</FeedbackHeader>
       <Line />
-      <GradeSelect
+      {isPersonalized ? (
+        <>
+          <GradeSelect
         value={grade}
         onChange={(e) => setGrade(e.target.value)}
       >
@@ -125,6 +129,10 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({ identity }) => {
           </EditButton>
         </ButtonContainer>
       )}
+        </>
+      ) :(
+        <Comment> 현재 선택된 학생이 없습니다. 선택하시려면 좌측 학생생을 클릭하세요.</Comment>
+      )}   
     </FeedbackContainer>
   );
 };
