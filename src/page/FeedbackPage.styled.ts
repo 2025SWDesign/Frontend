@@ -62,6 +62,7 @@ export const ContentBox = styled.div<FeedbackPageProps>`
   display: flex;
   flex-direction: column;
   width: 100%;
+  overflow: hidden;
   border: 1px solid #e0e0e0;
   border-radius: 0.5rem;
 
@@ -193,14 +194,14 @@ export const EditButton = styled.button`
   }
 `;
 
-export const Comment = styled.div`
-  width: 82.25rem;
-  height: 5rem;
-  margin: 1.25rem auto;
-  font-family: "Noto Sans";
-  font-size: 1.25rem;
-  font-style: normal;
-  font-weight: bold;
+export const GuideMessage = styled.div`
+  height: 42.75rem;
+  display: flex;
+
+  justify-content: center;
   color: #000;
-  text-align: center;
+  font-family: "Noto Sans";
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-top: 20.3rem;
 `;
