@@ -41,10 +41,17 @@ interface Student {
 
 interface MainLayoutProps {
   identity: string;
+  selectedStudent: Student | null;
+  setSelectedStudent: (student: Student | null) => void;
   children: React.ReactNode;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({
+  identity,
+  selectedStudent,
+  setSelectedStudent,
+  children,
+}) => {
   const navigate = useNavigate();
   const initialStudents = Array.from({ length: 30 }, (_, i) => ({
     grade: 2,
@@ -84,13 +91,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
     ][i],
     img: "/assets/img/photo.png",
   }));
-  const [selectedStudent, setSelectedStudent] = useState<{
-    name: string;
-    grade: number;
-    class: number;
-    number: number;
-    img: string;
-  } | null>(null);
 
   const [students, setStudents] = useState<Student[]>([]); // 초기에는 빈 배열
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태
@@ -390,7 +390,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
               onKeyDown={handleKeyDown}
             />
           </SearchBox>
-          <StudentList>
+          <StudentList $isStudentSelected={!!selectedStudent}>
             <table>
               <thead>
                 <tr>
@@ -407,7 +407,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
                       key={index}
                       onClick={() => {
                         setSelectedStudent(student);
-                        navigate("/student-info");
+                        if (location.pathname === "/") {
+                          navigate("/student-info");
+                        }
                       }}
                       style={{ cursor: "pointer" }}
                     >
@@ -452,7 +454,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
         <MainArea>
           <TabArea>
             <TabButton
-              isActive={location.pathname === "/student-info"}
+              $isActive={location.pathname === "/student-info"}
               onClick={() => navigate("/student-info")}
             >
               <svg
@@ -487,7 +489,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
               </svg>
               <p>학생부 관리</p>
             </TabButton>
-            <TabButton isActive={location.pathname === "/grade"}>
+            <TabButton
+              $isActive={location.pathname === "/grade"}
+              onClick={() => {
+                navigate("/grade");
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -503,7 +510,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
               <p>학생 성적 관리</p>
             </TabButton>
             <TabButton
-              isActive={location.pathname === "/counseling"}
+              $isActive={location.pathname === "/counseling"}
               onClick={() => navigate("/counseling")}
             >
               <svg
@@ -527,7 +534,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
               <p>상담 내역</p>
             </TabButton>
             <TabButton
-              isActive={location.pathname === "/feedback"}
+              $isActive={location.pathname === "/feedback"}
               onClick={() => navigate("/feedback")}
             >
               <svg
@@ -544,7 +551,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ identity, children }) => {
               </svg>
               <p>피드백 내역</p>
             </TabButton>
-            <TabButton isActive={location.pathname === "/report"}>
+            <TabButton $isActive={location.pathname === "/report"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
