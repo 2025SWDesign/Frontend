@@ -33,3 +33,15 @@ export const StdInfoText = styled.h1`
   margin-left: 2.5rem;
   margin-bottom: 2rem;
 `;
+
+export const GuideMessage = styled.div`
+  height: 42.75rem;
+  display: flex;
+
+  justify-content: center;
+  color: #000;
+  font-family: "Noto Sans";
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-top: 20.3rem;
+`;

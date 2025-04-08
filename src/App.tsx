@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import MainPage from "./page/MainPage";
@@ -14,18 +14,8 @@ import ReportPage from "./page/ReportPage";
 const App: React.FC = () => {
   type IdentityType = "student" | "parent" | "teacher";
   const [identity, setIdentity] = useState<IdentityType>("teacher");
-  const isHomeroom = true;
-  //const isHomeroom = false;
-  const [isPersonalized, setIsPersonalized] = useState(true);
+  const [isHomeroom, setIsHomeroom] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-
-  useEffect(() => {
-    if (identity === "teacher") {
-      setIsPersonalized(false);
-    } else {
-      setIsPersonalized(true);
-    }
-  }, [identity]);
 
   interface Student {
     name: string;
@@ -34,6 +24,13 @@ const App: React.FC = () => {
     number: number;
     img: string;
   }
+
+  const renderHomeroomStatus = () => {
+    if (isHomeroom) {
+      return <div>담임</div>;
+    }
+    return null;
+  };
 
   return (
     <Router>
@@ -47,9 +44,11 @@ const App: React.FC = () => {
               setSelectedStudent={setSelectedStudent}
             >
               <MainPage identity={identity} />
+              {renderHomeroomStatus()}
               <button onClick={() => setIdentity("student")}>학생</button>
               <button onClick={() => setIdentity("parent")}>학부모</button>
               <button onClick={() => setIdentity("teacher")}>교사</button>
+              <button onClick={() => setIsHomeroom(!isHomeroom)}>담임</button>
             </MainLayout>
           }
         />
@@ -62,7 +61,11 @@ const App: React.FC = () => {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             >
-              <StudentInfo />
+              <StudentInfo
+                identity={identity}
+                selectedStudent={selectedStudent}
+                setSelectedStudent={setSelectedStudent}
+              />
             </MainLayout>
           }
         />
@@ -76,7 +79,8 @@ const App: React.FC = () => {
             >
               <CounselingPage
                 identity={identity}
-                isPersonalized={isPersonalized}
+                isHomeroom={isHomeroom}
+                selectedStudent={selectedStudent}
               />
             </MainLayout>
           }
@@ -103,7 +107,8 @@ const App: React.FC = () => {
             >
               <FeedbackPage
                 identity={identity}
-                isPersonalized={isPersonalized}
+                isHomeroom={isHomeroom}
+                selectedStudent={selectedStudent}
               />
             </MainLayout>
           }
@@ -116,7 +121,11 @@ const App: React.FC = () => {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             >
-              <StudentManagementPage identity={identity} />
+              <StudentManagementPage
+                identity={identity}
+                isHomeroom={isHomeroom}
+                selectedStudent={selectedStudent}
+              />
             </MainLayout>
           }
         />
