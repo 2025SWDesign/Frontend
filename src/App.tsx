@@ -9,6 +9,7 @@ import FeedbackPage from "./page/FeedbackPage";
 import SignInPage from "./page/SignInPage";
 import StudentManagementPage from "./page/StudentManagementPage";
 import GradePage from "./page/GradePage";
+import ReportPage from "./page/ReportPage";
 
 const App: React.FC = () => {
   type IdentityType = "student" | "parent" | "teacher";
@@ -17,14 +18,14 @@ const App: React.FC = () => {
   //const isHomeroom = false;
   const [isPersonalized, setIsPersonalized] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  
+
   useEffect(() => {
-    if(identity === 'teacher') {
+    if (identity === "teacher") {
       setIsPersonalized(false);
     } else {
       setIsPersonalized(true);
     }
-  }, [identity]); 
+  }, [identity]);
 
   interface Student {
     name: string;
@@ -73,7 +74,10 @@ const App: React.FC = () => {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             >
-              <CounselingPage identity={identity} isPersonalized={isPersonalized}/>
+              <CounselingPage
+                identity={identity}
+                isPersonalized={isPersonalized}
+              />
             </MainLayout>
           }
         />
@@ -97,7 +101,10 @@ const App: React.FC = () => {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
             >
-              <FeedbackPage identity={identity} isPersonalized={isPersonalized}/>
+              <FeedbackPage
+                identity={identity}
+                isPersonalized={isPersonalized}
+              />
             </MainLayout>
           }
         />
@@ -124,6 +131,21 @@ const App: React.FC = () => {
               <GradePage
                 identity={identity}
                 isHomeroom={isHomeroom}
+                selectedStudent={selectedStudent}
+              />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/report"
+          element={
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
+              <ReportPage
+                identity={identity}
                 selectedStudent={selectedStudent}
               />
             </MainLayout>
