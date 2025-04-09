@@ -9,6 +9,7 @@ import FeedbackPage from "./page/FeedbackPage";
 import SignInPage from "./page/SignInPage";
 import StudentManagementPage from "./page/StudentManagementPage";
 import GradePage from "./page/GradePage";
+import ReportPage from "./page/ReportPage";
 
 const App: React.FC = () => {
   type IdentityType = "student" | "parent" | "teacher";
@@ -139,6 +140,21 @@ const App: React.FC = () => {
               <GradePage
                 identity={identity}
                 isHomeroom={isHomeroom}
+                selectedStudent={selectedStudent}
+              />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/report"
+          element={
+            <MainLayout
+              identity={identity}
+              selectedStudent={selectedStudent}
+              setSelectedStudent={setSelectedStudent}
+            >
+              <ReportPage
+                identity={identity}
                 selectedStudent={selectedStudent}
               />
             </MainLayout>

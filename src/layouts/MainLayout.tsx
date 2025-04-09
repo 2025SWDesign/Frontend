@@ -471,10 +471,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               </svg>
               <p>학생 정보</p>
             </TabButton>
-            <TabButton 
+            <TabButton
               $isActive={location.pathname === "/student-manage"}
               onClick={() => navigate("/student-manage")}
-              >
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -551,7 +551,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               </svg>
               <p>피드백 내역</p>
             </TabButton>
-            <TabButton $isActive={location.pathname === "/report"}>
+            <TabButton
+              $isActive={location.pathname === "/report"}
+              onClick={() => navigate("/report")}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
