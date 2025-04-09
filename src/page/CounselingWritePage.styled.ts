@@ -31,7 +31,7 @@ export const Header = styled.div`
 `;
 
 export const TitleInput = styled.input`
-  width: 63rem;
+  width: 47rem;
   padding: 0.75rem 1rem;
   font-size: 1.25rem;
   border: 0.0625rem solid #ddd;
@@ -47,23 +47,50 @@ export const TitleInput = styled.input`
   }
 `;
 
+export const DateSection = styled.div`
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+`;
+
+export const DateLabel = styled.label`
+  width: 8rem;
+  font-family: Inter;
+  font-size: 1.2rem;
+  font-style: normal; 
+  font-weight: 700;
+  line-height: normal;
+`;
+
+export const DateInput = styled.input`
+  padding: 0rem 0rem;
+  font-family: Inter;
+  font-size: 1.25rem;
+  font-style: normal;
+  line-height: normal;
+  border: 0.0625rem solid #ddd;
+  border-radius: 0.5rem;
+  outline: none;
+
+  &:focus {
+    border-color: #146c94;
+  }
+`;
+
 export const PrivacySection = styled.div`
-  padding-left: 1.5rem;
+  padding-left: 1rem;
   display: flex;
   align-items: center;
 `;
 
 export const CheckboxLabel = styled.label`
+  width: 15rem;
   padding-right: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   cursor: pointer;
   font-family: Inter;
-  font-size: 1.375rem;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 130%;
+  font-size: 1.2rem;
 `;
 
 export const Checkbox = styled.input`

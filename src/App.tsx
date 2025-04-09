@@ -63,8 +63,8 @@ const App: React.FC = () => {
             >
               <StudentInfo
                 identity={identity}
+                isHomeroom={isHomeroom}
                 selectedStudent={selectedStudent}
-                setSelectedStudent={setSelectedStudent}
               />
             </MainLayout>
           }
