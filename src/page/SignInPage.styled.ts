@@ -168,3 +168,30 @@ export const SecondaryArea = styled.div`
     text-decoration: underline;
   }
 `;
+
+export const SchoolList = styled.ul`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+`;
+
+export const SchoolItem = styled.li`
+  margin-left: 1rem;
+  font-size: 1.15rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;

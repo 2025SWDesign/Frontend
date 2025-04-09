@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-
 import Logo from "/assets/img/Logo_2w.png";
-
 import {
   SplitScreen,
   LeftCard,
@@ -14,16 +12,49 @@ import {
   DropDown,
   InputText,
   Line,
-} from "./SignInPage.styled"; // 스타일 가져오기
+  SchoolList,
+  SchoolItem,
+} from "./SignInPage.styled";
 
 const SignInPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [userType, setUserType] = useState("teacher");
+  const [schoolQuery, setSchoolQuery] = useState("");
+  const [selectedSchool, setSelectedSchool] = useState("");
+  const [schoolResults, setSchoolResults] = useState<string[]>([]);
 
   const toggleSignUp = () => {
     setIsSignUp(!isSignUp);
   };
 
-  const [userType, setUserType] = useState("teacher");
+  // Mock school data
+  const allSchools = [
+    "서울고등학교",
+    "부산고등학교",
+    "대구중학교",
+    "인천초등학교",
+    "광주고등학교",
+    "대전중학교",
+    "울산초등학교",
+  ];
+
+  const handleSchoolSearch = (query: string) => {
+    setSchoolQuery(query);
+    if (query.length > 0) {
+      const filteredSchools = allSchools.filter((school) =>
+        school.toLowerCase().includes(query.toLowerCase())
+      );
+      setSchoolResults(filteredSchools);
+    } else {
+      setSchoolResults([]);
+    }
+  };
+
+  const handleSchoolSelect = (school: string) => {
+    setSelectedSchool(school);
+    setSchoolQuery(school);
+    setSchoolResults([]); 
+  };
 
   return (
     <div>
@@ -53,30 +84,75 @@ const SignInPage: React.FC = () => {
               <option value="parent">학부모</option>
               <option value="student">학생</option>
             </DropDown>
-            <InputText>아이디</InputText>
-            <InputArea>
-              <input placeholder="example@email.com" type="text" />
-            </InputArea>
             {isSignUp ? (
               <>
                 <InputText>이름</InputText>
                 <InputArea>
-                  <input placeholder="홍길동" type="text"></input>
+                  <input placeholder="홍길동" type="text" />
                 </InputArea>
               </>
             ) : null}
+            <InputText>학교명</InputText>
+            <InputArea style={{ position: "relative" }}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#666666"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  position: "absolute",
+                  left: "20",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                placeholder="학교명을 검색하세요"
+                type="text"
+                value={schoolQuery}
+                onChange={(e) => handleSchoolSearch(e.target.value)}
+                alt="학교명을 검색하세요"
+                style={{ paddingLeft: "2rem" }} 
+              />
+              {schoolResults.length > 0 && (
+                <SchoolList>
+                  {schoolResults.map((school) => (
+                    <SchoolItem
+                      key={school}
+                      onClick={() => handleSchoolSelect(school)}
+                    >
+                      {school}
+                    </SchoolItem>
+                  ))}
+                </SchoolList>
+              )}
+            </InputArea>
+            <InputText>아이디</InputText>
+            <InputArea>
+              <input placeholder="example@email.com" type="text" />
+            </InputArea>
             <InputText>비밀번호</InputText>
             <InputArea>
-              <input placeholder="영문+숫자" type="password"></input>
+              <input placeholder="영문+숫자" type="password" />
             </InputArea>
+
             {isSignUp ? (
               <>
                 <InputText>비밀번호 확인</InputText>
                 <InputArea>
-                  <input placeholder="영문+숫자" type="password"></input>
+                  <input placeholder="영문+숫자" type="password" />
                 </InputArea>
               </>
             ) : null}
+
             <SignButton>
               <p>{isSignUp ? "회원가입" : "로그인"}</p>
             </SignButton>

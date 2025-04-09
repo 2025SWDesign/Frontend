@@ -9,7 +9,7 @@ export const StdInfoHeader = styled.p`
   font-style: normal;
   font-weight: bold;
   display: flex;
-  margin : 1rem 0 1rem 3rem;
+  margin: 1rem 0 1rem 3rem;
 `;
 export const Line = styled.div`
   width: 90rem;
@@ -24,16 +24,6 @@ export const StdInfoContent = styled.div`
   margin-top: 2rem;
 `;
 
-export const StdInfoText = styled.h1`
-  color: #000;
-  font-family: Inter;
-  font-size: 2rem;
-  font-style: normal;
-
-  margin-left: 2.5rem;
-  margin-bottom: 2rem;
-`;
-
 export const GuideMessage = styled.div`
   height: 42.75rem;
   display: flex;
@@ -44,4 +34,29 @@ export const GuideMessage = styled.div`
   font-size: 1.5rem;
   font-weight: 400;
   margin-top: 20.3rem;
+`;
+
+export const Table = styled.table`
+  margin-left: 3rem;
+  width: 46rem;
+  border-collapse: collapse;
+`;
+
+export const TableRow = styled.tr``;
+
+export const HeaderCell = styled.td`
+  width: 20%;
+  background-color: #146c94;
+  color: white;
+  padding: 0.75rem;
+  border: 0.0625rem solid #ddd;
+  text-align: center;
+  font-weight: bold;
+`;
+
+export const DataCell = styled.td`
+  width: 80%;
+  padding: 0.2rem;
+  border: 0.0625rem solid #ddd;
+  text-align: center;
 `;
