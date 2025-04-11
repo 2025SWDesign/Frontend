@@ -9,7 +9,7 @@ import {
   Line,
   MainContainer,
   TitleArea,
-} from "./FeedBackReport.styled";
+} from "./FeedbackReport.styled";
 
 interface Student {
   name: string;

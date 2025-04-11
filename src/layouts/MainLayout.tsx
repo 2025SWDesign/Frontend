@@ -30,6 +30,7 @@ import {
   NotificationTitle,
   NotificationText,
 } from "./MainLayout.styled";
+import MyPage from "../page/MyPage";
 
 interface Student {
   name: string;
@@ -44,6 +45,8 @@ interface MainLayoutProps {
   selectedStudent: Student | null;
   setSelectedStudent: (student: Student | null) => void;
   children: React.ReactNode;
+  isHomeroom: boolean;
+  setIsHomeroom: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({
@@ -51,6 +54,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   selectedStudent,
   setSelectedStudent,
   children,
+  isHomeroom,
+  setIsHomeroom,
 }) => {
   const navigate = useNavigate();
   const initialStudents = Array.from({ length: 30 }, (_, i) => ({
@@ -113,6 +118,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       setStudents(initialStudents);
     }
   }, [identity, initialStudents, students.length]);
+
+  //MyPage 모달용
+  const [isMyPageOpen, setIsMyPageOpen] = useState(false);
 
   //유저 드롭다운 메뉴
   const [isUserDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -201,7 +209,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                       <p>OOO 선생님</p>
                     </DropdownFlexContainer>
                     <UserDropdownButtons>
-                      <UserDropdownItem>개인정보 수정/설정</UserDropdownItem>
+                      <UserDropdownItem onClick={() => setIsMyPageOpen(true)}>
+                        개인정보 수정/설정
+                      </UserDropdownItem>
                       <UserDropdownItem>로그아웃</UserDropdownItem>
                     </UserDropdownButtons>
                   </UserDropdownMenu>
@@ -573,6 +583,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           <PageArea>{children}</PageArea>
         </MainArea>
       </MainContainer>
+      {isMyPageOpen && (
+        <MyPage
+          onClose={() => setIsMyPageOpen(false)}
+          isHomeroom={isHomeroom}
+          setIsHomeroom={setIsHomeroom}
+        />
+      )}
     </LayoutWrapper>
   );
 };
