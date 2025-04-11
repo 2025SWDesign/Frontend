@@ -14,7 +14,7 @@ import ReportPage from "./page/ReportPage";
 const App: React.FC = () => {
   type IdentityType = "student" | "parent" | "teacher";
   const [identity, setIdentity] = useState<IdentityType>("teacher");
-  const [isHomeroom, setIsHomeroom] = useState(true);
+  const [isHomeroom, setIsHomeroom] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
   interface Student {
@@ -42,6 +42,8 @@ const App: React.FC = () => {
               identity={identity}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
+              isHomeroom={isHomeroom}
+              setIsHomeroom={setIsHomeroom}
             >
               <MainPage identity={identity} />
               {renderHomeroomStatus()}
@@ -60,6 +62,8 @@ const App: React.FC = () => {
               identity={identity}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
+              isHomeroom={isHomeroom}
+              setIsHomeroom={setIsHomeroom}
             >
               <StudentInfo
                 identity={identity}
@@ -76,6 +80,8 @@ const App: React.FC = () => {
               identity={identity}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
+              isHomeroom={isHomeroom}
+              setIsHomeroom={setIsHomeroom}
             >
               <CounselingPage
                 identity={identity}
@@ -92,6 +98,8 @@ const App: React.FC = () => {
               identity={identity}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
+              isHomeroom={isHomeroom}
+              setIsHomeroom={setIsHomeroom}
             >
               <CounselingWritePage />
             </MainLayout>
@@ -104,6 +112,8 @@ const App: React.FC = () => {
               identity={identity}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
+              isHomeroom={isHomeroom}
+              setIsHomeroom={setIsHomeroom}
             >
               <FeedbackPage
                 identity={identity}
@@ -120,6 +130,8 @@ const App: React.FC = () => {
               identity={identity}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
+              isHomeroom={isHomeroom}
+              setIsHomeroom={setIsHomeroom}
             >
               <StudentManagementPage
                 identity={identity}
@@ -136,6 +148,8 @@ const App: React.FC = () => {
               identity={identity}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
+              isHomeroom={isHomeroom}
+              setIsHomeroom={setIsHomeroom}
             >
               <GradePage
                 identity={identity}
@@ -152,6 +166,8 @@ const App: React.FC = () => {
               identity={identity}
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
+              isHomeroom={isHomeroom}
+              setIsHomeroom={setIsHomeroom}
             >
               <ReportPage
                 identity={identity}
