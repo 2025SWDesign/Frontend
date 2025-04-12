@@ -41,7 +41,7 @@ export const GradeContainer = styled.div`
 
 export const TableArea = styled.div`
   width: 57.5rem;
-  height: 44.75rem;
+  height: 48.2rem;
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -50,7 +50,7 @@ export const TableArea = styled.div`
 
 export const StudentsTableArea = styled.div`
   width: 86rem;
-  height: 44.75rem;
+  height: 48.2rem;
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -287,7 +287,7 @@ export const SaveButton = styled.button`
 
 export const ChartArea = styled.div`
   width: 32.5rem;
-  height: 44.75rem;
+  height: 48.2rem;
   border-left: 0.0625rem solid #000;
 `;
 

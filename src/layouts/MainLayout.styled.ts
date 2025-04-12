@@ -204,74 +204,88 @@ export const MainContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
-  background: #e5e5e5;
 `;
 
 export const SideBar = styled.aside`
   width: 21.75rem;
-  height: 57rem;
+  height: 57.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-radius: 1.25rem;
+  border: 1px solid #000;
+  background: #fff;
 `;
 
 export const StudentImg = styled.img`
   margin-top: 5.5rem;
-  width: 17rem;
-  height: 22rem;
+  width: 12.5rem;
+  height: 16.25rem;
+  border-radius: 0.625rem;
+  border: 1px solid #000;
 `;
 
 export const StudentClass = styled.p`
-  margin: 2rem 0 0 0;
+  margin: 1rem 0 0 0;
   color: #000;
   text-align: center;
   font-family: Inter;
-  font-size: 2rem;
+  font-size: 1.25rem;
   font-weight: 700;
 `;
 
 export const StudentName = styled.p`
-  margin: 1rem 0 -1.5rem 0;
+  margin: 0.5rem 0 -0.5rem 0;
   color: #000;
   text-align: center;
-  font-family: Inter;
-  font-size: 2.5rem;
+  font-family: "Inter";
+  font-size: 2rem;
   font-weight: 700;
 `;
 
 export const SearchBox = styled.div`
+  margin-top: 1rem;
   width: 20rem;
-  height: 2.5rem;
-  border-radius: 0.625rem;
-  margin: 5.5rem 0 0 0;
-  background: #329ac9;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  > svg {
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-right: 1rem;
-  }
   input {
-    background: none;
-    border: none;
-    outline: none;
+    width: 16.75rem;
+    height: 2.25rem;
+    background: white;
+    border: 1px solid black;
+    border-radius: 0.625rem 0rem 0rem 0.625rem;
     overflow: auto;
-    color: #fff;
+    color: black;
     text-align: center;
     font-family: "Inter";
+    font-weight: 700;
     font-size: 1rem;
     &::placeholder {
-      color: white;
+      font-weight: 400;
+      color: #424242;
     }
+  }
+`;
+
+export const SearchButton = styled.button`
+  width: 3.25rem;
+  height: 2.5rem;
+  border-radius: 0rem 0.625rem 0.625rem 0rem;
+  border: none;
+  background: #004260;
+  cursor: pointer;
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 `;
 
 export const StudentList = styled.div<{ $isStudentSelected: boolean }>`
   margin-top: 1rem;
-  max-height: 46rem;
-  ${({ $isStudentSelected }) => $isStudentSelected && `max-height: 10rem;`}
+  max-height: 50.5rem;
+  ${({ $isStudentSelected }) => $isStudentSelected && `max-height: 23rem;`}
   overflow-y: scroll;
   overflow-x: none;
   table {
@@ -294,19 +308,9 @@ export const StudentList = styled.div<{ $isStudentSelected: boolean }>`
       margin: 0;
     }
     th {
-      background: #004260;
+      background: #146c94;
       color: #fff;
     }
-    th:first-child {
-      background: #004260;
-      color: #fff;
-    }
-
-    th:last-child {
-      background: #004260;
-      color: #fff;
-    }
-
     td {
       background: white;
     }
@@ -318,8 +322,6 @@ export const StudentList = styled.div<{ $isStudentSelected: boolean }>`
 `;
 
 export const MainArea = styled.main`
-  height: 57rem;
-  border-radius: 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -333,9 +335,10 @@ export const TabArea = styled.div`
 `;
 
 export const TabButton = styled.button<{ $isActive: boolean }>`
-  width: 13.75rem;
+  width: 15.02rem;
+  height: 3.75rem;
   border-radius: 1.25rem 1.25rem 0rem 0rem;
-  border: 1px solid #fff;
+  border: 0.5px solid #000;
 
   display: flex;
   align-items: center;
@@ -364,7 +367,8 @@ export const TabButton = styled.button<{ $isActive: boolean }>`
 
 export const PageArea = styled.div`
   width: 90rem;
-  height: 50rem;
-  border-radius: 1.25rem;
-  background-color: white;
+  height: 53.5rem;
+  border-radius: 0rem 0rem 1.25rem 1.25rem;
+  border: 1px solid #000;
+  background: #fff;
 `;

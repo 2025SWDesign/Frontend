@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import searchButton from "/assets/img/searchButton.png";
 
 export const CounselingContainer = styled.div``;
 
@@ -35,14 +34,14 @@ export const TableHeader = styled.th<{ width?: string }>`
   border: 0.0625rem solid #ddd;
   text-align: center;
   font-weight: bold;
-  width: ${props => props.width || "auto"};
+  width: ${(props) => props.width || "auto"};
 `;
 
 export const TableCell = styled.td<{ isBold?: boolean }>`
   padding: 0.2rem;
   border: 0.0625rem solid #ddd;
   text-align: center;
-  font-weight: ${props => props.isBold ? "bold" : "normal"};
+  font-weight: ${(props) => (props.isBold ? "bold" : "normal")};
 `;
 
 export const TableRow = styled.tr`
@@ -127,28 +126,33 @@ export const SearchInput = styled.input`
   width: 16.25rem;
   height: 2.625rem;
   flex-shrink: 0;
-  border: 0.0625rem solid #ddd;
-  border-radius: 0.625rem;
-  background-color: #329ac9;
+  border-radius: 0.625rem 0rem 0rem 0.625rem;
+  border: 1px solid #000;
+  background: #fff;
+
   &::placeholder {
-    color: #fff;
+    color: #424242;
     text-align: center;
-    font-family: Inter;
+    font-family: "Inter";
     font-size: 1rem;
-    font-style: normal;
     font-weight: 700;
-    line-height: normal;
   }
 `;
 
 export const SearchButton = styled.button`
   width: 3.75rem;
-  height: 2.925rem;
+  height: 2.9rem;
   flex-shrink: 0;
-  border-radius: 0.625rem;
-  background: #004260 url(${searchButton}) no-repeat center;
+  border: none;
+  border-radius: 0rem 0.625rem 0.625rem 0rem;
+  background: #004260;
   background-size: 2rem 2rem;
   color: white;
+  cursor: pointer;
+  svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
 `;
 
 export const WriteButton = styled.button`
