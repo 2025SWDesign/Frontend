@@ -78,34 +78,37 @@ export const DropDown = styled.select<{ id?: string }>`
   ${(props) => props.id === "type" && `width: 12rem; padding-left: 1rem;`}
 `;
 
-export const SearchBox = styled.input`
-  width: 20rem;
-  height: 2.75rem;
-  border-radius: 0.625rem;
-  background: #329ac9;
+export const SearchBox = styled.div`
+  width: 25rem;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  border: none;
-  outline: none;
-  overflow: auto;
-  color: #fff;
-  text-align: center;
-  font-family: "Inter";
-  font-size: 1rem;
-  &::placeholder {
-    color: white;
+  input {
+    width: 21rem;
+    height: 2.5rem;
+    background: white;
+    border: 1px solid black;
+    border-radius: 0.625rem 0rem 0rem 0.625rem;
+    overflow: auto;
+    color: black;
+    text-align: center;
+    font-family: "Inter";
+    font-weight: 700;
+    font-size: 1rem;
+    &::placeholder {
+      color: #424242;
+      font-weight: 400;
+    }
   }
 `;
+
 export const SearchButton = styled.button`
-  width: 3.75rem;
+  width: 3.25rem;
   height: 2.75rem;
-  border-radius: 0.625rem;
-  background: #004260;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 0rem 0.625rem 0.625rem 0rem;
   border: none;
+  background: #004260;
   cursor: pointer;
   svg {
     width: 1.5rem;
