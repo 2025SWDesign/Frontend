@@ -105,6 +105,52 @@ export const Input = styled.input`
   }
 `;
 
+export const SchoolInput = styled.input`
+  width: 23rem;
+  height: 2.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.625rem;
+
+  color: black;
+  font-family: "Noto Sans";
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  padding-left: 1rem;
+  margin: 0.25rem 0 1rem 0;
+  &::placeholder {
+    color: black;
+  }
+`;
+
+export const SchoolList = styled.ul`
+  position: absolute;
+  width: 24rem;
+  top: 35%;
+  left: 3.25%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 20rem;
+  overflow-y: auto;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+`;
+
+export const SchoolItem = styled.li`
+  margin-left: 1rem;
+  font-size: 1.15rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;
+
 export const DropdownBox = styled.div`
   display: flex;
   flex-direction: row;

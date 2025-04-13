@@ -9,6 +9,9 @@ import {
   Line,
   ModalContainer,
   Overlay,
+  SchoolInput,
+  SchoolItem,
+  SchoolList,
   Section,
   SectionTitle,
   TitleArea,
@@ -18,9 +21,11 @@ interface MyPageProps {
   onClose: () => void;
   isHomeroom: boolean;
   setIsHomeroom: React.Dispatch<React.SetStateAction<boolean>>;
+  identity: string;
 }
 
 const MyPage: React.FC<MyPageProps> = ({
+  identity,
   onClose,
   isHomeroom,
   setIsHomeroom,
@@ -28,7 +33,6 @@ const MyPage: React.FC<MyPageProps> = ({
   const [selectedGrade, setSelectedGrade] = useState("1");
   const [selectedClass, setSelectedClass] = useState("1");
   const [name, setName] = useState("OOO");
-  const [school, setSchool] = useState("인천중학교");
   const handleSaveInfo = () => {
     setIsHomeroom(localIsHomeroom);
     alert("개인정보가 변경되었습니다.");
@@ -53,6 +57,38 @@ const MyPage: React.FC<MyPageProps> = ({
     setPasswordError("");
     alert("비밀번호가 성공적으로 변경되었습니다.");
   };
+
+  const allSchools = [
+    "서울고등학교",
+    "부산고등학교",
+    "대구중학교",
+    "인천중학교",
+    "광주고등학교",
+    "대전중학교",
+    "울산중학교",
+  ];
+
+  const [schoolQuery, setSchoolQuery] = useState("");
+  const [selectedSchool, setSelectedSchool] = useState("인천중학교");
+  const [schoolResults, setSchoolResults] = useState<string[]>([]);
+  const handleSchoolSearch = (query: string) => {
+    setSchoolQuery(query);
+    if (query.length > 0) {
+      const filteredSchools = allSchools.filter((school) =>
+        school.toLowerCase().includes(query.toLowerCase())
+      );
+      setSchoolResults(filteredSchools);
+    } else {
+      setSchoolResults([]);
+    }
+  };
+
+  const handleSchoolSelect = (school: string) => {
+    setSelectedSchool(school);
+    setSchoolQuery(school);
+    setSchoolResults([]);
+  };
+
   return (
     <Overlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
@@ -84,41 +120,58 @@ const MyPage: React.FC<MyPageProps> = ({
             onChange={(e) => setName(e.target.value)}
           />
           <label>학교명</label>
-          <Input
+          <SchoolInput
+            placeholder={selectedSchool}
             type="text"
-            value={school}
-            onChange={(e) => setSchool(e.target.value)}
+            value={schoolQuery}
+            onChange={(e) => handleSchoolSearch(e.target.value)}
           />
-          <InfoRow>
-            담임교사 여부
-            <input
-              type="checkbox"
-              checked={localIsHomeroom}
-              onChange={(e) => setLocalIsHomeroom(e.target.checked)}
-            />
-          </InfoRow>
-          <DropdownBox>
-            <DropDown
-              value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
-            >
-              <option value="1">1학년</option>
-              <option value="2">2학년</option>
-              <option value="3">3학년</option>
-            </DropDown>
-            <DropDown
-              id="semester"
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-            >
-              <option value="1">1반</option>
-              <option value="2">2반</option>
-              <option value="3">3반</option>
-              <option value="4">4반</option>
-              <option value="5">5반</option>
-              <option value="6">6반</option>
-            </DropDown>
-          </DropdownBox>
+          {schoolResults.length > 0 && (
+            <SchoolList>
+              {schoolResults.map((school) => (
+                <SchoolItem
+                  key={school}
+                  onClick={() => handleSchoolSelect(school)}
+                >
+                  {school}
+                </SchoolItem>
+              ))}
+            </SchoolList>
+          )}
+          {identity === "teacher" && (
+            <>
+              <InfoRow>
+                담임교사 여부
+                <input
+                  type="checkbox"
+                  checked={localIsHomeroom}
+                  onChange={(e) => setLocalIsHomeroom(e.target.checked)}
+                />
+              </InfoRow>
+              <DropdownBox>
+                <DropDown
+                  value={selectedGrade}
+                  onChange={(e) => setSelectedGrade(e.target.value)}
+                >
+                  <option value="1">1학년</option>
+                  <option value="2">2학년</option>
+                  <option value="3">3학년</option>
+                </DropDown>
+                <DropDown
+                  id="semester"
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                >
+                  <option value="1">1반</option>
+                  <option value="2">2반</option>
+                  <option value="3">3반</option>
+                  <option value="4">4반</option>
+                  <option value="5">5반</option>
+                  <option value="6">6반</option>
+                </DropDown>
+              </DropdownBox>
+            </>
+          )}
           <ChangeButton onClick={handleSaveInfo}>개인정보 변경</ChangeButton>
         </Section>
 

@@ -589,6 +589,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       </MainContainer>
       {isMyPageOpen && (
         <MyPage
+          identity={identity}
           onClose={() => setIsMyPageOpen(false)}
           isHomeroom={isHomeroom}
           setIsHomeroom={setIsHomeroom}
