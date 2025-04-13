@@ -218,7 +218,7 @@ export const SideBar = styled.aside`
 `;
 
 export const StudentImg = styled.img`
-  margin-top: 5.5rem;
+  margin-top: 3rem;
   width: 12.5rem;
   height: 16.25rem;
   border-radius: 0.625rem;
@@ -235,7 +235,7 @@ export const StudentClass = styled.p`
 `;
 
 export const StudentName = styled.p`
-  margin: 0.5rem 0 -0.5rem 0;
+  margin: 0.5rem 0 1rem 0;
   color: #000;
   text-align: center;
   font-family: "Inter";

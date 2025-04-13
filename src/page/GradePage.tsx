@@ -136,21 +136,28 @@ const GradePage: React.FC<GradePageProps> = ({
   const identityCheck = () => {
     console.log(identity);
   };
+  //기간&과목별용
   const [isPeriod, setIsPeriod] = useState(true);
   const [selectedGrade, setSelectedGrade] = useState("1");
   const [selectedSemester, setSelectedSemester] = useState("1");
-
   const [editedSemesterGrades, setEditedSemesterGrades] =
     useState(semesterGradeData);
   const [editedSubjectGrades, setEditedSubjectGrades] =
     useState(subjectGradeData);
-
   const fullSemester = `${selectedGrade}학년 ${selectedSemester}학기`;
   const selectedData = editedSemesterGrades.find(
     (d) => d.name === fullSemester
   );
   const [selectedSubject, setSelectedSubject] = useState("국어");
   const [isEditing, setIsEditing] = useState(false); // 편집 모드 여부
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const currentSemester =
+    currentMonth >= 3 && currentMonth <= 8 ? "1학기" : "2학기";
+
+  const teacherGrade = initialStudents[0].grade;
+  const teacherClass = initialStudents[0].class;
 
   // 학기별 테이블 데이터
   const semesterTableData = selectedData
@@ -257,124 +264,45 @@ const GradePage: React.FC<GradePageProps> = ({
       {identity === "teacher" && isHomeroom && !selectedStudent ? (
         <GradeContainer>
           <StudentsTableArea>
-            <ToggleWrapper
-              onClick={() => {
-                if (isEditing) return; // 편집 중이면 동작 X
-                setIsPeriod(!isPeriod);
-              }}
-            >
-              <ToggleButton $isPeriod={isPeriod} />
-              <OptionButton $isActive={isPeriod}>기간별</OptionButton>
-              <OptionButton $isActive={!isPeriod}>과목별</OptionButton>
-            </ToggleWrapper>
-            <DropdownBox>
-              {isPeriod ? (
-                <>
-                  <DropDown
-                    value={selectedGrade}
-                    onChange={(e) => setSelectedGrade(e.target.value)}
-                    disabled={isEditing}
-                  >
-                    <option value="1">1학년</option>
-                    <option value="2">2학년</option>
-                    <option value="3">3학년</option>
-                  </DropDown>
-                  <DropDown
-                    id="semester"
-                    value={selectedSemester}
-                    onChange={(e) => setSelectedSemester(e.target.value)}
-                    disabled={isEditing}
-                  >
-                    <option value="1">1학기</option>
-                    <option value="2">2학기</option>
-                  </DropDown>
-                </>
-              ) : (
-                <DropDown
-                  id="subject"
-                  value={selectedSubject}
-                  onChange={(e) => setSelectedSubject(e.target.value)}
-                  disabled={isEditing}
-                >
-                  {Object.keys(subjectGradeData).map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
-                    </option>
-                  ))}
-                </DropDown>
-              )}
-            </DropdownBox>
+            <h2>{`${currentYear}학년도 ${currentSemester} 성적 - ${teacherGrade}학년 ${teacherClass}반`}</h2>
             <StudentGradeTable>
-              {isPeriod ? (
-                <table>
-                  <thead>
-                    <tr>
-                      <th>이름</th>
-                      <th>국어</th>
-                      <th>영어</th>
-                      <th>수학</th>
-                      <th>사회</th>
-                      <th>과학</th>
-                      <th>평균</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {initialStudents.map((student) => {
-                      const scores = studentScores[student.name];
-                      const average =
-                        (scores.국어 +
-                          scores.영어 +
-                          scores.수학 +
-                          scores.사회 +
-                          scores.과학) /
-                        5;
+              <table>
+                <thead>
+                  <tr>
+                    <th>이름</th>
+                    <th>국어</th>
+                    <th>영어</th>
+                    <th>수학</th>
+                    <th>사회</th>
+                    <th>과학</th>
+                    <th>평균</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {initialStudents.map((student) => {
+                    const scores = studentScores[student.name];
+                    const average =
+                      (scores.국어 +
+                        scores.영어 +
+                        scores.수학 +
+                        scores.사회 +
+                        scores.과학) /
+                      5;
 
-                      return (
-                        <tr key={student.number}>
-                          <td>{student.name}</td>
-                          <td>{scores.국어}</td>
-                          <td>{scores.영어}</td>
-                          <td>{scores.수학}</td>
-                          <td>{scores.사회}</td>
-                          <td>{scores.과학}</td>
-                          <td>{average.toFixed(1)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              ) : (
-                <table>
-                  <thead>
-                    <tr>
-                      <th>이름</th>
-                      {semesterNames.map((semester) => (
-                        <th key={semester}>{semester}</th>
-                      ))}
-                      <th>평균</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {initialStudents.map((student) => {
-                      const scores = Array.from({ length: 6 }, () =>
-                        generateRandomScore()
-                      ); // 임시로 학기별 성적 생성
-                      const average =
-                        scores.reduce((sum, v) => sum + v, 0) / scores.length;
-
-                      return (
-                        <tr key={student.number}>
-                          <td>{student.name}</td>
-                          {scores.map((score, i) => (
-                            <td key={i}>{score}</td>
-                          ))}
-                          <td>{average.toFixed(1)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
+                    return (
+                      <tr key={student.number}>
+                        <td>{student.name}</td>
+                        <td>{scores.국어}</td>
+                        <td>{scores.영어}</td>
+                        <td>{scores.수학}</td>
+                        <td>{scores.사회}</td>
+                        <td>{scores.과학}</td>
+                        <td>{average.toFixed(1)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </StudentGradeTable>
           </StudentsTableArea>
         </GradeContainer>
