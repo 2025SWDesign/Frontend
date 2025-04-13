@@ -50,11 +50,17 @@ export const TableArea = styled.div`
 
 export const StudentsTableArea = styled.div`
   width: 86rem;
-  height: 48.2rem;
+  height: 50rem;
   display: flex;
   flex-direction: column;
   align-items: start;
   padding-left: 3rem;
+  h2 {
+    color: #000;
+    font-family: "Inter";
+    font-size: 1.5rem;
+    margin: 1.5rem 0 0.8rem 0rem;
+  }
 `;
 
 export const DropdownBox = styled.div`
@@ -149,7 +155,7 @@ export const ScoreInput = styled.input`
 
 export const StudentGradeTable = styled.div`
   border-radius: 0.5rem;
-  max-height: 30rem;
+  max-height: 41rem;
   overflow-y: auto;
   overflow-x: none;
 
