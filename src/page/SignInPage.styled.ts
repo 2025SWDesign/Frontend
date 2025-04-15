@@ -10,8 +10,8 @@ export const SplitScreen = styled.div`
 
 export const LeftCard = styled.div`
   width: 57rem;
-  height: 59.5rem;
-  border-radius: 1.25rem 0rem 0rem 1.25rem;
+  height: 62.5rem;
+  border-radius: 1.25rem;
   background: #004260;
   display: flex;
   flex-direction: column;
@@ -33,9 +33,7 @@ export const WelcomeLogo = styled.img`
 
 export const RightCard = styled.div`
   width: 57rem;
-  height: 59.5rem;
-  border-radius: 0rem 1.25rem 1.25rem 0rem;
-  background: #d9d9d9;
+  height: 62.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -59,9 +57,8 @@ export const InnerContent = styled.div`
 
 export const DropDown = styled.select`
   width: 32.5rem;
-  height: 4.25rem;
+  height: 3.75rem;
   padding: 0.6rem;
-  margin-right: 0.5rem;
   border-radius: 0.625rem;
   border: 0.0625rem solid #000;
   appearance: none;
@@ -91,25 +88,26 @@ export const InputText = styled.div`
   color: #000;
   align-self: flex-start;
   font-family: "Inter";
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
 `;
 
 // InputArea: 입력 필드 스타일
 export const InputArea = styled.div`
   width: 32.5rem;
-  height: 4rem;
+  height: 3.75rem;
   background-color: #ffffff;
   display: flex;
   align-items: center;
   border-radius: 0.625rem;
+  border: solid 1px #424242;
 
   input {
     border: none;
-    width: 23.5rem;
+    width: 30rem;
     margin: 0 0.5rem 0 2.5rem;
     background-color: transparent;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   input:focus {
@@ -117,9 +115,56 @@ export const InputArea = styled.div`
   }
 `;
 
+export const StudentInputArea = styled.div`
+  width: 32.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const StudentInput = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-right: 1.8rem;
+`;
+
+export const MiniInput = styled.div`
+  width: 9.5rem;
+  height: 3.75rem;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  border-radius: 0.625rem;
+  border: solid 1px #424242;
+
+  input {
+    display: flex;
+    border: none;
+    width: 13rem;
+    margin: 0 0.5rem 0 1rem;
+    background-color: transparent;
+    font-size: 1.25rem;
+  }
+
+  input:focus {
+    outline: none;
+  }
+`;
+export const ToggleButton = styled.button`
+  background: none;
+  border: none;
+  margin-right: 1rem;
+  cursor: pointer;
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    stroke: #424242;
+  }
+`;
+
 export const SignButton = styled.button`
   width: 32.5rem;
-  height: 4.875rem;
+  height: 4.5rem;
   border-radius: 1.25rem;
   background: #004260;
   margin: 2.75rem 0 1.5rem 0;
