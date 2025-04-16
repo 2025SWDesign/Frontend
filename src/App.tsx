@@ -16,11 +16,14 @@ const App: React.FC = () => {
   const [identity, setIdentity] = useState<IdentityType>("teacher");
   const [isHomeroom, setIsHomeroom] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [schoolID, setSchoolID] = useState(0);
+  const [classID, setClassID] = useState(0);
 
   interface Student {
+    studentId: number;
     name: string;
     grade: number;
-    class: number;
+    gradeClass: number;
     number: number;
     img: string;
   }
@@ -44,6 +47,8 @@ const App: React.FC = () => {
               setSelectedStudent={setSelectedStudent}
               isHomeroom={isHomeroom}
               setIsHomeroom={setIsHomeroom}
+              schoolID={schoolID}
+              classID={classID}
             >
               <MainPage identity={identity} />
               {renderHomeroomStatus()}

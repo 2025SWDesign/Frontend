@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "/assets/img/Logo.png";
+import axios from "axios";
 
 import {
   LayoutWrapper,
@@ -34,9 +35,10 @@ import {
 import MyPage from "../page/MyPage";
 
 interface Student {
+  studentId: number;
   name: string;
   grade: number;
-  class: number;
+  gradeClass: number;
   number: number;
   img: string;
 }
@@ -48,6 +50,8 @@ interface MainLayoutProps {
   children: React.ReactNode;
   isHomeroom: boolean;
   setIsHomeroom: React.Dispatch<React.SetStateAction<boolean>>;
+  schoolID: number;
+  classID: number;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({
@@ -57,55 +61,102 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   children,
   isHomeroom,
   setIsHomeroom,
+  schoolID,
+  classID,
 }) => {
   const navigate = useNavigate();
-  const initialStudents = Array.from({ length: 30 }, (_, i) => ({
-    grade: 2,
-    class: 2,
-    number: i + 1,
-    name: [
-      "강민수",
-      "고준영",
-      "김다은",
-      "김민재",
-      "김서윤",
-      "김수현",
-      "김지훈",
-      "남궁우진",
-      "노지현",
-      "문태영",
-      "박가영",
-      "박도윤",
-      "박민지",
-      "박서준",
-      "박지훈",
-      "서예린",
-      "신윤서",
-      "안도현",
-      "양지우",
-      "오하늘",
-      "유진호",
-      "이도윤",
-      "이서진",
-      "이영훈",
-      "임수빈",
-      "장우석",
-      "전예진",
-      "정민규",
-      "조하람",
-      "최다온",
-    ][i],
-    img: "/assets/img/photo.png",
-  }));
 
   const [students, setStudents] = useState<Student[]>([]); // 초기에는 빈 배열
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태
 
-  const handleSearch = () => {
-    const filteredStudents = initialStudents.filter((student) =>
-      student.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setStudents(filteredStudents);
+  // 반 학생 목록 가져오기
+  const fetchClassStudents = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `/api/v1/school/${schoolID}/class/${classID}/students`
+      );
+
+      if (response.data.status === 200) {
+        // API 응답 구조에 맞게 데이터 변환
+        const studentsData = response.data.data.map(
+          (item: {
+            studentId: number;
+            user: { name: string };
+            grade: number;
+            gradeClass: number;
+            number: number;
+          }) => ({
+            studentId: item.studentId,
+            name: item.user.name,
+            grade: item.grade,
+            gradeClass: item.gradeClass,
+            number: item.number,
+            img: "/assets/img/photo.png", // 기본 이미지 경로 설정
+          })
+        );
+
+        setStudents(studentsData);
+      }
+    } catch (error) {
+      console.error("반 학생 목록 조회 실패:", error);
+      setStudents([]);
+    }
+  }, [schoolID, classID]);
+
+  useEffect(() => {
+    if (isHomeroom) {
+      fetchClassStudents();
+    }
+  }, [isHomeroom, schoolID, classID, fetchClassStudents]);
+
+  const handleSearch = async () => {
+    try {
+      // 검색어가 있는 경우 학생 검색 API 호출
+      if (searchQuery.trim()) {
+        const response = await axios.get(
+          `/api/v1/school/${schoolID}/search/student?name=${searchQuery}`
+        );
+        console.log(response.data); // API 응답 데이터 확인
+        // API 응답 형식에 맞게 처리하는 코드 추가 필요
+      } else if (isHomeroom) {
+        // 검색어가 없고 담임인 경우, 전체 반 학생 목록을 다시 불러옴
+        fetchClassStudents();
+      }
+    } catch (error) {
+      console.error("학생 검색 실패:", error);
+      // 에러 발생 시 빈 배열 또는 초기 학생 목록 설정
+      // 담임인 경우 기존 반 학생 목록을 유지
+      if (!isHomeroom) {
+        setStudents([]);
+      }
+    }
+  };
+
+  const fetchStudentDetails = async (studentId: number) => {
+    try {
+      const response = await axios.get(`/api/v1/school/${schoolID}/students/${studentId}`);
+      
+      if (response.data.status === 200) {
+        const studentData = response.data.data;
+        // API 응답을 selectedStudent 형식에 맞게 변환
+        const formattedStudent: Student = {
+          studentId: studentData.studentId,
+          name: studentData.user.name,
+          grade: studentData.grade,
+          gradeClass: studentData.gradeClass,
+          number: studentData.number,
+          img: studentData.user.photo || "/assets/img/photo.png" // 사진이 없는 경우 기본 이미지 사용
+        };
+        
+        setSelectedStudent(formattedStudent);
+        
+        if (location.pathname === "/") {
+          navigate("/student-info");
+        }
+      }
+    } catch (error) {
+      console.error('학생 상세정보 조회 실패:', error);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -113,12 +164,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       handleSearch();
     }
   };
-
-  useEffect(() => {
-    if (identity === "teacher" && students.length === 0) {
-      setStudents(initialStudents);
-    }
-  }, [identity, initialStudents, students.length]);
 
   //MyPage 모달용
   const [isMyPageOpen, setIsMyPageOpen] = useState(false);
@@ -375,9 +420,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         <SideBar>
           {selectedStudent && (
             <>
-              <StudentImg src={selectedStudent.img} alt="image" />
+              <StudentImg src="/assets/img/photo.png" alt="image" />
               <StudentClass>
-                {selectedStudent.grade}학년 {selectedStudent.class}반
+                {selectedStudent.grade}학년 {selectedStudent.gradeClass}반
               </StudentClass>
               <StudentName>{selectedStudent.name} 학생</StudentName>
             </>
@@ -419,16 +464,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                     <tr
                       key={index}
                       onClick={() => {
-                        setSelectedStudent(student);
-                        if (location.pathname === "/") {
-                          navigate("/student-info");
-                        }
+                        fetchStudentDetails(student.studentId);
                       }}
                       style={{ cursor: "pointer" }}
                     >
                       <td>{student.name}</td>
                       <td>{student.grade}</td>
-                      <td>{student.class}</td>
+                      <td>{student.gradeClass}</td>
                       <td>{student.number}</td>
                     </tr>
                   ))
