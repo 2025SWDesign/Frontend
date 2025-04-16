@@ -26,6 +26,14 @@ export const LeftCard = styled.div`
   }
 `;
 
+export const Title = styled.h1`
+  color: #000;
+  text-align: center;
+  font-family: "Inter";
+  font-size: 2.5rem;
+  font-weight: 700;
+`;
+
 export const WelcomeLogo = styled.img`
   width: 45.75rem;
   height: 25.5rem;
@@ -171,7 +179,8 @@ export const SignButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-
+  cursor: pointer;
+  
   p {
     font-size: 1.5rem;
     font-weight: bold;
@@ -179,9 +188,68 @@ export const SignButton = styled.button`
   }
 `;
 
-export const Line = styled.div`
-  width: 45rem;
-  height: 0.0625rem;
+export const KakaoButton = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 22rem;
+  height: 3.75rem;
+  background: #FEE500;
+  border-radius: 0.75rem;
+  padding: 0 1.5rem 0 1.5rem;
+  margin-top: 4rem;
+  cursor: pointer;
+
+  svg{
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  div{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.85);
+    text-align: center;
+    font-family: "Inter";
+    font-size: 1.25rem;
+    font-weight: 400;
+  }
+
+`
+
+export const EmailButton = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 22rem;
+  height: 3.75rem;
+  border-radius: 0.75rem;
+  border: 2px solid #B9B9B9;
+  padding: 0 1.5rem 0 1.5rem;
+  margin-bottom: 4rem;
+  cursor: pointer;
+
+  svg{
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  div{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    color: #000;
+    text-align: center;
+    font-family: "Inter";
+    font-size: 1.25rem;
+    font-weight: 400;
+  }
+`
+
+export const Line = styled.hr`
+  width: 100%;
   background: #424242;
   margin: 1rem;
 `;
