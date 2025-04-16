@@ -18,9 +18,13 @@ import {
   StudentInputArea,
   StudentInput,
   MiniInput,
+  EmailButton,
+  KakaoButton,
+  Title,
 } from "./SignInPage.styled";
 import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { MdOutlineMail } from "react-icons/md";
 
 interface SignUpPayload {
   schoolName: string;
@@ -41,9 +45,9 @@ interface SignUpPayload {
   };
 }
 const SignInPage: React.FC = () => {
-  const [mode, setMode] = useState<"signIn" | "signUp" | "forgotPassword">(
-    "signIn"
-  );
+  const [mode, setMode] = useState<
+    "selectSignIn" | "signIn" | "selectSignUp" | "signUp" | "forgotPassword" | "additionalInfo"
+  >("selectSignIn");
 
   const [userType, setUserType] = useState("TEACHER");
   const [schoolQuery, setSchoolQuery] = useState("");
@@ -134,6 +138,10 @@ const SignInPage: React.FC = () => {
     }
   };
 
+  const handleKakaoLogin = () => {
+    setMode("additionalInfo");
+  };
+
   const signUp = async (payload: SignUpPayload) => {
     try {
       const response = await axios.post(`/api/v1/auth/sign-up`, payload);
@@ -151,6 +159,30 @@ const SignInPage: React.FC = () => {
 
   const renderForm = () => {
     switch (mode) {
+      case "selectSignIn":
+        return( 
+          <>
+            <Title>로그인</Title>
+            <KakaoButton onClick={handleKakaoLogin}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <g clip-path="url(#clip0_303_153)">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M18 1.19995C8.05835 1.19995 0 7.42587 0 15.1045C0 19.88 3.11681 24.0899 7.86305 26.5939L5.86606 33.8889C5.68962 34.5335 6.42683 35.0473 6.99293 34.6738L15.7467 28.8964C16.4854 28.9676 17.2362 29.0093 18 29.0093C27.9409 29.0093 35.9999 22.7836 35.9999 15.1045C35.9999 7.42587 27.9409 1.19995 18 1.19995Z" fill="black"/>
+                </g>
+                <defs>
+                  <clipPath id="clip0_303_153">
+                    <rect width="35.9999" height="36" fill="white"/>
+                  </clipPath>
+                </defs>
+              </svg>
+              <div>카카오로 로그인</div>
+            </KakaoButton>
+            <Line/>
+            <EmailButton onClick={() => setMode("signIn")}>
+              <MdOutlineMail/>
+              <div>이메일로 로그인</div>
+            </EmailButton>
+          </>
+        );
       case "signIn":
         return (
           <>
@@ -181,6 +213,30 @@ const SignInPage: React.FC = () => {
             <SignButton>
               <p>로그인</p>
             </SignButton>
+          </>
+        );
+      case "selectSignUp":
+        return( 
+          <>
+          <Title>회원가입</Title>
+            <KakaoButton onClick={handleKakaoLogin}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <g clip-path="url(#clip0_303_153)">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M18 1.19995C8.05835 1.19995 0 7.42587 0 15.1045C0 19.88 3.11681 24.0899 7.86305 26.5939L5.86606 33.8889C5.68962 34.5335 6.42683 35.0473 6.99293 34.6738L15.7467 28.8964C16.4854 28.9676 17.2362 29.0093 18 29.0093C27.9409 29.0093 35.9999 22.7836 35.9999 15.1045C35.9999 7.42587 27.9409 1.19995 18 1.19995Z" fill="black"/>
+                </g>
+                <defs>
+                  <clipPath id="clip0_303_153">
+                    <rect width="35.9999" height="36" fill="white"/>
+                  </clipPath>
+                </defs>
+              </svg>
+              <div>카카오로 회원가입</div>
+            </KakaoButton>
+            <Line/>
+            <EmailButton onClick={() => setMode("signIn")}>
+              <MdOutlineMail/>
+              <div>이메일로 회원가입</div>
+            </EmailButton>
           </>
         );
       case "signUp":
@@ -353,41 +409,181 @@ const SignInPage: React.FC = () => {
             </SignButton>
           </>
         );
+        case "additionalInfo":
+        return (
+          <>
+            <Title>추가 정보 입력</Title>
+            <DropDown
+              value={userType}
+              onChange={(e) => setUserType(e.target.value)}
+            >
+              <option value="TEACHER">교사</option>
+              <option value="PARENT">학부모</option>
+              <option value="STUDENT">학생</option>
+            </DropDown>
+            {userType === "TEACHER" && (
+              <>
+                <InputText>담당 과목</InputText>
+                <DropDown
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                >
+                  <option value="국어">국어</option>
+                  <option value="영어">영어</option>
+                  <option value="수학">수학</option>
+                  <option value="과학">과학</option>
+                  <option value="사회">사회</option>
+                </DropDown>
+              </>
+            )}
+            {userType === "STUDENT" && (
+              <>
+                <StudentInputArea>
+                  <StudentInput>
+                    <InputText>학년</InputText>
+                    <MiniInput>
+                      <input
+                        type="number"
+                        placeholder="예: 2"
+                        value={studentGrade}
+                        onChange={(e) => setStudentGrade(e.target.value)}
+                      />
+                    </MiniInput>
+                  </StudentInput>
+                  <StudentInput>
+                    <InputText>반</InputText>
+                    <MiniInput>
+                      <input
+                        type="number"
+                        placeholder="예: 2"
+                        value={studentClass}
+                        onChange={(e) => setStudentClass(e.target.value)}
+                      />
+                    </MiniInput>
+                  </StudentInput>
+                  <StudentInput>
+                    <InputText>번호</InputText>
+                    <MiniInput>
+                      <input
+                        type="number"
+                        placeholder="예: 10"
+                        value={studentNumber}
+                        onChange={(e) => setStudentNumber(e.target.value)}
+                      />
+                    </MiniInput>
+                  </StudentInput>
+                </StudentInputArea>
+              </>
+            )}
+            <InputText>학교명</InputText>
+            <InputArea style={{ position: "relative" }}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#666"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  position: "absolute",
+                  left: "20",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                placeholder="학교명을 검색하세요"
+                type="text"
+                value={schoolQuery}
+                onChange={(e) => handleSchoolSearch(e.target.value)}
+                style={{ paddingLeft: "2rem" }}
+              />
+              {schoolResults.length > 0 && (
+                <SchoolList>
+                  {schoolResults.map((school) => (
+                    <SchoolItem
+                      key={school}
+                      onClick={() => handleSchoolSelect(school)}
+                    >
+                      {school}
+                    </SchoolItem>
+                  ))}
+                </SchoolList>
+              )}
+            </InputArea>
+            <SignButton>
+              <p>회원가입 완료</p>'
+            </SignButton>
+          </>
+        )
     }
   };
 
   const renderSecondaryArea = () => {
     switch (mode) {
-      case "signIn":
+      case "selectSignIn":
         return (
           <SecondaryArea>
             <div>
-              <p>비밀번호를 잊으셨나요?</p>
-              <a onClick={() => setMode("forgotPassword")}>비밀번호 찾기</a>
-            </div>
-            <div>
               <p>아직 계정이 없으신가요?</p>
-              <a onClick={() => setMode("signUp")}>회원가입</a>
+              <a onClick={() => setMode("selectSignUp")}>회원가입</a>
             </div>
           </SecondaryArea>
         );
-      case "signUp":
+      case "signIn":
+        return (
+          <>
+            <Line />
+            <SecondaryArea>
+              <div>
+                <p>비밀번호를 잊으셨나요?</p>
+                <a onClick={() => setMode("forgotPassword")}>비밀번호 찾기</a>
+              </div>
+              <div>
+                <p>아직 계정이 없으신가요?</p>
+                <a onClick={() => setMode("selectSignUp")}>회원가입</a>
+              </div>
+            </SecondaryArea>
+          </>
+        );
+      case "selectSignUp":
         return (
           <SecondaryArea>
             <div>
               <p>이미 계정이 있으신가요?</p>
-              <a onClick={() => setMode("signIn")}>로그인 하기</a>
+              <a onClick={() => setMode("selectSignIn")}>로그인 하기</a>
             </div>
           </SecondaryArea>
+        );  
+      case "signUp":
+        return (
+          <>
+            <Line />
+            <SecondaryArea>
+              <div>
+                <p>이미 계정이 있으신가요?</p>
+                <a onClick={() => setMode("selectSignIn")}>로그인 하기</a>
+              </div>
+            </SecondaryArea>
+          </>
         );
       case "forgotPassword":
         return (
-          <SecondaryArea>
-            <div>
-              <p>비밀번호가 기억나셨나요?</p>
-              <a onClick={() => setMode("signIn")}>로그인 하기</a>
-            </div>
-          </SecondaryArea>
+          <>
+            <Line />
+            <SecondaryArea>
+              <div>
+                <p>비밀번호가 기억나셨나요?</p>
+                <a onClick={() => setMode("signIn")}>로그인 하기</a>
+              </div>
+            </SecondaryArea>
+          </>
         );
     }
   };
@@ -401,7 +597,7 @@ const SignInPage: React.FC = () => {
         <RightCard>
           <InnerContent>
             {renderForm()}
-            <Line />
+
             {renderSecondaryArea()}
           </InnerContent>
         </RightCard>
