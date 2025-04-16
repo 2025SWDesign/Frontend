@@ -33,6 +33,7 @@ import {
   SearchButton,
 } from "./MainLayout.styled";
 import MyPage from "../page/MyPage";
+import { useAuth } from "../hooks/useAuth";
 
 interface Student {
   studentId: number;
@@ -50,31 +51,61 @@ interface MainLayoutProps {
   children: React.ReactNode;
   isHomeroom: boolean;
   setIsHomeroom: React.Dispatch<React.SetStateAction<boolean>>;
-  schoolID: number;
-  classID: number;
+  schoolId: number;
+  classId: number;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({
-  identity,
   selectedStudent,
   setSelectedStudent,
   children,
-  isHomeroom,
-  setIsHomeroom,
-  schoolID,
-  classID,
 }) => {
   const navigate = useNavigate();
-
   const [students, setStudents] = useState<Student[]>([]); // 초기에는 빈 배열
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태
+  const [userName, setUserName] = useState("");
+  const [isHomeroom, setIsHomeroom] = useState(false);
+  const [schoolName, setSchoolName] = useState("");
+  const { schoolId, classId } = useAuth(); 
+  const [role, setRole]=useState("");
+  // 유저 정보 불러오기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const token = sessionStorage.getItem("accessToken");
+        if (!token || !schoolId) return;
+  
+        const response = await axios.get(`/api/v1/school/${schoolId}/users/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("유저 정보 불러오기 성공:", response.data);
+        const { name, role, teacher, school } = response.data.data;
+        setUserName(name);
+        setRole(role);
+        setIsHomeroom(teacher?.isHomeroom || false);
+        setSchoolName(school?.schoolName || "");
+      } catch (err) {
+        console.error("유저 정보 불러오기 실패:", err);
+      }
+    };
+  
+    fetchUserInfo();
+  }, [schoolId]);
 
   // 반 학생 목록 가져오기
   const fetchClassStudents = useCallback(async () => {
     try {
+      const token = sessionStorage.getItem("accessToken");
+      if (!token || !schoolId) return;
+
       const response = await axios.get(
-        `/api/v1/school/${schoolID}/class/${classID}/students`
-      );
+        `/api/v1/school/${schoolId}/class/${classId}/students`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.data.status === 200) {
         // API 응답 구조에 맞게 데이터 변환
@@ -101,21 +132,27 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       console.error("반 학생 목록 조회 실패:", error);
       setStudents([]);
     }
-  }, [schoolID, classID]);
+  }, [schoolId, classId]);
 
   useEffect(() => {
     if (isHomeroom) {
       fetchClassStudents();
     }
-  }, [isHomeroom, schoolID, classID, fetchClassStudents]);
+  }, [isHomeroom, schoolId, classId, fetchClassStudents]);
 
   const handleSearch = async () => {
     try {
+      const token = sessionStorage.getItem("accessToken");
+      if (!token || !schoolId) return;
+
       // 검색어가 있는 경우 학생 검색 API 호출
       if (searchQuery.trim()) {
         const response = await axios.get(
-          `/api/v1/school/${schoolID}/search/student?name=${searchQuery}`
-        );
+          `/api/v1/school/${schoolId}/search/student?name=${searchQuery}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         console.log(response.data); // API 응답 데이터 확인
         // API 응답 형식에 맞게 처리하는 코드 추가 필요
       } else if (isHomeroom) {
@@ -134,7 +171,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({
 
   const fetchStudentDetails = async (studentId: number) => {
     try {
-      const response = await axios.get(`/api/v1/school/${schoolID}/students/${studentId}`);
+      const token = sessionStorage.getItem("accessToken");
+      if (!token || !schoolId) return;
+
+      const response = await axios.get(`/api/v1/school/${schoolId}/students/${studentId}`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       
       if (response.data.status === 200) {
         const studentData = response.data.data;
@@ -212,12 +256,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   return (
     <LayoutWrapper>
       <Header>
-        <a href="/">
+        <a href="/main">
           <img src={Logo} alt="logo" />
         </a>
         <UserArea>
           <div>
-            <p>OOO 선생님</p>
+            <p>{userName} {role==="TEACHER" ? "선생님" : "학생"}</p>
             <UserIconContainer id="userDropdown" onClick={toggleUserDropdown}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -252,7 +296,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                           fill="black"
                         />
                       </svg>
-                      <p>OOO 선생님</p>
+                      <p>{userName} {role==="TEACHER" ? "선생님" : "학생"}</p>
                     </DropdownFlexContainer>
                     <UserDropdownButtons>
                       <UserDropdownItem onClick={() => setIsMyPageOpen(true)}>
@@ -631,10 +675,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       </MainContainer>
       {isMyPageOpen && (
         <MyPage
-          identity={identity}
+          identity={role}
           onClose={() => setIsMyPageOpen(false)}
           isHomeroom={isHomeroom}
           setIsHomeroom={setIsHomeroom}
+          schoolName={schoolName}
         />
       )}
     </LayoutWrapper>

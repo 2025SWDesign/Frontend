@@ -25,6 +25,8 @@ import {
 import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { MdOutlineMail } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 interface SignUpPayload {
   schoolName: string;
@@ -48,7 +50,8 @@ const SignInPage: React.FC = () => {
   const [mode, setMode] = useState<
     "selectSignIn" | "signIn" | "selectSignUp" | "signUp" | "forgotPassword" | "additionalInfo"
   >("selectSignIn");
-
+  const navigate = useNavigate();
+  //회원가입용(교사)
   const [userType, setUserType] = useState("TEACHER");
   const [schoolQuery, setSchoolQuery] = useState("");
   const [selectedSchool, setSelectedSchool] = useState("");
@@ -60,10 +63,16 @@ const SignInPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [subject, setSubject] = useState("국어");
 
+  //회원가입용(학생)
   const [studentGrade, setStudentGrade] = useState("");
   const [studentClass, setStudentClass] = useState("");
   const [studentNumber, setStudentNumber] = useState("");
 
+  //로그인
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const { setAuth } = useAuth();
+  
   const allSchools = [
     "서울고등학교",
     "부산고등학교",
@@ -90,6 +99,41 @@ const SignInPage: React.FC = () => {
     setSelectedSchool(school);
     setSchoolQuery(school);
     setSchoolResults([]);
+  };
+
+  const handleSignIn = async () => {
+    try {
+      const response = await axios.post("/api/v1/auth/sign-in", {
+        email: loginEmail,
+        password: loginPassword,
+        schoolName: selectedSchool,
+      });
+  
+      const { accessToken, refreshToken, schoolId, classId } = response.data.data;
+      console.log("로그인 성공:", response.data);
+  
+      setAuth({
+        accessToken,
+        refreshToken,
+        schoolId: String(schoolId),
+        classId: classId ? String(classId) : null,
+      });
+
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
+      sessionStorage.setItem("schoolId", String(schoolId));
+      if (classId !== undefined) {
+        sessionStorage.setItem("classId", String(classId)); // 담임인 경우만
+      }
+  
+      navigate("/main");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data?.message || "로그인 실패");
+      } else {
+        alert("알 수 없는 에러 발생");
+      }
+    }
   };
 
   const handleSignUp = async () => {
@@ -186,31 +230,72 @@ const SignInPage: React.FC = () => {
       case "signIn":
         return (
           <>
-            <DropDown
-              value={userType}
-              onChange={(e) => setUserType(e.target.value)}
-            >
-              <option value="TEACHER">교사</option>
-              <option value="PARENT">학부모</option>
-              <option value="STUDENT">학생</option>
-            </DropDown>
+            <Title>로그인</Title>
+            <InputText>학교명</InputText>
+            <InputArea style={{ position: "relative" }}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#666"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  position: "absolute",
+                  left: "20",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                placeholder="학교명을 검색하세요"
+                type="text"
+                value={schoolQuery}
+                onChange={(e) => handleSchoolSearch(e.target.value)}
+                style={{ paddingLeft: "2rem" }}
+              />
+              {schoolResults.length > 0 && (
+                <SchoolList>
+                  {schoolResults.map((school) => (
+                    <SchoolItem
+                      key={school}
+                      onClick={() => handleSchoolSelect(school)}
+                    >
+                      {school}
+                    </SchoolItem>
+                  ))}
+                </SchoolList>
+              )}
+            </InputArea>
             <InputText>아이디</InputText>
             <InputArea>
-              <input placeholder="example@email.com" type="email" />
+              <input
+                placeholder="example@email.com"
+                type="email"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+              />
             </InputArea>
             <InputText>비밀번호</InputText>
             <InputArea>
               <input
                 placeholder="비밀번호를 입력하세요"
                 type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={loginPassword}
+                autoComplete="off"
+                onChange={(e) => setLoginPassword(e.target.value)}
               />
               <ToggleButton onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </ToggleButton>
             </InputArea>
-            <SignButton>
+            <SignButton onClick={handleSignIn}>
               <p>로그인</p>
             </SignButton>
           </>
@@ -233,7 +318,7 @@ const SignInPage: React.FC = () => {
               <div>카카오로 회원가입</div>
             </KakaoButton>
             <Line/>
-            <EmailButton onClick={() => setMode("signIn")}>
+            <EmailButton onClick={() => setMode("signUp")}>
               <MdOutlineMail/>
               <div>이메일로 회원가입</div>
             </EmailButton>
@@ -370,6 +455,7 @@ const SignInPage: React.FC = () => {
                 placeholder="사용할 비밀번호를 입력하세요"
                 type={showPassword ? "text" : "password"}
                 value={password}
+                autoComplete="off" 
                 onChange={(e) => setPassword(e.target.value)}
               />
               <ToggleButton onClick={() => setShowPassword(!showPassword)}>
@@ -382,6 +468,7 @@ const SignInPage: React.FC = () => {
                 placeholder="비밀번호 확인"
                 type={showPassword ? "text" : "password"}
                 value={confirmPassword}
+                autoComplete="off" 
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <ToggleButton onClick={() => setShowPassword(!showPassword)}>

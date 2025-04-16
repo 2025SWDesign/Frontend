@@ -22,6 +22,7 @@ interface MyPageProps {
   isHomeroom: boolean;
   setIsHomeroom: React.Dispatch<React.SetStateAction<boolean>>;
   identity: string;
+  schoolName: string;
 }
 
 const MyPage: React.FC<MyPageProps> = ({
@@ -29,6 +30,7 @@ const MyPage: React.FC<MyPageProps> = ({
   onClose,
   isHomeroom,
   setIsHomeroom,
+  schoolName,
 }) => {
   const [selectedGrade, setSelectedGrade] = useState("1");
   const [selectedClass, setSelectedClass] = useState("1");
@@ -69,7 +71,7 @@ const MyPage: React.FC<MyPageProps> = ({
   ];
 
   const [schoolQuery, setSchoolQuery] = useState("");
-  const [selectedSchool, setSelectedSchool] = useState("인천중학교");
+  const [selectedSchool, setSelectedSchool] = useState(schoolName);
   const [schoolResults, setSchoolResults] = useState<string[]>([]);
   const handleSchoolSearch = (query: string) => {
     setSchoolQuery(query);

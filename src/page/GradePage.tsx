@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import RadarChart from "../Components/RadarChart";
+import RadarChart from "../components/RadarChart";
 import {
   MainContainer,
   DropDown,
