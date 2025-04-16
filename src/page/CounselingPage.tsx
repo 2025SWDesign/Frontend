@@ -22,9 +22,10 @@ import {
 } from "./CounselingPage.styled";
 
 interface Student {
+  studentId: number;
   name: string;
   grade: number;
-  class: number;
+  gradeClass: number;
   number: number;
   img: string;
 }
