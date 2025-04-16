@@ -100,8 +100,7 @@ export const InputText = styled.div`
   font-weight: 700;
 `;
 
-// InputArea: 입력 필드 스타일
-export const InputArea = styled.div`
+export const InputArea = styled.form`
   width: 32.5rem;
   height: 3.75rem;
   background-color: #ffffff;

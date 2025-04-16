@@ -14,9 +14,9 @@ import {
   SearchBox,
   SearchButton,
 } from "./ReportPage.styled";
-import ScoreReport from "../Components/ScoreReport";
-import CounselingReport from "../Components/CounselingReport";
-import FeedBackReport from "../Components/FeedbackReport";
+import ScoreReport from "../components/ScoreReport";
+import CounselingReport from "../components/CounselingReport";
+import FeedBackReport from "../components/FeedbackReport";
 
 interface ReportPageProps {
   identity: string;
