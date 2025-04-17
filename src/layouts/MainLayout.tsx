@@ -66,20 +66,25 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   const [userName, setUserName] = useState("");
   const [isHomeroom, setIsHomeroom] = useState(false);
   const [schoolName, setSchoolName] = useState("");
-  const { schoolId, classId } = useAuth(); 
-  const [role, setRole]=useState("");
+  const { schoolId, classId } = useAuth();
+  const [role, setRole] = useState("");
+
   // 유저 정보 불러오기
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const token = sessionStorage.getItem("accessToken");
+
         if (!token || !schoolId) return;
-  
-        const response = await axios.get(`/api/v1/school/${schoolId}/users/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+
+        const response = await axios.get(
+          `/api/v1/school/${schoolId}/users/me`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log("유저 정보 불러오기 성공:", response.data);
         const { name, role, teacher, school } = response.data.data;
         setUserName(name);
@@ -90,7 +95,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         console.error("유저 정보 불러오기 실패:", err);
       }
     };
-  
+
     fetchUserInfo();
   }, [schoolId]);
 
@@ -101,11 +106,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       if (!token || !schoolId) return;
 
       const response = await axios.get(
-        `/api/v1/school/${schoolId}/class/${classId}/students`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        `/api/v1/school/${schoolId}/class/${classId}/students`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.data.status === 200) {
         // API 응답 구조에 맞게 데이터 변환
@@ -140,6 +147,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     }
   }, [isHomeroom, schoolId, classId, fetchClassStudents]);
 
+  // 학생 검색
   const handleSearch = async () => {
     try {
       const token = sessionStorage.getItem("accessToken");
@@ -148,13 +156,35 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       // 검색어가 있는 경우 학생 검색 API 호출
       if (searchQuery.trim()) {
         const response = await axios.get(
-          `/api/v1/school/${schoolId}/search/student?name=${searchQuery}`,{
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response.data); // API 응답 데이터 확인
-        // API 응답 형식에 맞게 처리하는 코드 추가 필요
+          `/api/v1/school/${schoolId}/search/student?name=${searchQuery}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("검색한 학생들", response.data);
+
+        const studentsData = response.data.data.map(
+          (item: {
+            id: number;
+            name: string;
+            email: string;
+            student: {
+              grade: number;
+              gradeClass: number;
+              number: number;
+            };
+          }) => ({
+            studentId: item.id,
+            name: item.name,
+            grade: item.student.grade,
+            gradeClass: item.student.gradeClass,
+            number: item.student.number,
+            img: "/assets/img/photo.png", // 기본 이미지 경로 설정
+          })
+        );
+        setStudents(studentsData);
       } else if (isHomeroom) {
         // 검색어가 없고 담임인 경우, 전체 반 학생 목록을 다시 불러옴
         fetchClassStudents();
@@ -169,17 +199,22 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     }
   };
 
+  // 학생 클릭 시 상세정보 조회
   const fetchStudentDetails = async (studentId: number) => {
     try {
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
+      console.log("학생 상세정보 조회", studentId);
 
-      const response = await axios.get(`/api/v1/school/${schoolId}/students/${studentId}`,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
+      const response = await axios.get(
+        `/api/v1/school/${schoolId}/students/${studentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (response.data.status === 200) {
         const studentData = response.data.data;
         // API 응답을 selectedStudent 형식에 맞게 변환
@@ -189,17 +224,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           grade: studentData.grade,
           gradeClass: studentData.gradeClass,
           number: studentData.number,
-          img: studentData.user.photo || "/assets/img/photo.png" // 사진이 없는 경우 기본 이미지 사용
+          img: studentData.user.photo || "/assets/img/photo.png", // 사진이 없는 경우 기본 이미지 사용
         };
-        
+
         setSelectedStudent(formattedStudent);
-        
-        if (location.pathname === "/") {
+
+        if (location.pathname === "/main") {
           navigate("/student-info");
         }
       }
     } catch (error) {
-      console.error('학생 상세정보 조회 실패:', error);
+      console.error("학생 상세정보 조회 실패:", error);
     }
   };
 
@@ -261,7 +296,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         </a>
         <UserArea>
           <div>
-            <p>{userName} {role==="TEACHER" ? "선생님" : "학생"}</p>
+            <p>
+              {userName} {role === "TEACHER" ? "선생님" : "학생"}
+            </p>
             <UserIconContainer id="userDropdown" onClick={toggleUserDropdown}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -296,7 +333,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                           fill="black"
                         />
                       </svg>
-                      <p>{userName} {role==="TEACHER" ? "선생님" : "학생"}</p>
+                      <p>
+                        {userName} {role === "TEACHER" ? "선생님" : "학생"}
+                      </p>
                     </DropdownFlexContainer>
                     <UserDropdownButtons>
                       <UserDropdownItem onClick={() => setIsMyPageOpen(true)}>
