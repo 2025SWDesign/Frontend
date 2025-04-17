@@ -112,7 +112,7 @@ const SignInPage: React.FC = () => {
       const { accessToken, refreshToken, schoolId, classId } = response.data.data;
       console.log("로그인 성공:", response.data);
   
-      setAuth({
+      setAuth({ 
         accessToken,
         refreshToken,
         schoolId: String(schoolId),

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   StudentManagementContainer,
   StudentManagementHeader,
@@ -61,12 +62,11 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
     number: "15",
   });
 
-  // 상태관리리
+  // 상태관리
   const [specialNotes, setSpecialNotes] = useState(""); // 특기사항
   const [isSpecialNotesEditing, setIsSpeicalNotesEditing] = useState(false); // 특기사항 편집
   const [isAttendanceEditing, setIsAttendanceEditing] = useState(false); // 개인 출석 편집
-  const [isClassAttendanceEditing, setIsClassAttendanceEditing] =
-    useState(false); // 담임 모드 출석 편집집
+  const [isClassAttendanceEditing, setIsClassAttendanceEditing] = useState(false); // 담임 모드 출석 편집집
 
   // 기본 정보 변경 핸들러
   const handleBasicInfoChange =
