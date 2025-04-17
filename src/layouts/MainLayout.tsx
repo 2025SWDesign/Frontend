@@ -68,6 +68,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   const [schoolName, setSchoolName] = useState("");
   const { schoolId, classId } = useAuth(); 
   const [role, setRole]=useState("");
+
   // 유저 정보 불러오기
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -194,7 +195,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         
         setSelectedStudent(formattedStudent);
         
-        if (location.pathname === "/") {
+        if (location.pathname === "/main") {
           navigate("/student-info");
         }
       }
@@ -222,6 +223,29 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     setUserDropdownOpen(!isUserDropdownOpen);
   };
 
+  const handleLogout = async () => {
+    try {
+      const token = sessionStorage.getItem("accessToken");
+      if (!token || !schoolId) return;
+  
+      const response = await axios.post(
+        `/api/v1/auth/sign-out`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      console.log("로그아웃 성공:", response.data);
+      navigate("/");
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+      throw error;
+    }
+  };
+  
   // 알림 드롭다운 메뉴
   const [isNoteDropdownOpen, setNoteDropdownOpen] = useState(false);
 
@@ -302,7 +326,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                       <UserDropdownItem onClick={() => setIsMyPageOpen(true)}>
                         개인정보 수정/설정
                       </UserDropdownItem>
-                      <UserDropdownItem>로그아웃</UserDropdownItem>
+                      <UserDropdownItem onClick={handleLogout}>로그아웃</UserDropdownItem>
                     </UserDropdownButtons>
                   </UserDropdownMenu>
                 </>
