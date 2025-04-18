@@ -17,20 +17,7 @@ import {
 import ScoreReport from "../components/ScoreReport";
 import CounselingReport from "../components/CounselingReport";
 import FeedBackReport from "../components/FeedbackReport";
-
-interface ReportPageProps {
-  identity: string;
-  selectedStudent: Student | null;
-}
-
-interface Student {
-  studentId: number;
-  name: string;
-  grade: number;
-  gradeClass: number;
-  number: number;
-  img: string;
-}
+import { useStudentStore } from "../stores/studentStore";
 
 const semesterGradeData = [
   { name: "1학년 1학기", 국어: 80, 영어: 70, 수학: 90, 과학: 60, 사회: 85 },
@@ -41,13 +28,7 @@ const semesterGradeData = [
   { name: "3학년 2학기", 국어: 88, 영어: 80, 수학: 89, 과학: 72, 사회: 90 },
 ];
 
-const ReportPage: React.FC<ReportPageProps> = ({
-  identity,
-  selectedStudent,
-}) => {
-  const identityCheck = () => {
-    console.log(identity);
-  };
+const ReportPage: React.FC = () => {
   const [selectedGrade, setSelectedGrade] = useState("1");
   const [selectedSemester, setSelectedSemester] = useState("1");
   const [isExcel, setIsExcel] = useState(true);
@@ -56,6 +37,7 @@ const ReportPage: React.FC<ReportPageProps> = ({
   //성적 보고서 용
   const fullSemester = `${selectedGrade}학년 ${selectedSemester}학기`;
   const selectedData = semesterGradeData.find((d) => d.name === fullSemester);
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
 
   const semesterTableData = selectedData
     ? Object.entries(selectedData)
@@ -74,7 +56,7 @@ const ReportPage: React.FC<ReportPageProps> = ({
     : [];
 
   return (
-    <MainContainer onClick={identityCheck}>
+    <MainContainer>
       <h1>보고서 생성</h1>
       <Line />
       <ControlContainer>

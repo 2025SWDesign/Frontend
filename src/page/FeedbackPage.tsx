@@ -14,27 +14,10 @@ import {
   GradeSelect,
   GuideMessage,
 } from "./FeedbackPage.styled";
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
 
-interface Student {
-  studentId: number;
-  name: string;
-  grade: number;
-  gradeClass: number;
-  number: number;
-  img: string;
-}
-
-interface FeedbackPageProps {
-  identity: string;
-  isHomeroom: boolean;
-  selectedStudent: Student | null;
-}
-
-const FeedbackPage: React.FC<FeedbackPageProps> = ({
-  identity,
-  //isHomeroom,
-  selectedStudent,
-}) => {
+const FeedbackPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [feedbacks, setFeedbacks] = useState({
     academic: "",
@@ -43,6 +26,8 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
     attitude: "",
   });
   const [grade, setGrade] = useState("1");
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
+  const role = useAuthStore((state) => state.role);
 
   const handleChange =
     (field: keyof typeof feedbacks) =>
@@ -71,7 +56,7 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
     <FeedbackContainer>
       <FeedbackHeader>피드백 내역</FeedbackHeader>
       <Line />
-      {selectedStudent || !(identity == "teacher") ? (
+      {selectedStudent || !(role == "TEACHER") ? (
         <>
           <GradeSelect value={grade} onChange={(e) => setGrade(e.target.value)}>
             <option value="1">1학년</option>
@@ -80,52 +65,52 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
           </GradeSelect>
 
           <FeedbackContentContainer>
-            <ContentBox identity={identity}>
+            <ContentBox identity={role}>
               <ContentTitle>성적</ContentTitle>
               <ContentForm
                 value={feedbacks.academic}
                 onChange={handleChange("academic")}
                 disabled={!isEditing}
                 placeholder={isEditing ? "성적에 대한 피드백을 입력하세요" : ""}
-                identity={identity}
+                identity={role}
               />
             </ContentBox>
 
-            <ContentBox identity={identity}>
+            <ContentBox identity={role}>
               <ContentTitle>행동</ContentTitle>
               <ContentForm
                 value={feedbacks.behavior}
                 onChange={handleChange("behavior")}
                 disabled={!isEditing}
                 placeholder={isEditing ? "행동에 대한 피드백을 입력하세요" : ""}
-                identity={identity}
+                identity={role}
               />
             </ContentBox>
 
-            <ContentBox identity={identity}>
+            <ContentBox identity={role}>
               <ContentTitle>출결</ContentTitle>
               <ContentForm
                 value={feedbacks.attendance}
                 onChange={handleChange("attendance")}
                 disabled={!isEditing}
                 placeholder={isEditing ? "출결에 대한 피드백을 입력하세요" : ""}
-                identity={identity}
+                identity={role}
               />
             </ContentBox>
 
-            <ContentBox identity={identity}>
+            <ContentBox identity={role}>
               <ContentTitle>태도</ContentTitle>
               <ContentForm
                 value={feedbacks.attitude}
                 onChange={handleChange("attitude")}
                 disabled={!isEditing}
                 placeholder={isEditing ? "태도에 대한 피드백을 입력하세요" : ""}
-                identity={identity}
+                identity={role}
               />
             </ContentBox>
           </FeedbackContentContainer>
 
-          {identity === "teacher" && (
+          {role === "TEACHER" && (
             <ButtonContainer>
               <div>
                 <SendButton onClick={handleSendToStudent} disabled={isEditing}>

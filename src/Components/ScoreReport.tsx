@@ -12,12 +12,14 @@ import {
 import RadarChart from "./RadarChart";
 
 interface Student {
+  studentId: number;
   name: string;
   grade: number;
-  class: number;
+  gradeClass: number;
   number: number;
   img: string;
 }
+
 interface ScoreReportProps {
   student: Student;
   grade: string;
@@ -38,7 +40,7 @@ const ScoreReport: React.FC<ScoreReportProps> = ({
     <MainContainer>
       <Header>
         <p>
-          {student.grade}학년 {student.class}반 {student.number}번
+          {student.grade}학년 {student.gradeClass}반 {student.number}번
         </p>
         <TitleArea>
           <h1>{student.name} 학생</h1>

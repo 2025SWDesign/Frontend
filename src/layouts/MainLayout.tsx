@@ -33,7 +33,8 @@ import {
   SearchButton,
 } from "./MainLayout.styled";
 import MyPage from "../page/MyPage";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
 
 interface Student {
   studentId: number;
@@ -45,43 +46,42 @@ interface Student {
 }
 
 interface MainLayoutProps {
-  identity: string;
-  selectedStudent: Student | null;
-  setSelectedStudent: (student: Student | null) => void;
   children: React.ReactNode;
-  isHomeroom: boolean;
-  setIsHomeroom: React.Dispatch<React.SetStateAction<boolean>>;
-  schoolId: number;
-  classId: number;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({
-  selectedStudent,
-  setSelectedStudent,
-  children,
-}) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>([]); // 초기에는 빈 배열
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태
-  const [userName, setUserName] = useState("");
-  const [isHomeroom, setIsHomeroom] = useState(false);
-  const [schoolName, setSchoolName] = useState("");
-  const { schoolId, classId } = useAuth();
-  const [role, setRole] = useState("");
 
+  const userName = useAuthStore((state) => state.userName);
+  const setUserName = useAuthStore((state) => state.setUserName);
+
+  const role = useAuthStore((state) => state.role);
+  const setRole = useAuthStore((state) => state.setRole);
+
+  const isHomeroom = useAuthStore((state) => state.isHomeroom);
+  const setIsHomeroom = useAuthStore((state) => state.setIsHomeroom);
+  const schoolId = useAuthStore((state) => state.schoolId);
+  const setSchoolName = useAuthStore((state) => state.setSchoolName);
+  const classId = useAuthStore((state) => state.classId);
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
+  const setSelectedStudent = useStudentStore(
+    (state) => state.setSelectedStudent
+  );
+
+  const accessToken = useAuthStore((state) => state.accessToken);
   // 유저 정보 불러오기
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const token = sessionStorage.getItem("accessToken");
-
-        if (!token || !schoolId) return;
+        if (!accessToken || !schoolId) return;
 
         const response = await axios.get(
           `/api/v1/school/${schoolId}/users/me`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -89,7 +89,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         const { name, role, teacher, school } = response.data.data;
         setUserName(name);
         setRole(role);
-        setIsHomeroom(teacher?.isHomeroom || false);
+        setIsHomeroom(teacher?.isHomeroom ?? false);
         setSchoolName(school?.schoolName || "");
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
@@ -97,7 +97,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     };
 
     fetchUserInfo();
-  }, [schoolId]);
+  });
 
   // 반 학생 목록 가져오기
   const fetchClassStudents = useCallback(async () => {
@@ -261,7 +261,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     try {
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
-  
+
       const response = await axios.post(
         `/api/v1/auth/sign-out`,
         {},
@@ -271,7 +271,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           },
         }
       );
-      
+
       console.log("로그아웃 성공:", response.data);
       navigate("/");
     } catch (error) {
@@ -279,7 +279,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       throw error;
     }
   };
-  
+
   // 알림 드롭다운 메뉴
   const [isNoteDropdownOpen, setNoteDropdownOpen] = useState(false);
 
@@ -364,7 +364,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                       <UserDropdownItem onClick={() => setIsMyPageOpen(true)}>
                         개인정보 수정/설정
                       </UserDropdownItem>
-                      <UserDropdownItem onClick={handleLogout}>로그아웃</UserDropdownItem>
+                      <UserDropdownItem onClick={handleLogout}>
+                        로그아웃
+                      </UserDropdownItem>
                     </UserDropdownButtons>
                   </UserDropdownMenu>
                 </>
@@ -735,15 +737,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           <PageArea>{children}</PageArea>
         </MainArea>
       </MainContainer>
-      {isMyPageOpen && (
-        <MyPage
-          identity={role}
-          onClose={() => setIsMyPageOpen(false)}
-          isHomeroom={isHomeroom}
-          setIsHomeroom={setIsHomeroom}
-          schoolName={schoolName}
-        />
-      )}
+      {isMyPageOpen && <MyPage onClose={() => setIsMyPageOpen(false)} />}
     </LayoutWrapper>
   );
 };

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import RadarChart from "../components/RadarChart";
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
+
 import {
   MainContainer,
   DropDown,
@@ -23,21 +26,6 @@ import {
   StudentsTableArea,
   GuideMessage,
 } from "./GradePage.styled";
-
-interface GradePageProps {
-  identity: string;
-  isHomeroom: boolean;
-  selectedStudent: Student | null;
-}
-
-interface Student {
-  studentId: number;
-  name: string;
-  grade: number;
-  gradeClass: number;
-  number: number;
-  img: string;
-}
 
 // 학기별 성적
 const semesterGradeData = [
@@ -129,14 +117,7 @@ const studentScores: { [key: string]: StudentScore } = initialStudents.reduce(
   {} as { [key: string]: StudentScore }
 );
 
-const GradePage: React.FC<GradePageProps> = ({
-  identity,
-  isHomeroom,
-  selectedStudent,
-}) => {
-  const identityCheck = () => {
-    console.log(identity);
-  };
+const GradePage: React.FC = () => {
   //기간&과목별용
   const [isPeriod, setIsPeriod] = useState(true);
   const [selectedGrade, setSelectedGrade] = useState("1");
@@ -159,6 +140,10 @@ const GradePage: React.FC<GradePageProps> = ({
 
   const teacherGrade = initialStudents[0].grade;
   const teacherClass = initialStudents[0].class;
+
+  const role = useAuthStore((state) => state.role);
+  const isHomeroom = useAuthStore((state) => state.isHomeroom);
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
 
   // 학기별 테이블 데이터
   const semesterTableData = selectedData
@@ -246,7 +231,7 @@ const GradePage: React.FC<GradePageProps> = ({
     console.log("🟢 selectedStudent changed:", selectedStudent);
   }, [selectedStudent]);
 
-  if (identity === "teacher" && !isHomeroom && !selectedStudent) {
+  if (role === "TEACHER" && !isHomeroom && !selectedStudent) {
     return (
       <MainContainer>
         <h1>학생성적관리</h1>
@@ -259,10 +244,10 @@ const GradePage: React.FC<GradePageProps> = ({
   }
 
   return (
-    <MainContainer onClick={identityCheck}>
+    <MainContainer>
       <h1>학생성적관리</h1>
       <Line />
-      {identity === "teacher" && isHomeroom && !selectedStudent ? (
+      {role === "TEACHER" && isHomeroom && !selectedStudent ? (
         <GradeContainer>
           <StudentsTableArea>
             <h2>{`${currentYear}학년도 ${currentSemester} 성적 - ${teacherGrade}학년 ${teacherClass}반`}</h2>
@@ -307,7 +292,7 @@ const GradePage: React.FC<GradePageProps> = ({
             </StudentGradeTable>
           </StudentsTableArea>
         </GradeContainer>
-      ) : identity === "teacher" && selectedStudent ? (
+      ) : role === "TEACHER" && selectedStudent ? (
         <GradeContainer>
           <TableArea>
             <ToggleWrapper

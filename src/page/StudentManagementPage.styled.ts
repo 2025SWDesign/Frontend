@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 interface StudentManagementPageProps {
-  identity: string;
+  role: string;
 }
 
 export const StudentManagementContainer = styled.div``;
@@ -87,7 +87,9 @@ export const SemesterAttendanceSection = styled.section<StudentManagementPagePro
   margin-left: 2.5rem;
   width: 78rem;
 
-  ${(props) => props.identity !== "teacher" && `
+  ${(props) =>
+    props.role !== "TEACHER" &&
+    `
     margin-bottom: 2rem;
     margin-top: 1.5rem;
   `}
@@ -95,10 +97,10 @@ export const SemesterAttendanceSection = styled.section<StudentManagementPagePro
 
 export const AttendanceTableWrapper = styled.div`
   overflow-x: auto;
-  overflow-y: hidden; 
+  overflow-y: hidden;
   max-width: 100%;
   border: 1px solid #e0e0e0;
-  border-radius: 0.5rem; 
+  border-radius: 0.5rem;
 `;
 
 export const AttendanceTable = styled.table`
@@ -167,10 +169,8 @@ export const AttendanceCell = styled.td`
 
 // 학생 출결 정보 섹션
 export const StudentAttendanceSection = styled.section`
-
   margin-left: 2.5rem;
   margin-bottom: 1rem;
-
 `;
 
 export const AttendanceSummaryTable = styled.table`
@@ -189,14 +189,14 @@ export const SummaryHeaderCell = styled.th`
   text-align: center;
   font-weight: bold;
   white-space: nowrap;
-  
+
   /* 첫 번째 행의 첫 번째 셀 (왼쪽 상단) */
-  &:first-child:nth-last-child(n+1):first-child {
+  &:first-child:nth-last-child(n + 1):first-child {
     border-top-left-radius: 0.5rem;
   }
-  
+
   /* 첫 번째 행의 마지막 셀 (오른쪽 상단) */
-  &:last-child:nth-child(n+1):first-child {
+  &:last-child:nth-child(n + 1):first-child {
     border-top-right-radius: 0.5rem;
   }
 `;
@@ -214,11 +214,11 @@ export const SummaryCell = styled.td`
   padding: 0.15rem;
   border: 1px solid #e0e0e0;
   text-align: center;
-  
+
   tr:last-child &:first-child {
     border-bottom-left-radius: 0.5rem;
   }
-  
+
   tr:last-child &:last-child {
     border-bottom-right-radius: 0.5rem;
   }
@@ -231,13 +231,14 @@ export const SpecialNotesSection = styled.section<StudentManagementPageProps>`
   margin-left: 2.5rem;
   margin-bottom: 1rem;
 
-  ${(props) => props.identity !== "teacher" && `  
+  ${(props) =>
+    props.role !== "TEACHER" &&
+    `  
     margin-top: 2rem;
   `}
 `;
 
 export const NotesForm = styled.textarea<StudentManagementPageProps>`
-  
   width: 76rem;
   height: 5rem;
   padding: 1rem;
@@ -256,7 +257,9 @@ export const NotesForm = styled.textarea<StudentManagementPageProps>`
     cursor: not-allowed;
   }
 
-  ${(props) => props.identity !== "teacher" && `
+  ${(props) =>
+    props.role !== "TEACHER" &&
+    `
     height: 8rem;
   `}
 `;
@@ -287,12 +290,12 @@ export const ClassAttendanceTableWrapper = styled.div`
   border-radius: 0.5rem;
   margin-top: 1rem;
   width: 55rem;
-  margin-left : 3rem;
+  margin-left: 3rem;
 `;
 
 export const ClassAttendanceTable = styled.table`
   border-collapse: collapse;
-  
+
   width: 100%;
 `;
 
@@ -331,7 +334,6 @@ export const ClassAttendanceCell = styled.td`
   padding: 0.35rem;
   border: 1px solid #e0e0e0;
   text-align: center;
-
 `;
 export const ClassAttendanceEditButton = styled.button`
   margin-left: 53rem;
