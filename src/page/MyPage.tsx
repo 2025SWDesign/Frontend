@@ -16,22 +16,17 @@ import {
   SectionTitle,
   TitleArea,
 } from "./MyPage.styled";
+import { useAuthStore } from "../stores/authStore";
 
 interface MyPageProps {
   onClose: () => void;
-  isHomeroom: boolean;
-  setIsHomeroom: React.Dispatch<React.SetStateAction<boolean>>;
-  identity: string;
-  schoolName: string;
 }
 
-const MyPage: React.FC<MyPageProps> = ({
-  identity,
-  onClose,
-  isHomeroom,
-  setIsHomeroom,
-  schoolName,
-}) => {
+const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
+  const role = useAuthStore((state) => state.role);
+  const isHomeroom = useAuthStore((state) => state.isHomeroom);
+  const setIsHomeroom = useAuthStore((state) => state.setIsHomeroom);
+  const schoolName = useAuthStore((state) => state.schoolName);
   const [selectedGrade, setSelectedGrade] = useState("1");
   const [selectedClass, setSelectedClass] = useState("1");
   const [name, setName] = useState("OOO");
@@ -140,7 +135,7 @@ const MyPage: React.FC<MyPageProps> = ({
               ))}
             </SchoolList>
           )}
-          {identity === "teacher" && (
+          {role === "TEACHER" && (
             <>
               <InfoRow>
                 담임교사 여부

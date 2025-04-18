@@ -26,7 +26,7 @@ import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { MdOutlineMail } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStore } from "../stores/authStore";
 
 interface SignUpPayload {
   schoolName: string;
@@ -76,7 +76,9 @@ const SignInPage: React.FC = () => {
   //로그인
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  const { setAuth } = useAuth();
+
+  const setAuthTokens = useAuthStore((state) => state.setAuthTokens);
+  const setSchoolAndClass = useAuthStore((state) => state.setSchoolAndClass);
 
   const allSchools = [
     "서울고등학교",
@@ -125,12 +127,8 @@ const SignInPage: React.FC = () => {
         response.data.data;
       console.log("로그인 성공:", response.data);
 
-      setAuth({
-        accessToken,
-        refreshToken,
-        schoolId: String(schoolId),
-        classId: classId ? String(classId) : null,
-      });
+      setAuthTokens(accessToken, refreshToken);
+      setSchoolAndClass(Number(schoolId), classId ?? 0);
 
       sessionStorage.setItem("accessToken", accessToken);
       sessionStorage.setItem("refreshToken", refreshToken);

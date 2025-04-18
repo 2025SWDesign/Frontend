@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
 import {
   StudentManagementContainer,
   StudentManagementHeader,
@@ -34,26 +35,7 @@ import {
   GuideMessage,
 } from "./StudentManagementPage.styled";
 
-interface Student {
-  studentId: number;
-  name: string;
-  grade: number;
-  gradeClass: number;
-  number: number;
-  img: string;
-}
-
-interface StudentManagementPageProps {
-  identity: string;
-  isHomeroom: boolean;
-  selectedStudent: Student | null;
-}
-
-const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
-  identity,
-  isHomeroom,
-  selectedStudent,
-}) => {
+const StudentManagementPage: React.FC = () => {
   // 학생 기본 정보 상태
   const [basicInfo, setBasicInfo] = useState({
     name: "홍길동",
@@ -66,7 +48,8 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
   const [specialNotes, setSpecialNotes] = useState(""); // 특기사항
   const [isSpecialNotesEditing, setIsSpeicalNotesEditing] = useState(false); // 특기사항 편집
   const [isAttendanceEditing, setIsAttendanceEditing] = useState(false); // 개인 출석 편집
-  const [isClassAttendanceEditing, setIsClassAttendanceEditing] = useState(false); // 담임 모드 출석 편집집
+  const [isClassAttendanceEditing, setIsClassAttendanceEditing] =
+    useState(false); // 담임 모드 출석 편집집
 
   // 기본 정보 변경 핸들러
   const handleBasicInfoChange =
@@ -148,7 +131,9 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
   // 현재 날짜 구하기
   const today = new Date();
   const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
-
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
+  const role = useAuthStore((state) => state.role);
+  const isHomeroom = useAuthStore((state) => state.isHomeroom);
   // 반 학생들 출석 상태 관리
   const [classAttendance, setClassAttendance] = useState([
     {
@@ -500,10 +485,10 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
     <StudentManagementContainer>
       <StudentManagementHeader>학생부 관리</StudentManagementHeader>
       <Line />
-      {selectedStudent || !(identity == "teacher") ? (
+      {selectedStudent || !(role == "TEACHER") ? (
         <>
           {/* 학생 기본정보 수정 섹션 수정 */}
-          {identity === "teacher" && (
+          {role == "TEACHER" && (
             <BasicInfoSection>
               <SectionTitle>학생 기본정보 수정</SectionTitle>
               <InfoRow>
@@ -537,7 +522,7 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
           )}
 
           {/* 해당 학기 출석 섹션 */}
-          <SemesterAttendanceSection identity={identity}>
+          <SemesterAttendanceSection role={role}>
             <SectionTitle>해당 학기 출석</SectionTitle>
             {/* 해당 학기 출석 테이블의 "총" 열 추가 */}
             <AttendanceTableWrapper>
@@ -570,7 +555,7 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
                 </tbody>
               </AttendanceTable>
             </AttendanceTableWrapper>
-            {identity === "teacher" && (
+            {role === "TEACHER" && (
               <AttendanceEditButton onClick={toggleAttendanceEditMode}>
                 {isAttendanceEditing ? "저장" : "수정"}
               </AttendanceEditButton>
@@ -620,7 +605,7 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
           </StudentAttendanceSection>
 
           {/* 특기 사항 섹션 */}
-          <SpecialNotesSection identity={identity}>
+          <SpecialNotesSection role={role}>
             <SectionTitle>특기 사항</SectionTitle>
             <NotesForm
               value={specialNotes}
@@ -629,9 +614,9 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
               placeholder={
                 isSpecialNotesEditing ? "학생의 특기 사항을 입력하세요" : ""
               }
-              identity={identity}
+              role={role}
             />
-            {identity === "teacher" && (
+            {role === "TEACHER" && (
               <EditButton onClick={toggleSpecialNotesEditMode}>
                 {isSpecialNotesEditing ? "저장" : "수정"}
               </EditButton>
