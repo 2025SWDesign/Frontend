@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "/assets/img/Logo.png";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance.ts";
 
 import {
   LayoutWrapper,
@@ -77,13 +77,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       try {
         if (!accessToken || !schoolId) return;
 
-        const response = await axios.get(
-          `/api/v1/school/${schoolId}/users/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
+        const response = await axiosInstance.get(
+          `/school/${schoolId}/users/me`
         );
         console.log("유저 정보 불러오기 성공:", response.data);
         const { name, role, teacher, school } = response.data.data;
@@ -97,7 +92,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
 
     fetchUserInfo();
-  });
+  }, [
+    accessToken,
+    schoolId,
+    setUserName,
+    setRole,
+    setIsHomeroom,
+    setSchoolName,
+  ]);
 
   // 반 학생 목록 가져오기
   const fetchClassStudents = useCallback(async () => {
@@ -105,13 +107,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
 
-      const response = await axios.get(
-        `/api/v1/school/${schoolId}/class/${classId}/students`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await axiosInstance.get(
+        `/school/${schoolId}/class/${classId}/students`
       );
 
       if (response.data.status === 200) {
@@ -155,13 +152,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       // 검색어가 있는 경우 학생 검색 API 호출
       if (searchQuery.trim()) {
-        const response = await axios.get(
-          `/api/v1/school/${schoolId}/search/student?name=${searchQuery}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await axiosInstance.get(
+          `/school/${schoolId}/search/student?name=${searchQuery}`
         );
         console.log("검색한 학생들", response.data);
 
@@ -206,13 +198,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       if (!token || !schoolId) return;
       console.log("학생 상세정보 조회", studentId);
 
-      const response = await axios.get(
-        `/api/v1/school/${schoolId}/students/${studentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await axiosInstance.get(
+        `/school/${schoolId}/students/${studentId}`
       );
 
       if (response.data.status === 200) {
@@ -262,16 +249,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
 
-      const response = await axios.post(
-        `/api/v1/auth/sign-out`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await axiosInstance.post(`/auth/sign-out`, {});
       console.log("로그아웃 성공:", response.data);
       navigate("/");
     } catch (error) {
