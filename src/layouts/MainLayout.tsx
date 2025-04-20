@@ -116,10 +116,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         const studentsData = response.data.data.map(
           (item: {
             studentId: number;
-            user: { name: string };
             grade: number;
             gradeClass: number;
             number: number;
+            user: { name: string; schoolId?: number };
           }) => ({
             studentId: item.studentId,
             name: item.user.name,
@@ -155,20 +155,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         const response = await axiosInstance.get(
           `/school/${schoolId}/search/student?name=${searchQuery}`
         );
-        console.log("검색한 학생들", response.data);
-
+        console.log("학생 검색", response.data);
         const studentsData = response.data.data.map(
-          (item: {
-            id: number;
+          (item: {     
+            email : string;
             name: string;
-            email: string;
-            student: {
-              grade: number;
-              gradeClass: number;
-              number: number;
-            };
+            student: {grade: number; gradeClass: number; number: number; studentId: number;};
           }) => ({
-            studentId: item.id,
+            studentId: item.student.studentId,
             name: item.name,
             grade: item.student.grade,
             gradeClass: item.student.gradeClass,
@@ -176,6 +170,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             img: "/assets/img/photo.png", // 기본 이미지 경로 설정
           })
         );
+        console.log("검색한 학생들", studentsData);
         setStudents(studentsData);
       } else if (isHomeroom) {
         // 검색어가 없고 담임인 경우, 전체 반 학생 목록을 다시 불러옴
