@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
 
 import {
   FeedbackContainer,
@@ -27,7 +28,7 @@ interface Student {
 }
 
 interface FeedbackPageProps {
-  identity: string;
+  role: string;
   isHomeroom: boolean;
   selectedStudent: Student | null;
 }
@@ -39,10 +40,7 @@ interface FeedbackItem {
   updatedAt: string;
 }
 
-const FeedbackPage: React.FC<FeedbackPageProps> = ({
-  identity,
-  selectedStudent,
-}) => {
+const FeedbackPage: React.FC<FeedbackPageProps> = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [feedbacks, setFeedbacks] = useState({
     GRADE: "",
@@ -50,8 +48,10 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
     ATTENDANCE: "",
     ATTITUDE: "",
   });
-  const [schoolYear, setSchoolYear] = useState("1");
-  const { schoolId } = useAuth();
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
+  const role = useAuthStore((state) => state.role);
+  const schoolId = useAuthStore((state) => state.schoolId);
+  const [schoolYear, setSchoolYear] = useState("1");  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // 편집 모드 진입 시 모든 폼이 비어있는지 여부를 저장
@@ -223,7 +223,7 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
     <FeedbackContainer>
       <FeedbackHeader>피드백 내역</FeedbackHeader>
       <Line />
-      {selectedStudent || !(identity === "teacher") ? (
+      {selectedStudent || !(role === "TEACHER") ? (
         <>
           <GradeSelect
             value={schoolYear}
@@ -240,7 +240,7 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
             <GuideMessage>{error}</GuideMessage>
           ) : (
             <FeedbackContentContainer>
-              <ContentBox identity={identity}>
+              <ContentBox role={role}>
                 <ContentTitle>성적</ContentTitle>
                 <ContentForm
                   value={feedbacks.GRADE}
@@ -249,11 +249,11 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
                   placeholder={
                     isEditing ? "성적에 대한 피드백을 입력하세요" : ""
                   }
-                  identity={identity}
+                  role={role}
                 />
               </ContentBox>
 
-              <ContentBox identity={identity}>
+              <ContentBox role={role}>
                 <ContentTitle>행동</ContentTitle>
                 <ContentForm
                   value={feedbacks.BEHAVIOR}
@@ -262,11 +262,11 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
                   placeholder={
                     isEditing ? "행동에 대한 피드백을 입력하세요" : ""
                   }
-                  identity={identity}
+                  role={role}
                 />
               </ContentBox>
 
-              <ContentBox identity={identity}>
+              <ContentBox role={role}>
                 <ContentTitle>출결</ContentTitle>
                 <ContentForm
                   value={feedbacks.ATTENDANCE}
@@ -275,11 +275,11 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
                   placeholder={
                     isEditing ? "출결에 대한 피드백을 입력하세요" : ""
                   }
-                  identity={identity}
+                  role={role}
                 />
               </ContentBox>
 
-              <ContentBox identity={identity}>
+              <ContentBox role={role}>
                 <ContentTitle>태도</ContentTitle>
                 <ContentForm
                   value={feedbacks.ATTITUDE}
@@ -288,13 +288,13 @@ const FeedbackPage: React.FC<FeedbackPageProps> = ({
                   placeholder={
                     isEditing ? "태도에 대한 피드백을 입력하세요" : ""
                   }
-                  identity={identity}
+                  role={role}
                 />
               </ContentBox>
             </FeedbackContentContainer>
           )}
 
-          {identity === "teacher" && !error && (
+          {role === "TEACHER" && !error && (
             <ButtonContainer>
               <div>
                 <SendButton

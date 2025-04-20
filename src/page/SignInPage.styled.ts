@@ -157,7 +157,9 @@ export const MiniInput = styled.div`
     outline: none;
   }
 `;
-export const ToggleButton = styled.button`
+
+//자동 제출 방지용 button type 명시
+export const ToggleButton = styled.button.attrs({ type: "button" })`
   background: none;
   border: none;
   margin-right: 1rem;
@@ -179,7 +181,7 @@ export const SignButton = styled.button`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  
+
   p {
     font-size: 1.5rem;
     font-weight: bold;
@@ -194,18 +196,18 @@ export const KakaoButton = styled.div`
   align-items: center;
   width: 22rem;
   height: 3.75rem;
-  background: #FEE500;
+  background: #fee500;
   border-radius: 0.75rem;
   padding: 0 1.5rem 0 1.5rem;
   margin-top: 4rem;
   cursor: pointer;
 
-  svg{
+  svg {
     width: 1.5rem;
     height: 1.5rem;
   }
 
-  div{
+  div {
     width: 100%;
     display: flex;
     justify-content: center;
@@ -215,8 +217,7 @@ export const KakaoButton = styled.div`
     font-size: 1.25rem;
     font-weight: 400;
   }
-
-`
+`;
 
 export const EmailButton = styled.div`
   display: flex;
@@ -226,16 +227,16 @@ export const EmailButton = styled.div`
   width: 22rem;
   height: 3.75rem;
   border-radius: 0.75rem;
-  border: 2px solid #B9B9B9;
+  border: 2px solid #b9b9b9;
   padding: 0 1.5rem 0 1.5rem;
   margin-bottom: 4rem;
   cursor: pointer;
 
-  svg{
+  svg {
     width: 1.5rem;
     height: 1.5rem;
   }
-  div{
+  div {
     width: 100%;
     display: flex;
     justify-content: center;
@@ -245,7 +246,7 @@ export const EmailButton = styled.div`
     font-size: 1.25rem;
     font-weight: 400;
   }
-`
+`;
 
 export const Line = styled.hr`
   width: 100%;

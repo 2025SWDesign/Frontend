@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "/assets/img/Logo.png";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance.ts";
 
 import {
   LayoutWrapper,
@@ -33,7 +33,8 @@ import {
   SearchButton,
 } from "./MainLayout.styled";
 import MyPage from "../page/MyPage";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
 
 interface Student {
   studentId: number;
@@ -45,51 +46,45 @@ interface Student {
 }
 
 interface MainLayoutProps {
-  identity: string;
-  selectedStudent: Student | null;
-  setSelectedStudent: (student: Student | null) => void;
   children: React.ReactNode;
-  isHomeroom: boolean;
-  setIsHomeroom: React.Dispatch<React.SetStateAction<boolean>>;
-  schoolId: number;
-  classId: number;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({
-  selectedStudent,
-  setSelectedStudent,
-  children,
-}) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>([]); // 초기에는 빈 배열
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태
-  const [userName, setUserName] = useState("");
-  const [isHomeroom, setIsHomeroom] = useState(false);
-  const [schoolName, setSchoolName] = useState("");
-  const { schoolId, classId } = useAuth();
-  const [role, setRole] = useState("");
 
+  const userName = useAuthStore((state) => state.userName);
+  const setUserName = useAuthStore((state) => state.setUserName);
+
+  const role = useAuthStore((state) => state.role);
+  const setRole = useAuthStore((state) => state.setRole);
+
+  const isHomeroom = useAuthStore((state) => state.isHomeroom);
+  const setIsHomeroom = useAuthStore((state) => state.setIsHomeroom);
+  const schoolId = useAuthStore((state) => state.schoolId);
+  const setSchoolName = useAuthStore((state) => state.setSchoolName);
+  const classId = useAuthStore((state) => state.classId);
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
+  const setSelectedStudent = useStudentStore(
+    (state) => state.setSelectedStudent
+  );
+
+  const accessToken = useAuthStore((state) => state.accessToken);
   // 유저 정보 불러오기
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const token = sessionStorage.getItem("accessToken");
+        if (!accessToken || !schoolId) return;
 
-        if (!token || !schoolId) return;
-
-        const response = await axios.get(
-          `/api/v1/school/${schoolId}/users/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await axiosInstance.get(
+          `/school/${schoolId}/users/me`
         );
         console.log("유저 정보 불러오기 성공:", response.data);
         const { name, role, teacher, school } = response.data.data;
         setUserName(name);
         setRole(role);
-        setIsHomeroom(teacher?.isHomeroom || false);
+        setIsHomeroom(teacher?.isHomeroom ?? false);
         setSchoolName(school?.schoolName || "");
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
@@ -97,7 +92,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     };
 
     fetchUserInfo();
-  }, [schoolId]);
+  }, [
+    accessToken,
+    schoolId,
+    setUserName,
+    setRole,
+    setIsHomeroom,
+    setSchoolName,
+  ]);
 
   // 반 학생 목록 가져오기
   const fetchClassStudents = useCallback(async () => {
@@ -105,15 +107,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
 
-      const response = await axios.get(
-        `/api/v1/school/${schoolId}/class/${classId}/students`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await axiosInstance.get(
+        `/school/${schoolId}/class/${classId}/students`
       );
-      console.log("반 학생 목록 조회", response.data);
 
       if (response.data.status === 200) {
         // API 응답 구조에 맞게 데이터 변환
@@ -156,13 +152,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
 
       // 검색어가 있는 경우 학생 검색 API 호출
       if (searchQuery.trim()) {
-        const response = await axios.get(
-          `/api/v1/school/${schoolId}/search/student?name=${searchQuery}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await axiosInstance.get(
+          `/school/${schoolId}/search/student?name=${searchQuery}`
         );
         console.log("학생 검색", response.data);
         const studentsData = response.data.data.map(
@@ -202,15 +193,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       if (!token || !schoolId) return;
       console.log("학생 상세정보 조회", studentId);
 
-      const response = await axios.get(
-        `/api/v1/school/${schoolId}/students/${studentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await axiosInstance.get(
+        `/school/${schoolId}/students/${studentId}`
       );
-      console.log("학생 상세정보", response.data);
 
       if (response.data.status === 200) {
         const studentData = response.data.data;
@@ -259,16 +244,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
 
-      const response = await axios.post(
-        `/api/v1/auth/sign-out`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await axiosInstance.post(`/auth/sign-out`, {});
       console.log("로그아웃 성공:", response.data);
       navigate("/");
     } catch (error) {
@@ -734,15 +710,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           <PageArea>{children}</PageArea>
         </MainArea>
       </MainContainer>
-      {isMyPageOpen && (
-        <MyPage
-          identity={role}
-          onClose={() => setIsMyPageOpen(false)}
-          isHomeroom={isHomeroom}
-          setIsHomeroom={setIsHomeroom}
-          schoolName={schoolName}
-        />
-      )}
+      {isMyPageOpen && <MyPage onClose={() => setIsMyPageOpen(false)} />}
     </LayoutWrapper>
   );
 };

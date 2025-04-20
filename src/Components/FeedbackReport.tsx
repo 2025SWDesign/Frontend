@@ -12,12 +12,14 @@ import {
 } from "./FeedbackReport.styled";
 
 interface Student {
+  studentId: number;
   name: string;
   grade: number;
-  class: number;
+  gradeClass: number;
   number: number;
   img: string;
 }
+
 interface FeedbackReportProps {
   student: Student;
   grade: string;
@@ -28,7 +30,7 @@ const FeedbackReport: React.FC<FeedbackReportProps> = ({ student, grade }) => {
     <MainContainer>
       <Header>
         <p>
-          {student.grade}학년 {student.class}반 {student.number}번
+          {student.grade}학년 {student.gradeClass}반 {student.number}번
         </p>
         <TitleArea>
           <h1>{student.name} 학생</h1>

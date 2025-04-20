@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 interface FeedbackPageProps {
-  identity: string;
+  role: string;
 }
 
 export const FeedbackContainer = styled.div``;
@@ -67,7 +67,7 @@ export const ContentBox = styled.div<FeedbackPageProps>`
   border-radius: 0.5rem;
 
   ${(props) =>
-    props.identity !== "teacher" &&
+    props.role !== "TEACHER" &&
     `
     margin-bottom: 0.3rem;
   `}
@@ -126,7 +126,7 @@ export const ContentForm = styled.textarea<FeedbackPageProps>`
   }
 
   ${(props) =>
-    props.identity !== "teacher" &&
+    props.role !== "TEACHER" &&
     `
     height: 4.4rem;
   `}

@@ -1,13 +1,11 @@
 import React from "react";
+import { useAuthStore } from "../stores/authStore";
 
-interface MainPageProps {
-  identity: string;
-}
-
-const MainPage: React.FC<MainPageProps> = ({ identity }) => {
+const MainPage: React.FC = () => {
+  const role = useAuthStore((state) => state.role);
   return (
     <div>
-      <div>{identity}</div>
+      <div>{role}</div>
     </div>
   );
 };

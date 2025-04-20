@@ -26,7 +26,7 @@ import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { MdOutlineMail } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthStore } from "../stores/authStore";
 
 interface SignUpPayload {
   schoolName: string;
@@ -48,7 +48,12 @@ interface SignUpPayload {
 }
 const SignInPage: React.FC = () => {
   const [mode, setMode] = useState<
-    "selectSignIn" | "signIn" | "selectSignUp" | "signUp" | "forgotPassword" | "additionalInfo"
+    | "selectSignIn"
+    | "signIn"
+    | "selectSignUp"
+    | "signUp"
+    | "forgotPassword"
+    | "additionalInfo"
   >("selectSignIn");
   const navigate = useNavigate();
   //회원가입용(교사)
@@ -71,8 +76,10 @@ const SignInPage: React.FC = () => {
   //로그인
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  const { setAuth } = useAuth();
-  
+
+  const setAuthTokens = useAuthStore((state) => state.setAuthTokens);
+  const setSchoolAndClass = useAuthStore((state) => state.setSchoolAndClass);
+
   const allSchools = [
     "서울고등학교",
     "부산고등학교",
@@ -85,6 +92,8 @@ const SignInPage: React.FC = () => {
 
   const handleSchoolSearch = (query: string) => {
     setSchoolQuery(query);
+    setSelectedSchool("");
+
     if (query.length > 0) {
       const filteredSchools = allSchools.filter((school) =>
         school.toLowerCase().includes(query.toLowerCase())
@@ -103,21 +112,23 @@ const SignInPage: React.FC = () => {
 
   const handleSignIn = async () => {
     try {
+      if (!selectedSchool.trim()) {
+        alert("학교명을 검색 후 리스트에서 선택해주세요.");
+        return;
+      }
+
       const response = await axios.post("/api/v1/auth/sign-in", {
         email: loginEmail,
         password: loginPassword,
         schoolName: selectedSchool,
       });
-  
-      const { accessToken, refreshToken, schoolId, classId } = response.data.data;
+
+      const { accessToken, refreshToken, schoolId, classId } =
+        response.data.data;
       console.log("로그인 성공:", response.data);
-  
-      setAuth({ 
-        accessToken,
-        refreshToken,
-        schoolId: String(schoolId),
-        classId: classId ? String(classId) : null,
-      });
+
+      setAuthTokens(accessToken, refreshToken);
+      setSchoolAndClass(Number(schoolId), classId ?? 0);
 
       sessionStorage.setItem("accessToken", accessToken);
       sessionStorage.setItem("refreshToken", refreshToken);
@@ -125,7 +136,7 @@ const SignInPage: React.FC = () => {
       if (classId !== undefined) {
         sessionStorage.setItem("classId", String(classId)); // 담임인 경우만
       }
-  
+
       navigate("/main");
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -137,6 +148,11 @@ const SignInPage: React.FC = () => {
   };
 
   const handleSignUp = async () => {
+    if (!selectedSchool.trim()) {
+      alert("학교명을 검색 후 리스트에서 선택해주세요.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       alert("비밀번호가 일치하지 않습니다.");
       return;
@@ -204,25 +220,36 @@ const SignInPage: React.FC = () => {
   const renderForm = () => {
     switch (mode) {
       case "selectSignIn":
-        return( 
+        return (
           <>
             <Title>로그인</Title>
             <KakaoButton onClick={handleKakaoLogin}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="36"
+                height="36"
+                viewBox="0 0 36 36"
+                fill="none"
+              >
                 <g clip-path="url(#clip0_303_153)">
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M18 1.19995C8.05835 1.19995 0 7.42587 0 15.1045C0 19.88 3.11681 24.0899 7.86305 26.5939L5.86606 33.8889C5.68962 34.5335 6.42683 35.0473 6.99293 34.6738L15.7467 28.8964C16.4854 28.9676 17.2362 29.0093 18 29.0093C27.9409 29.0093 35.9999 22.7836 35.9999 15.1045C35.9999 7.42587 27.9409 1.19995 18 1.19995Z" fill="black"/>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M18 1.19995C8.05835 1.19995 0 7.42587 0 15.1045C0 19.88 3.11681 24.0899 7.86305 26.5939L5.86606 33.8889C5.68962 34.5335 6.42683 35.0473 6.99293 34.6738L15.7467 28.8964C16.4854 28.9676 17.2362 29.0093 18 29.0093C27.9409 29.0093 35.9999 22.7836 35.9999 15.1045C35.9999 7.42587 27.9409 1.19995 18 1.19995Z"
+                    fill="black"
+                  />
                 </g>
                 <defs>
                   <clipPath id="clip0_303_153">
-                    <rect width="35.9999" height="36" fill="white"/>
+                    <rect width="35.9999" height="36" fill="white" />
                   </clipPath>
                 </defs>
               </svg>
               <div>카카오로 로그인</div>
             </KakaoButton>
-            <Line/>
+            <Line />
             <EmailButton onClick={() => setMode("signIn")}>
-              <MdOutlineMail/>
+              <MdOutlineMail />
               <div>이메일로 로그인</div>
             </EmailButton>
           </>
@@ -301,25 +328,36 @@ const SignInPage: React.FC = () => {
           </>
         );
       case "selectSignUp":
-        return( 
+        return (
           <>
-          <Title>회원가입</Title>
+            <Title>회원가입</Title>
             <KakaoButton onClick={handleKakaoLogin}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="36"
+                height="36"
+                viewBox="0 0 36 36"
+                fill="none"
+              >
                 <g clip-path="url(#clip0_303_153)">
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M18 1.19995C8.05835 1.19995 0 7.42587 0 15.1045C0 19.88 3.11681 24.0899 7.86305 26.5939L5.86606 33.8889C5.68962 34.5335 6.42683 35.0473 6.99293 34.6738L15.7467 28.8964C16.4854 28.9676 17.2362 29.0093 18 29.0093C27.9409 29.0093 35.9999 22.7836 35.9999 15.1045C35.9999 7.42587 27.9409 1.19995 18 1.19995Z" fill="black"/>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M18 1.19995C8.05835 1.19995 0 7.42587 0 15.1045C0 19.88 3.11681 24.0899 7.86305 26.5939L5.86606 33.8889C5.68962 34.5335 6.42683 35.0473 6.99293 34.6738L15.7467 28.8964C16.4854 28.9676 17.2362 29.0093 18 29.0093C27.9409 29.0093 35.9999 22.7836 35.9999 15.1045C35.9999 7.42587 27.9409 1.19995 18 1.19995Z"
+                    fill="black"
+                  />
                 </g>
                 <defs>
                   <clipPath id="clip0_303_153">
-                    <rect width="35.9999" height="36" fill="white"/>
+                    <rect width="35.9999" height="36" fill="white" />
                   </clipPath>
                 </defs>
               </svg>
               <div>카카오로 회원가입</div>
             </KakaoButton>
-            <Line/>
+            <Line />
             <EmailButton onClick={() => setMode("signUp")}>
-              <MdOutlineMail/>
+              <MdOutlineMail />
               <div>이메일로 회원가입</div>
             </EmailButton>
           </>
@@ -455,7 +493,7 @@ const SignInPage: React.FC = () => {
                 placeholder="사용할 비밀번호를 입력하세요"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                autoComplete="off" 
+                autoComplete="off"
                 onChange={(e) => setPassword(e.target.value)}
               />
               <ToggleButton onClick={() => setShowPassword(!showPassword)}>
@@ -468,7 +506,7 @@ const SignInPage: React.FC = () => {
                 placeholder="비밀번호 확인"
                 type={showPassword ? "text" : "password"}
                 value={confirmPassword}
-                autoComplete="off" 
+                autoComplete="off"
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <ToggleButton onClick={() => setShowPassword(!showPassword)}>
@@ -496,7 +534,7 @@ const SignInPage: React.FC = () => {
             </SignButton>
           </>
         );
-        case "additionalInfo":
+      case "additionalInfo":
         return (
           <>
             <Title>추가 정보 입력</Title>
@@ -608,7 +646,7 @@ const SignInPage: React.FC = () => {
               <p>회원가입 완료</p>'
             </SignButton>
           </>
-        )
+        );
     }
   };
 
@@ -647,7 +685,7 @@ const SignInPage: React.FC = () => {
               <a onClick={() => setMode("selectSignIn")}>로그인 하기</a>
             </div>
           </SecondaryArea>
-        );  
+        );
       case "signUp":
         return (
           <>

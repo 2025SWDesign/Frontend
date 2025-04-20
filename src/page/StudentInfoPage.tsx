@@ -10,28 +10,17 @@ import {
   HeaderCell,
   DataCell,
 } from "./StudentInfoPage.styled";
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
 
-interface Student {
-  studentId: number;
-  name: string;
-  grade: number;
-  gradeClass: number;
-  number: number;
-  img: string;
-}
-
-interface StudentInfoPageProps {
-  identity: string;
-  isHomeroom: boolean;
-  selectedStudent: Student | null;
-}
-
-const StudentInfoPage: React.FC<StudentInfoPageProps> = ({ identity, selectedStudent }) => {
+const StudentInfoPage: React.FC = () => {
+  const role = useAuthStore((state) => state.role);
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
   return (
     <StdInfoContainer>
       <StdInfoHeader>학생 정보</StdInfoHeader>
       <Line />
-      {identity === "teacher" && !selectedStudent ? (
+      {role === "TEACHER" && !selectedStudent ? (
         <GuideMessage>
           좌측 검색창에서 성적을 조회할 학생을 검색하세요.
         </GuideMessage>

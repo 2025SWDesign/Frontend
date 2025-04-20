@@ -84,8 +84,9 @@ export const PrivacySection = styled.div`
 `;
 
 export const CheckboxLabel = styled.label`
-  width: 15rem;
+  width: 16rem;
   padding-right: 1rem;
+  margin-right: 1rem;
   display: flex;
   align-items: center;
   cursor: pointer;

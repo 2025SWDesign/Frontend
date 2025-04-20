@@ -20,21 +20,8 @@ import {
   WriteButton,
   GuideMessage,
 } from "./CounselingPage.styled";
-
-interface Student {
-  studentId: number;
-  name: string;
-  grade: number;
-  gradeClass: number;
-  number: number;
-  img: string;
-}
-
-interface CounselingPageProps {
-  identity: string;
-  isHomeroom: boolean;
-  selectedStudent: Student | null;
-}
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
 
 interface Post {
   id: number;
@@ -47,12 +34,9 @@ interface Post {
   nextCounselingDate: string;
 }
 
-const CounselingPage: React.FC<CounselingPageProps> = ({
-  identity,
-  //isHomeroom,
-  selectedStudent,
-}) => {
+const CounselingPage: React.FC = () => {
   const navigate = useNavigate();
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
   const posts: Post[] = [
     {
       id: 1,
@@ -303,6 +287,8 @@ const CounselingPage: React.FC<CounselingPageProps> = ({
   const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
   const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
 
+  const role = useAuthStore((state) => state.role);
+
   // 핸들러
   const handleRowClick = (id: number) => {
     // 클릭한 id에 해당하는 게시물 찾기
@@ -339,7 +325,7 @@ const CounselingPage: React.FC<CounselingPageProps> = ({
     <CounselingContainer>
       <CounselingHeader>상담 내역</CounselingHeader>
       <Line />
-      {selectedStudent || !(identity == "teacher") ? (
+      {selectedStudent || !(role === "TEACHER") ? (
         <>
           <BoardTable>
             <thead>
@@ -391,7 +377,7 @@ const CounselingPage: React.FC<CounselingPageProps> = ({
                 </svg>
               </SearchButton>
             </SearchContainer>
-            {identity === "teacher" && (
+            {role === "TEACHER" && (
               <WriteButton onClick={handleWrite}>글 작성</WriteButton>
             )}
           </Footer>
