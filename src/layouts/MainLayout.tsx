@@ -113,16 +113,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           },
         }
       );
+      console.log("반 학생 목록 조회", response.data);
 
       if (response.data.status === 200) {
         // API 응답 구조에 맞게 데이터 변환
         const studentsData = response.data.data.map(
           (item: {
             studentId: number;
-            user: { name: string };
             grade: number;
             gradeClass: number;
             number: number;
+            user: { name: string; schoolId?: number };
           }) => ({
             studentId: item.studentId,
             name: item.user.name,
@@ -163,20 +164,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             },
           }
         );
-        console.log("검색한 학생들", response.data);
-
+        console.log("학생 검색", response.data);
         const studentsData = response.data.data.map(
-          (item: {
-            id: number;
+          (item: {     
+            email : string;
             name: string;
-            email: string;
-            student: {
-              grade: number;
-              gradeClass: number;
-              number: number;
-            };
+            student: {grade: number; gradeClass: number; number: number; studentId: number;};
           }) => ({
-            studentId: item.id,
+            studentId: item.student.studentId,
             name: item.name,
             grade: item.student.grade,
             gradeClass: item.student.gradeClass,
@@ -184,6 +179,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             img: "/assets/img/photo.png", // 기본 이미지 경로 설정
           })
         );
+        console.log("검색한 학생들", studentsData);
         setStudents(studentsData);
       } else if (isHomeroom) {
         // 검색어가 없고 담임인 경우, 전체 반 학생 목록을 다시 불러옴
@@ -214,6 +210,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           },
         }
       );
+      console.log("학생 상세정보", response.data);
 
       if (response.data.status === 200) {
         const studentData = response.data.data;
@@ -261,7 +258,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     try {
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
-  
+
       const response = await axios.post(
         `/api/v1/auth/sign-out`,
         {},
@@ -271,7 +268,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           },
         }
       );
-      
+
       console.log("로그아웃 성공:", response.data);
       navigate("/");
     } catch (error) {
@@ -279,7 +276,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       throw error;
     }
   };
-  
+
   // 알림 드롭다운 메뉴
   const [isNoteDropdownOpen, setNoteDropdownOpen] = useState(false);
 
@@ -364,7 +361,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                       <UserDropdownItem onClick={() => setIsMyPageOpen(true)}>
                         개인정보 수정/설정
                       </UserDropdownItem>
-                      <UserDropdownItem onClick={handleLogout}>로그아웃</UserDropdownItem>
+                      <UserDropdownItem onClick={handleLogout}>
+                        로그아웃
+                      </UserDropdownItem>
                     </UserDropdownButtons>
                   </UserDropdownMenu>
                 </>

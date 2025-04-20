@@ -98,7 +98,7 @@ const CounselingWritePage: React.FC = () => {
           
           <PrivacySection>
             <CheckboxLabel>
-              <strong>동일 과목 교사에게 공개</strong>
+              <strong>동일 과목 교사에게만 공개</strong>
               <Checkbox
                 type="checkbox"
                 checked={isPrivate}
