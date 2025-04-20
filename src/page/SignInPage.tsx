@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Logo from "/assets/img/Logo_2w.png";
 import {
   SplitScreen,
@@ -27,6 +27,11 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { MdOutlineMail } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
+
+interface School {
+  schoolId: number;
+  schoolName: string;
+}
 
 interface SignUpPayload {
   schoolName: string;
@@ -60,7 +65,9 @@ const SignInPage: React.FC = () => {
   const [userType, setUserType] = useState("TEACHER");
   const [schoolQuery, setSchoolQuery] = useState("");
   const [selectedSchool, setSelectedSchool] = useState("");
-  const [schoolResults, setSchoolResults] = useState<string[]>([]);
+  const [schoolResults, setSchoolResults] = useState<School[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -80,35 +87,53 @@ const SignInPage: React.FC = () => {
   const setAuthTokens = useAuthStore((state) => state.setAuthTokens);
   const setSchoolAndClass = useAuthStore((state) => state.setSchoolAndClass);
 
-  const allSchools = [
-    "서울고등학교",
-    "부산고등학교",
-    "대구중학교",
-    "인천중학교",
-    "인천고등학교",
-    "대전중학교",
-    "울산중학교",
-  ];
+  const searchTimeoutRef = useRef<number | null>(null);
 
   const handleSchoolSearch = (query: string) => {
     setSchoolQuery(query);
     setSelectedSchool("");
 
-    if (query.length > 0) {
-      const filteredSchools = allSchools.filter((school) =>
-        school.toLowerCase().includes(query.toLowerCase())
-      );
-      setSchoolResults(filteredSchools);
-    } else {
-      setSchoolResults([]);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
     }
+
+    if (query.trim().length === 0) {
+      setSchoolResults([]);
+      setIsDropdownOpen(false);
+      return;
+    }
+
+    setIsDropdownOpen(true); // ✅ 검색 중엔 dropdown 열어둠
+
+    searchTimeoutRef.current = window.setTimeout(async () => {
+      try {
+        const response = await axios.get("/api/v1/school", {
+          params: { schoolName: query },
+        });
+        const schools: School[] = response.data.data;
+        setSchoolResults(schools);
+      } catch (error) {
+        console.error("학교 검색 실패", error);
+        setSchoolResults([]);
+      }
+    }, 300);
   };
 
-  const handleSchoolSelect = (school: string) => {
-    setSelectedSchool(school);
-    setSchoolQuery(school);
+  const handleSchoolSelect = (school: School) => {
+    setSelectedSchool(school.schoolName);
+    setSchoolQuery(school.schoolName);
     setSchoolResults([]);
+    setIsDropdownOpen(false); // ✅ 명시적으로 닫기
   };
+
+  //컴포넌트 언마운트 시 클리어
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSignIn = async () => {
     try {
@@ -258,73 +283,80 @@ const SignInPage: React.FC = () => {
         return (
           <>
             <Title>로그인</Title>
-            <InputText>학교명</InputText>
-            <InputArea style={{ position: "relative" }}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#666"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{
-                  position: "absolute",
-                  left: "20",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                }}
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                placeholder="학교명을 검색하세요"
-                type="text"
-                value={schoolQuery}
-                onChange={(e) => handleSchoolSearch(e.target.value)}
-                style={{ paddingLeft: "2rem" }}
-              />
-              {schoolResults.length > 0 && (
-                <SchoolList>
-                  {schoolResults.map((school) => (
-                    <SchoolItem
-                      key={school}
-                      onClick={() => handleSchoolSelect(school)}
-                    >
-                      {school}
-                    </SchoolItem>
-                  ))}
-                </SchoolList>
-              )}
-            </InputArea>
-            <InputText>아이디</InputText>
-            <InputArea>
-              <input
-                placeholder="example@email.com"
-                type="email"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-              />
-            </InputArea>
-            <InputText>비밀번호</InputText>
-            <InputArea>
-              <input
-                placeholder="비밀번호를 입력하세요"
-                type={showPassword ? "text" : "password"}
-                value={loginPassword}
-                autoComplete="off"
-                onChange={(e) => setLoginPassword(e.target.value)}
-              />
-              <ToggleButton onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <FiEyeOff /> : <FiEye />}
-              </ToggleButton>
-            </InputArea>
-            <SignButton onClick={handleSignIn}>
-              <p>로그인</p>
-            </SignButton>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSignIn();
+              }}
+            >
+              <InputText>학교명</InputText>
+              <InputArea style={{ position: "relative" }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    position: "absolute",
+                    left: "20",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                  }}
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  placeholder="학교명을 검색하세요"
+                  type="text"
+                  value={schoolQuery}
+                  onChange={(e) => handleSchoolSearch(e.target.value)}
+                  style={{ paddingLeft: "2rem" }}
+                />
+                {isDropdownOpen && schoolResults.length > 0 && (
+                  <SchoolList>
+                    {schoolResults.map((school) => (
+                      <SchoolItem
+                        key={school.schoolId}
+                        onClick={() => handleSchoolSelect(school)}
+                      >
+                        {school.schoolName}
+                      </SchoolItem>
+                    ))}
+                  </SchoolList>
+                )}
+              </InputArea>
+              <InputText>아이디</InputText>
+              <InputArea>
+                <input
+                  placeholder="example@email.com"
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                />
+              </InputArea>
+              <InputText>비밀번호</InputText>
+              <InputArea>
+                <input
+                  placeholder="비밀번호를 입력하세요"
+                  type={showPassword ? "text" : "password"}
+                  value={loginPassword}
+                  autoComplete="off"
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                />
+                <ToggleButton onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </ToggleButton>
+              </InputArea>
+              <SignButton onClick={handleSignIn}>
+                <p>로그인</p>
+              </SignButton>
+            </form>
           </>
         );
       case "selectSignUp":
@@ -365,157 +397,164 @@ const SignInPage: React.FC = () => {
       case "signUp":
         return (
           <>
-            <DropDown
-              value={userType}
-              onChange={(e) => setUserType(e.target.value)}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSignUp();
+              }}
             >
-              <option value="TEACHER">교사</option>
-              <option value="PARENT">학부모</option>
-              <option value="STUDENT">학생</option>
-            </DropDown>
-            {userType === "TEACHER" && (
-              <>
-                <InputText>담당 과목</InputText>
-                <DropDown
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                >
-                  <option value="국어">국어</option>
-                  <option value="영어">영어</option>
-                  <option value="수학">수학</option>
-                  <option value="과학">과학</option>
-                  <option value="사회">사회</option>
-                </DropDown>
-              </>
-            )}
-            {userType === "STUDENT" && (
-              <>
-                <StudentInputArea>
-                  <StudentInput>
-                    <InputText>학년</InputText>
-                    <MiniInput>
-                      <input
-                        type="number"
-                        placeholder="예: 2"
-                        value={studentGrade}
-                        onChange={(e) => setStudentGrade(e.target.value)}
-                      />
-                    </MiniInput>
-                  </StudentInput>
-                  <StudentInput>
-                    <InputText>반</InputText>
-                    <MiniInput>
-                      <input
-                        type="number"
-                        placeholder="예: 2"
-                        value={studentClass}
-                        onChange={(e) => setStudentClass(e.target.value)}
-                      />
-                    </MiniInput>
-                  </StudentInput>
-                  <StudentInput>
-                    <InputText>번호</InputText>
-                    <MiniInput>
-                      <input
-                        type="number"
-                        placeholder="예: 10"
-                        value={studentNumber}
-                        onChange={(e) => setStudentNumber(e.target.value)}
-                      />
-                    </MiniInput>
-                  </StudentInput>
-                </StudentInputArea>
-              </>
-            )}
-            <InputText>이름</InputText>
-            <InputArea>
-              <input
-                placeholder="홍길동"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </InputArea>
-            <InputText>학교명</InputText>
-            <InputArea style={{ position: "relative" }}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#666"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{
-                  position: "absolute",
-                  left: "20",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                }}
+              <DropDown
+                value={userType}
+                onChange={(e) => setUserType(e.target.value)}
               >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                placeholder="학교명을 검색하세요"
-                type="text"
-                value={schoolQuery}
-                onChange={(e) => handleSchoolSearch(e.target.value)}
-                style={{ paddingLeft: "2rem" }}
-              />
-              {schoolResults.length > 0 && (
-                <SchoolList>
-                  {schoolResults.map((school) => (
-                    <SchoolItem
-                      key={school}
-                      onClick={() => handleSchoolSelect(school)}
-                    >
-                      {school}
-                    </SchoolItem>
-                  ))}
-                </SchoolList>
+                <option value="TEACHER">교사</option>
+                <option value="PARENT">학부모</option>
+                <option value="STUDENT">학생</option>
+              </DropDown>
+              {userType === "TEACHER" && (
+                <>
+                  <InputText>담당 과목</InputText>
+                  <DropDown
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                  >
+                    <option value="국어">국어</option>
+                    <option value="영어">영어</option>
+                    <option value="수학">수학</option>
+                    <option value="과학">과학</option>
+                    <option value="사회">사회</option>
+                  </DropDown>
+                </>
               )}
-            </InputArea>
-            <InputText>아이디</InputText>
-            <InputArea>
-              <input
-                placeholder="example@email.com"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </InputArea>
-            <InputText>비밀번호</InputText>
-            <InputArea>
-              <input
-                placeholder="사용할 비밀번호를 입력하세요"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                autoComplete="off"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <ToggleButton onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <FiEyeOff /> : <FiEye />}
-              </ToggleButton>
-            </InputArea>
-            <InputText>비밀번호 확인</InputText>
-            <InputArea>
-              <input
-                placeholder="비밀번호 확인"
-                type={showPassword ? "text" : "password"}
-                value={confirmPassword}
-                autoComplete="off"
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              <ToggleButton onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <FiEyeOff /> : <FiEye />}
-              </ToggleButton>
-            </InputArea>
-            <SignButton onClick={handleSignUp}>
-              <p>회원가입</p>
-            </SignButton>
+              {userType === "STUDENT" && (
+                <>
+                  <StudentInputArea>
+                    <StudentInput>
+                      <InputText>학년</InputText>
+                      <MiniInput>
+                        <input
+                          type="number"
+                          placeholder="예: 2"
+                          value={studentGrade}
+                          onChange={(e) => setStudentGrade(e.target.value)}
+                        />
+                      </MiniInput>
+                    </StudentInput>
+                    <StudentInput>
+                      <InputText>반</InputText>
+                      <MiniInput>
+                        <input
+                          type="number"
+                          placeholder="예: 2"
+                          value={studentClass}
+                          onChange={(e) => setStudentClass(e.target.value)}
+                        />
+                      </MiniInput>
+                    </StudentInput>
+                    <StudentInput>
+                      <InputText>번호</InputText>
+                      <MiniInput>
+                        <input
+                          type="number"
+                          placeholder="예: 10"
+                          value={studentNumber}
+                          onChange={(e) => setStudentNumber(e.target.value)}
+                        />
+                      </MiniInput>
+                    </StudentInput>
+                  </StudentInputArea>
+                </>
+              )}
+              <InputText>이름</InputText>
+              <InputArea>
+                <input
+                  placeholder="홍길동"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </InputArea>
+              <InputText>학교명</InputText>
+              <InputArea style={{ position: "relative" }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    position: "absolute",
+                    left: "20",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                  }}
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  placeholder="학교명을 검색하세요"
+                  type="text"
+                  value={schoolQuery}
+                  onChange={(e) => handleSchoolSearch(e.target.value)}
+                  style={{ paddingLeft: "2rem" }}
+                />
+                {isDropdownOpen && schoolResults.length > 0 && (
+                  <SchoolList>
+                    {schoolResults.map((school) => (
+                      <SchoolItem
+                        key={school.schoolId}
+                        onClick={() => handleSchoolSelect(school)}
+                      >
+                        {school.schoolName}
+                      </SchoolItem>
+                    ))}
+                  </SchoolList>
+                )}
+              </InputArea>
+              <InputText>아이디</InputText>
+              <InputArea>
+                <input
+                  placeholder="example@email.com"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </InputArea>
+              <InputText>비밀번호</InputText>
+              <InputArea>
+                <input
+                  placeholder="사용할 비밀번호를 입력하세요"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  autoComplete="off"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <ToggleButton onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </ToggleButton>
+              </InputArea>
+              <InputText>비밀번호 확인</InputText>
+              <InputArea>
+                <input
+                  placeholder="비밀번호 확인"
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  autoComplete="off"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                <ToggleButton onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </ToggleButton>
+              </InputArea>
+              <SignButton onClick={handleSignUp}>
+                <p>회원가입</p>
+              </SignButton>
+            </form>
           </>
         );
       case "forgotPassword":
@@ -538,6 +577,7 @@ const SignInPage: React.FC = () => {
         return (
           <>
             <Title>추가 정보 입력</Title>
+
             <DropDown
               value={userType}
               onChange={(e) => setUserType(e.target.value)}
@@ -629,14 +669,14 @@ const SignInPage: React.FC = () => {
                 onChange={(e) => handleSchoolSearch(e.target.value)}
                 style={{ paddingLeft: "2rem" }}
               />
-              {schoolResults.length > 0 && (
+              {isDropdownOpen && schoolResults.length > 0 && (
                 <SchoolList>
                   {schoolResults.map((school) => (
                     <SchoolItem
-                      key={school}
+                      key={school.schoolId}
                       onClick={() => handleSchoolSelect(school)}
                     >
-                      {school}
+                      {school.schoolName}
                     </SchoolItem>
                   ))}
                 </SchoolList>
