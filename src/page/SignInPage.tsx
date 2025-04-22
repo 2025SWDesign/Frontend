@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "/assets/img/Logo_2w.png";
 import {
   SplitScreen,
@@ -25,7 +26,6 @@ import {
 import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { MdOutlineMail } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 
 interface School {
@@ -61,6 +61,7 @@ const SignInPage: React.FC = () => {
     | "additionalInfo"
   >("selectSignIn");
   const navigate = useNavigate();
+  const location = useLocation();
   //회원가입용(교사)
   const [userType, setUserType] = useState("TEACHER");
   const [schoolQuery, setSchoolQuery] = useState("");
@@ -103,7 +104,7 @@ const SignInPage: React.FC = () => {
       return;
     }
 
-    setIsDropdownOpen(true); // ✅ 검색 중엔 dropdown 열어둠
+    setIsDropdownOpen(true);
 
     searchTimeoutRef.current = window.setTimeout(async () => {
       try {
@@ -123,7 +124,7 @@ const SignInPage: React.FC = () => {
     setSelectedSchool(school.schoolName);
     setSchoolQuery(school.schoolName);
     setSchoolResults([]);
-    setIsDropdownOpen(false); // ✅ 명시적으로 닫기
+    setIsDropdownOpen(false);
   };
 
   //컴포넌트 언마운트 시 클리어
@@ -224,7 +225,47 @@ const SignInPage: React.FC = () => {
   };
 
   const handleKakaoLogin = () => {
-    setMode("additionalInfo");
+    window.location.href = "http://localhost:3000/api/v1/auth/kakao/sign-in";
+  };
+
+  //카카오 추가정보용
+  const handleSubmitKakaoInfo = async () => {
+    if (!selectedSchool.trim()) {
+      alert("학교명을 검색 후 리스트에서 선택해주세요.");
+      return;
+    }
+
+    const payload =
+      userType === "TEACHER"
+        ? {
+            name,
+            role: "TEACHER",
+            subject,
+            schoolName: selectedSchool,
+          }
+        : {
+            name,
+            role: "STUDENT",
+            grade: Number(studentGrade),
+            gradeClass: Number(studentClass),
+            number: Number(studentNumber),
+            schoolName: selectedSchool,
+          };
+
+    try {
+      const response = await axios.post("/api/v1/auth/kakao/info", payload, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+      });
+
+      console.log(response.data);
+      alert("카카오 회원가입 완료");
+      navigate("/main");
+    } catch (error) {
+      alert("추가 정보 제출 실패");
+      console.error(error);
+    }
   };
 
   const signUp = async (payload: SignUpPayload) => {
@@ -242,6 +283,32 @@ const SignInPage: React.FC = () => {
     }
   };
 
+  //카카오 리디렉션 후 전역 상태 세팅 및 추가정보 분기
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const accessToken = params.get("accessToken");
+    const refreshToken = params.get("refreshToken");
+    const needsExtraInfo = params.get("needsExtraInfo") === "true";
+    const schoolId = params.get("schoolId");
+    const classId = params.get("classId");
+
+    if (accessToken && refreshToken) {
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
+      if (schoolId) sessionStorage.setItem("schoolId", schoolId);
+      if (classId) sessionStorage.setItem("classId", classId);
+
+      setAuthTokens(accessToken, refreshToken);
+      if (schoolId) setSchoolAndClass(Number(schoolId), Number(classId) || 0);
+
+      if (needsExtraInfo) {
+        setMode("additionalInfo");
+      } else {
+        navigate("/main");
+      }
+    }
+  }, [location.search, navigate, setAuthTokens, setSchoolAndClass]);
+
   const renderForm = () => {
     switch (mode) {
       case "selectSignIn":
@@ -256,10 +323,10 @@ const SignInPage: React.FC = () => {
                 viewBox="0 0 36 36"
                 fill="none"
               >
-                <g clip-path="url(#clip0_303_153)">
+                <g clipPath="url(#clip0_303_153)">
                   <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
                     d="M18 1.19995C8.05835 1.19995 0 7.42587 0 15.1045C0 19.88 3.11681 24.0899 7.86305 26.5939L5.86606 33.8889C5.68962 34.5335 6.42683 35.0473 6.99293 34.6738L15.7467 28.8964C16.4854 28.9676 17.2362 29.0093 18 29.0093C27.9409 29.0093 35.9999 22.7836 35.9999 15.1045C35.9999 7.42587 27.9409 1.19995 18 1.19995Z"
                     fill="black"
                   />
@@ -373,8 +440,8 @@ const SignInPage: React.FC = () => {
               >
                 <g clip-path="url(#clip0_303_153)">
                   <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
                     d="M18 1.19995C8.05835 1.19995 0 7.42587 0 15.1045C0 19.88 3.11681 24.0899 7.86305 26.5939L5.86606 33.8889C5.68962 34.5335 6.42683 35.0473 6.99293 34.6738L15.7467 28.8964C16.4854 28.9676 17.2362 29.0093 18 29.0093C27.9409 29.0093 35.9999 22.7836 35.9999 15.1045C35.9999 7.42587 27.9409 1.19995 18 1.19995Z"
                     fill="black"
                   />
@@ -577,7 +644,6 @@ const SignInPage: React.FC = () => {
         return (
           <>
             <Title>추가 정보 입력</Title>
-
             <DropDown
               value={userType}
               onChange={(e) => setUserType(e.target.value)}
@@ -640,6 +706,15 @@ const SignInPage: React.FC = () => {
                 </StudentInputArea>
               </>
             )}
+            <InputText>이름</InputText>
+            <InputArea>
+              <input
+                placeholder="홍길동"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </InputArea>
             <InputText>학교명</InputText>
             <InputArea style={{ position: "relative" }}>
               <svg
@@ -682,7 +757,7 @@ const SignInPage: React.FC = () => {
                 </SchoolList>
               )}
             </InputArea>
-            <SignButton>
+            <SignButton onClick={handleSubmitKakaoInfo}>
               <p>회원가입 완료</p>'
             </SignButton>
           </>
