@@ -100,7 +100,7 @@ export const InputText = styled.div`
   font-weight: 700;
 `;
 
-export const InputArea = styled.form`
+export const InputArea = styled.div`
   width: 32.5rem;
   height: 3.75rem;
   background-color: #ffffff;
