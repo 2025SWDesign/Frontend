@@ -96,11 +96,19 @@ const CounselingPage: React.FC = () => {
     fetchConsultations();
   }, [selectedStudent?.studentId, schoolId]);
 
+  const toLocalDateString = (isoString: string) => {
+    const d = new Date(isoString);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const da = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${da}`;
+  };
+
   // 검색 필터링
   const filteredPosts = posts.filter((post) => {
     if (searchType === "period" && selectedDate) {
-      const postDate = new Date(post.date).toISOString().split("T")[0];
-      return postDate === selectedDate;
+      const postLocalDate = toLocalDateString(post.date);
+      return postLocalDate === selectedDate;
     }
     if (!searchQuery) return true;
     switch (searchType) {
