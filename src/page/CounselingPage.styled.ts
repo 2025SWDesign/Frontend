@@ -129,6 +129,8 @@ export const SearchInput = styled.input`
   border-radius: 0.625rem 0rem 0rem 0.625rem;
   border: 1px solid #000;
   background: #fff;
+  font-size: 1.3rem;
+  padding-left: 1rem;
 
   &::placeholder {
     color: #424242;
@@ -178,4 +180,27 @@ export const GuideMessage = styled.div`
   font-family: "Noto Sans";
   font-size: 1.5rem;
   font-weight: 400;
+`;
+
+export const DateSection = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const DateInput = styled.input`
+  width: 13rem;
+  margin-right: 0.5rem;
+  height: 2.9rem;
+  color: #424242;
+  text-align: center;
+  font-family: "Inter";
+  font-size: 1rem;
+  font-weight: 700;
+  border: 0.0625rem solid #ddd;
+  border-radius: 0.5rem;
+  outline: none;
+
+  &:focus {
+    border-color: #146c94;
+  }
 `;
