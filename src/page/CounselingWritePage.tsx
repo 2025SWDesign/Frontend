@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface Post {
-  id: number;
-  title: string;
-  author: string;
-  subject: string;
-  counselingDate: string;
+  consultationId: number;
+  studentId: number;
+  teacherId: number;
+  date: string;
+  isPublicToSubject: boolean;
   content: string;
-  isPrivate: boolean;
-  nextCounselingDate: string;
+  nextPlan: string;
+  title: string;
+  subject: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface LocationState {
@@ -31,46 +36,79 @@ import {
   ButtonGroup,
   SaveButton,
   CancelButton,
-  DateInput, 
-  DateLabel, 
-  DateSection, 
+  DateInput,
+  DateLabel,
+  DateSection,
 } from "./CounselingWritePage.styled";
+import { useAuthStore } from "../stores/authStore";
+import { useStudentStore } from "../stores/studentStore";
 
 const CounselingWritePage: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as LocationState || { viewOnly: false };
-  // 안전하게 값을 추출
+  const state = (location.state as LocationState) || { viewOnly: false };
   const post = state.post;
   const viewOnly = state.viewOnly || false;
-  
+  const selectedStudent = useStudentStore((state) => state.selectedStudent);
+  const schoolId = useAuthStore((state) => state.schoolId);
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [nextCounselingDate, setNextCounselingDate] = useState("");
 
-  // Load post data when component mounts or when post changes
+  // 날짜 형식 변환 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // 'yyyy-MM-dd' 형식으로 변환
+  };
+
   useEffect(() => {
     if (post) {
       setTitle(post.title || "");
       setContent(post.content || "");
-      setIsPrivate(post.isPrivate || false);
-      setNextCounselingDate(post.nextCounselingDate || "");
+      setIsPrivate(post.isPublicToSubject || false);
+      setNextCounselingDate(formatDate(post.nextPlan) || ""); // 날짜 변환
     }
   }, [post]);
 
-  const handleSubmit = () => {
-    // 여기에 저장 로직 구현
-    console.log({
+  const handleSubmit = async () => {
+    // 날짜 형식 변환
+    const formatDateForAPI = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toISOString(); 
+    };
+  
+    const requestData = {
       title,
       content,
-      isPrivate,
-      nextCounselingDate,
-    });
+      date: formatDateForAPI(new Date().toISOString()), // 현재 날짜 사용 (상담 작성일)
+      nextPlan: formatDateForAPI(nextCounselingDate), // 사용자가 입력한 '다음 상담 기간'
+      isPublicToSubject: isPrivate, // 체크박스 상태
+    };
+  
+    try {
+      const token = sessionStorage.getItem("accessToken"); // 토큰 가져오기
+      console.log(selectedStudent?.studentId);
+      const response = await axios.post(
+        `/api/v1/school/${schoolId}/consultation/students/${selectedStudent?.studentId}`,
+        requestData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("상담 기록 저장 성공:", response.data);
+      handleGoBack(); 
+    } catch (err) {
+      console.error("상담 기록 저장 실패:", err);
+      // 실패 시 처리, 예: 사용자에게 에러 메시지 표시
+    }
   };
 
   const handleGoBack = () => {
-    // 뒤로가기 로직
-    window.history.back();
+    navigate(-1); 
   };
 
   return (
@@ -85,7 +123,7 @@ const CounselingWritePage: React.FC = () => {
             onChange={(e) => setTitle(e.target.value)}
             disabled={viewOnly}
           />
-          
+
           <DateSection>
             <DateLabel>다음 상담 기간</DateLabel>
             <DateInput
@@ -95,7 +133,7 @@ const CounselingWritePage: React.FC = () => {
               disabled={viewOnly}
             />
           </DateSection>
-          
+
           <PrivacySection>
             <CheckboxLabel>
               <strong>동일 과목 교사에게만 공개</strong>
