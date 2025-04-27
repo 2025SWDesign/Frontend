@@ -33,6 +33,17 @@ export const ReportContainer = styled.div`
   overflow-y: scroll;
 `;
 
+export const GuideContainer = styled.div`
+  width: 90rem;
+  height: 37.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+  font-family: "Noto Sans";
+  font-size: 1.5rem;
+  font-weight: 400;
+`;
 export const ControlContainer = styled.div`
   width: 90rem;
   display: flex;
