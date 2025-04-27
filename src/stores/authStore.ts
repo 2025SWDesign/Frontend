@@ -11,12 +11,15 @@ interface AuthState {
   classId: number;
   schoolName: string;
   userName: string;
+  grade: number;
+  gradeClass: number;
   setUserName: (name: string) => void;
   setSchoolName: (name: string) => void;
   setRole: (role: RoleType) => void;
   setIsHomeroom: (value: boolean) => void;
   setAuthTokens: (access: string, refresh: string) => void;
   setSchoolAndClass: (schoolId: number, classId: number) => void;
+  setGradeAndClass: (grade: number, gradeClass: number) => void;
   resetAuth: () => void;
 }
 
@@ -29,6 +32,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   classId: Number(sessionStorage.getItem("classId")) || 0,
   schoolName: "",
   userName: "",
+  grade: 0,
+  gradeClass: 0,
 
   setUserName: (userName) => set({ userName }),
   setSchoolName: (schoolName) => set({ schoolName }),
@@ -40,6 +45,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ accessToken, refreshToken });
   },
   setSchoolAndClass: (schoolId, classId) => set({ schoolId, classId }),
+  setGradeAndClass: (grade, gradeClass) => set({ grade, gradeClass }),
   resetAuth: () => {
     sessionStorage.clear();
     set({
