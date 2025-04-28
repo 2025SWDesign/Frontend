@@ -98,6 +98,11 @@ const GradePage: React.FC = () => {
   const teacherGrade = useAuthStore((state) => state.grade);
   const teacherClass = useAuthStore((state) => state.gradeClass);
 
+  const schoolId = useAuthStore((state) => state.schoolId);
+  const [studentGrades, setStudentGrades] = useState<
+    { subject: string; score: number }[]
+  >([]);
+
   useEffect(() => {
     const loadClassGrades = async () => {
       try {
@@ -195,6 +200,46 @@ const GradePage: React.FC = () => {
     }));
   };
 
+  const postStudentGrades = async () => {
+    if (!selectedStudent) return;
+    try {
+      const response = await axios.post(
+        `/school/${schoolId}/grades/students/${selectedStudent.studentId}`,
+        studentGrades.map((grade) => ({
+          subject: grade.subject,
+          schoolYear: Number(selectedGrade),
+          semester: Number(selectedSemester),
+          score: grade.score,
+        }))
+      );
+      console.log("✅ 성적 입력 성공:", response.data);
+      alert("성적이 입력되었습니다!");
+    } catch (error) {
+      console.error("❌ 성적 입력 실패:", error);
+      alert("성적 입력 실패");
+    }
+  };
+
+  const patchStudentGrades = async () => {
+    if (!selectedStudent) return;
+    try {
+      const response = await axios.patch(
+        `/school/${schoolId}/grades/students/${selectedStudent.studentId}`,
+        studentGrades.map((grade) => ({
+          subject: grade.subject,
+          schoolYear: Number(selectedGrade),
+          semester: Number(selectedSemester),
+          score: grade.score,
+        }))
+      );
+      console.log("✅ 성적 수정 성공:", response.data);
+      alert("성적이 수정되었습니다!");
+    } catch (error) {
+      console.error("❌ 성적 수정 실패:", error);
+      alert("성적 수정 실패");
+    }
+  };
+
   const [backupSemesterGrades, setBackupSemesterGrades] =
     useState(semesterGradeData);
   const [backupSubjectGrades, setBackupSubjectGrades] =
@@ -214,7 +259,12 @@ const GradePage: React.FC = () => {
     setIsEditing(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (studentGrades.length === 0) {
+      await postStudentGrades(); // POST 신규 입력
+    } else {
+      await patchStudentGrades(); // PATCH 수정
+    }
     setIsEditing(false);
   };
 
