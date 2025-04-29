@@ -2,6 +2,18 @@ import React, { useEffect, useState } from "react";
 import RadarChart from "../components/RadarChart";
 import { useAuthStore } from "../stores/authStore";
 import { useStudentStore } from "../stores/studentStore";
+import axios from "../api/axiosInstance";
+
+interface Grade {
+  subject: string;
+  score: number;
+  student: {
+    studentId: number;
+    user: {
+      name: string;
+    };
+  };
+}
 
 import {
   MainContainer,
@@ -54,74 +66,12 @@ const semesterNames = [
   "3학년 1학기",
   "3학년 2학기",
 ];
-const generateRandomScore = () => Math.floor(Math.random() * 41) + 60; // 60~100점
-
-const initialStudents = Array.from({ length: 30 }, (_, i) => ({
-  grade: 2,
-  class: 2,
-  number: i + 1,
-  name: [
-    "강민수",
-    "고준영",
-    "김다은",
-    "김민재",
-    "김서윤",
-    "김수현",
-    "김지훈",
-    "남궁우진",
-    "노지현",
-    "문태영",
-    "박가영",
-    "박도윤",
-    "박민지",
-    "박서준",
-    "박지훈",
-    "서예린",
-    "신윤서",
-    "안도현",
-    "양지우",
-    "오하늘",
-    "유진호",
-    "이도윤",
-    "이서진",
-    "이영훈",
-    "임수빈",
-    "장우석",
-    "전예진",
-    "정민규",
-    "조하람",
-    "최다온",
-  ][i],
-  img: "/assets/img/photo.png",
-}));
-
-interface StudentScore {
-  국어: number;
-  영어: number;
-  수학: number;
-  사회: number;
-  과학: number;
-}
-
-const studentScores: { [key: string]: StudentScore } = initialStudents.reduce(
-  (acc, student) => {
-    acc[student.name] = {
-      국어: generateRandomScore(),
-      영어: generateRandomScore(),
-      수학: generateRandomScore(),
-      사회: generateRandomScore(),
-      과학: generateRandomScore(),
-    };
-    return acc;
-  },
-  {} as { [key: string]: StudentScore }
-);
 
 const GradePage: React.FC = () => {
   //기간&과목별용
   const [isPeriod, setIsPeriod] = useState(true);
   const [selectedGrade, setSelectedGrade] = useState("1");
-  const [selectedSemester, setSelectedSemester] = useState("1");
+  const [selectedSemester, setSelectedSemester] = useState("2");
   const [editedSemesterGrades, setEditedSemesterGrades] =
     useState(semesterGradeData);
   const [editedSubjectGrades, setEditedSubjectGrades] =
@@ -138,12 +88,58 @@ const GradePage: React.FC = () => {
   const currentSemester =
     currentMonth >= 3 && currentMonth <= 8 ? "1학기" : "2학기";
 
-  const teacherGrade = initialStudents[0].grade;
-  const teacherClass = initialStudents[0].class;
-
   const role = useAuthStore((state) => state.role);
   const isHomeroom = useAuthStore((state) => state.isHomeroom);
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
+
+  const [classGrades, setClassGrades] = useState<Grade[]>([]);
+  const subjects = ["국어", "영어", "수학", "과학", "사회"];
+
+  const teacherGrade = useAuthStore((state) => state.grade);
+  const teacherClass = useAuthStore((state) => state.gradeClass);
+
+  const schoolId = useAuthStore((state) => state.schoolId);
+  const [studentGrades, setStudentGrades] = useState<
+    { subject: string; score: number }[]
+  >([]);
+
+  useEffect(() => {
+    const loadClassGrades = async () => {
+      try {
+        if (isHomeroom) {
+          const schoolId = Number(sessionStorage.getItem("schoolId"));
+          const classId = Number(sessionStorage.getItem("classId"));
+          const semester = `${selectedSemester}`;
+
+          const response = await axios.get(
+            `/school/${schoolId}/grades/class/${classId}?semester=${semester}`
+          );
+
+          setClassGrades(response.data.grades);
+          console.log(response.data);
+        }
+      } catch (err) {
+        console.error("성적 조회 실패", err);
+      }
+    };
+
+    loadClassGrades();
+  }, [isHomeroom, selectedSemester]);
+
+  const groupedByStudent = classGrades.reduce(
+    (acc, curr) => {
+      const { studentId } = curr.student;
+      if (!acc[studentId]) {
+        acc[studentId] = {
+          name: curr.student.user.name,
+          scores: {},
+        };
+      }
+      acc[studentId].scores[curr.subject] = curr.score;
+      return acc;
+    },
+    {} as Record<number, { name: string; scores: Record<string, number> }>
+  );
 
   // 학기별 테이블 데이터
   const semesterTableData = selectedData
@@ -204,6 +200,46 @@ const GradePage: React.FC = () => {
     }));
   };
 
+  const postStudentGrades = async () => {
+    if (!selectedStudent) return;
+    try {
+      const response = await axios.post(
+        `/school/${schoolId}/grades/students/${selectedStudent.studentId}`,
+        studentGrades.map((grade) => ({
+          subject: grade.subject,
+          schoolYear: Number(selectedGrade),
+          semester: Number(selectedSemester),
+          score: grade.score,
+        }))
+      );
+      console.log("✅ 성적 입력 성공:", response.data);
+      alert("성적이 입력되었습니다!");
+    } catch (error) {
+      console.error("❌ 성적 입력 실패:", error);
+      alert("성적 입력 실패");
+    }
+  };
+
+  const patchStudentGrades = async () => {
+    if (!selectedStudent) return;
+    try {
+      const response = await axios.patch(
+        `/school/${schoolId}/grades/students/${selectedStudent.studentId}`,
+        studentGrades.map((grade) => ({
+          subject: grade.subject,
+          schoolYear: Number(selectedGrade),
+          semester: Number(selectedSemester),
+          score: grade.score,
+        }))
+      );
+      console.log("✅ 성적 수정 성공:", response.data);
+      alert("성적이 수정되었습니다!");
+    } catch (error) {
+      console.error("❌ 성적 수정 실패:", error);
+      alert("성적 수정 실패");
+    }
+  };
+
   const [backupSemesterGrades, setBackupSemesterGrades] =
     useState(semesterGradeData);
   const [backupSubjectGrades, setBackupSubjectGrades] =
@@ -223,7 +259,12 @@ const GradePage: React.FC = () => {
     setIsEditing(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (studentGrades.length === 0) {
+      await postStudentGrades(); // POST 신규 입력
+    } else {
+      await patchStudentGrades(); // PATCH 수정
+    }
     setIsEditing(false);
   };
 
@@ -256,37 +297,40 @@ const GradePage: React.FC = () => {
                 <thead>
                   <tr>
                     <th>이름</th>
-                    <th>국어</th>
-                    <th>영어</th>
-                    <th>수학</th>
-                    <th>사회</th>
-                    <th>과학</th>
+                    {subjects.map((subj) => (
+                      <th key={subj}>{subj}</th>
+                    ))}
                     <th>평균</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {initialStudents.map((student) => {
-                    const scores = studentScores[student.name];
-                    const average =
-                      (scores.국어 +
-                        scores.영어 +
-                        scores.수학 +
-                        scores.사회 +
-                        scores.과학) /
-                      5;
+                  {Object.entries(groupedByStudent).map(
+                    ([studentId, { name, scores }]) => {
+                      const subjectScores = subjects.map(
+                        (subject) => scores[subject] ?? "-"
+                      );
+                      const validScores = subjectScores.filter(
+                        (s) => typeof s === "number"
+                      ) as number[];
+                      const average =
+                        validScores.length > 0
+                          ? (
+                              validScores.reduce((sum, v) => sum + v, 0) /
+                              validScores.length
+                            ).toFixed(1)
+                          : "-";
 
-                    return (
-                      <tr key={student.number}>
-                        <td>{student.name}</td>
-                        <td>{scores.국어}</td>
-                        <td>{scores.영어}</td>
-                        <td>{scores.수학}</td>
-                        <td>{scores.사회}</td>
-                        <td>{scores.과학}</td>
-                        <td>{average.toFixed(1)}</td>
-                      </tr>
-                    );
-                  })}
+                      return (
+                        <tr key={studentId}>
+                          <td>{name}</td>
+                          {subjectScores.map((score, index) => (
+                            <td key={index}>{score}</td>
+                          ))}
+                          <td>{average}</td>
+                        </tr>
+                      );
+                    }
+                  )}
                 </tbody>
               </table>
             </StudentGradeTable>

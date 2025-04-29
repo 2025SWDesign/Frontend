@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Line,
   MainContainer,
@@ -13,11 +13,16 @@ import {
   ControlContainer,
   SearchBox,
   SearchButton,
+  GuideContainer,
 } from "./ReportPage.styled";
 import ScoreReport from "../components/ScoreReport";
 import CounselingReport from "../components/CounselingReport";
 import FeedBackReport from "../components/FeedbackReport";
 import { useStudentStore } from "../stores/studentStore";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import * as xlsx from "xlsx";
+import { saveAs } from "file-saver";
 
 const semesterGradeData = [
   { name: "1학년 1학기", 국어: 80, 영어: 70, 수학: 90, 과학: 60, 사회: 85 },
@@ -28,11 +33,29 @@ const semesterGradeData = [
   { name: "3학년 2학기", 국어: 88, 영어: 80, 수학: 89, 과학: 72, 사회: 90 },
 ];
 
+interface ScoreRow {
+  과목: string;
+  점수: number;
+  등급: number;
+}
+
+interface CounselingRow {
+  제목: string;
+  담당자: string;
+  내용: string;
+}
+
+interface FeedbackRow {
+  항목: string;
+  내용: string;
+}
+
 const ReportPage: React.FC = () => {
   const [selectedGrade, setSelectedGrade] = useState("1");
   const [selectedSemester, setSelectedSemester] = useState("1");
   const [isExcel, setIsExcel] = useState(true);
   const [selectedType, setSelectedType] = useState("score");
+  const reportRef = useRef<HTMLDivElement>(null);
 
   //성적 보고서 용
   const fullSemester = `${selectedGrade}학년 ${selectedSemester}학기`;
@@ -54,6 +77,137 @@ const ReportPage: React.FC = () => {
         .filter(([key]) => key !== "name")
         .map(([name, value]) => ({ name, value: Number(value) }))
     : [];
+
+  const getPdfFileName = () => {
+    if (!selectedStudent) return "report.pdf";
+
+    let reportType = "";
+    if (selectedType === "score") reportType = "성적보고서";
+    if (selectedType === "counseling") reportType = "상담내역";
+    if (selectedType === "feedback") reportType = "피드백내역";
+
+    return `${selectedStudent.name}_${reportType}.pdf`;
+  };
+
+  //pdf 생성
+  const generatePDF = async () => {
+    if (!reportRef.current || !selectedStudent) return;
+
+    const element = reportRef.current;
+
+    //기존 스타일 백업
+    const originalMaxHeight = element.style.maxHeight;
+    const originalOverflow = element.style.overflow;
+
+    try {
+      // 캡처 전 스타일 해제
+      element.style.maxHeight = "none";
+      element.style.overflow = "visible";
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const marginX = -20;
+      const marginY = 20;
+
+      const imgWidth = pdfWidth - marginX * 2;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = marginY;
+
+      // 첫 페이지 삽입
+      pdf.addImage(imgData, "PNG", marginX, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight - marginY * 2;
+
+      // 여러 페이지 분할
+      while (heightLeft > 0) {
+        position = marginY - (imgHeight - heightLeft);
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", marginX, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight - marginY * 2;
+      }
+
+      pdf.save(getPdfFileName());
+    } finally {
+      //캡처 끝나면 스타일 복원
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
+    }
+  };
+
+  const getExcelFileName = () => {
+    if (!selectedStudent) return "report.xlsx";
+
+    let reportType = "";
+    if (selectedType === "score") reportType = "성적보고서";
+    if (selectedType === "counseling") reportType = "상담내역";
+    if (selectedType === "feedback") reportType = "피드백내역";
+
+    return `${selectedStudent.name}_${reportType}.xlsx`;
+  };
+
+  //excel 생성
+  const generateExcel = () => {
+    if (!selectedStudent) return;
+
+    let data: ScoreRow[] | CounselingRow[] | FeedbackRow[] = [];
+
+    if (selectedType === "score") {
+      data = semesterTableData.map((row) => ({
+        과목: row.subject,
+        점수: row.score,
+        등급: row.grade,
+      }));
+    } else if (selectedType === "counseling") {
+      data = [
+        {
+          제목: "OOO",
+          담당자: "ooo",
+          내용: "Lorem ipsum 상담 내용...",
+        },
+      ];
+    } else if (selectedType === "feedback") {
+      data = [
+        { 항목: "성적", 내용: "Lorem ipsum 성적 피드백" },
+        { 항목: "행동", 내용: "Lorem ipsum 행동 피드백" },
+        { 항목: "출결", 내용: "Lorem ipsum 출결 피드백" },
+        { 항목: "태도", 내용: "Lorem ipsum 태도 피드백" },
+      ];
+    }
+
+    const worksheet = xlsx.utils.json_to_sheet(data);
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, worksheet, "Report");
+
+    const excelBuffer = xlsx.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    saveAs(blob, getExcelFileName());
+  };
+
+  const handleSave = () => {
+    if (isExcel) {
+      generateExcel();
+    } else {
+      generatePDF();
+    }
+  };
 
   return (
     <MainContainer>
@@ -219,7 +373,7 @@ const ReportPage: React.FC = () => {
               PDF
             </OptionButton>
           </ToggleWrapper>
-          <SaveButton>
+          <SaveButton onClick={handleSave}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="40"
@@ -235,23 +389,30 @@ const ReportPage: React.FC = () => {
           </SaveButton>
         </ButtonArea>
       </ControlContainer>
-      <ReportContainer>
-        {selectedType === "score" && selectedStudent && (
-          <ScoreReport
-            student={selectedStudent}
-            grade={selectedGrade}
-            semester={selectedSemester}
-            tableData={semesterTableData}
-            chartData={radarSemesterData}
-          />
-        )}
-        {selectedType === "counseling" && selectedStudent && (
-          <CounselingReport student={selectedStudent} />
-        )}
-        {selectedType === "feedback" && selectedStudent && (
-          <FeedBackReport student={selectedStudent} grade={selectedGrade} />
-        )}
-      </ReportContainer>
+      {!selectedStudent ? (
+        <GuideContainer>
+          {" "}
+          좌측의 검색창에서 보고서를 생성할 학생을 선택하세요.
+        </GuideContainer>
+      ) : (
+        <ReportContainer ref={reportRef}>
+          {selectedType === "score" && selectedStudent && (
+            <ScoreReport
+              student={selectedStudent}
+              grade={selectedGrade}
+              semester={selectedSemester}
+              tableData={semesterTableData}
+              chartData={radarSemesterData}
+            />
+          )}
+          {selectedType === "counseling" && selectedStudent && (
+            <CounselingReport student={selectedStudent} />
+          )}
+          {selectedType === "feedback" && selectedStudent && (
+            <FeedBackReport student={selectedStudent} grade={selectedGrade} />
+          )}
+        </ReportContainer>
+      )}
     </MainContainer>
   );
 };

@@ -65,6 +65,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const schoolId = useAuthStore((state) => state.schoolId);
   const setSchoolName = useAuthStore((state) => state.setSchoolName);
   const classId = useAuthStore((state) => state.classId);
+  const setGradeAndClass = useAuthStore((state) => state.setGradeAndClass);
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
   const setSelectedStudent = useStudentStore(
     (state) => state.setSelectedStudent
@@ -87,6 +88,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         setRole(role);
         setIsHomeroom(teacher?.isHomeroom ?? false);
         setSchoolName(school?.schoolName || "");
+        setGradeAndClass(teacher?.class.grade, teacher?.class.gradeClass);
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
       }
@@ -100,6 +102,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     setRole,
     setIsHomeroom,
     setSchoolName,
+    setGradeAndClass,
   ]);
 
   // 반 학생 목록 가져오기
@@ -161,10 +164,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         );
         console.log("학생 검색", response.data);
         const studentsData = response.data.data.map(
-          (item: {     
-            email : string;
+          (item: {
+            email: string;
             name: string;
-            student: {grade: number; gradeClass: number; number: number; studentId: number;};
+            student: {
+              grade: number;
+              gradeClass: number;
+              number: number;
+              studentId: number;
+            };
           }) => ({
             studentId: item.student.studentId,
             name: item.name,
