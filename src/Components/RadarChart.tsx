@@ -14,11 +14,14 @@ const RadarChart: React.FC<{ data: RadarData[] }> = ({ data }) => {
 
     const width = 400;
     const height = 400;
+    const maxValue = 100; 
     const radius = Math.min(width, height) / 2 - 40;
     const levels = 5;
     const angleSlice = (2 * Math.PI) / data.length;
 
-    const scale = d3.scaleLinear().domain([0, 100]).range([0, radius]);
+    const rScale = d3.scaleLinear()
+    .range([0, radius])
+    .domain([0, maxValue]);
 
     // 🟢 SVG 요소 설정
     d3.select(svgRef.current).selectAll("*").remove(); // 기존 SVG 초기화
@@ -57,8 +60,8 @@ const RadarChart: React.FC<{ data: RadarData[] }> = ({ data }) => {
       .append("line")
       .attr("x1", 0)
       .attr("y1", 0)
-      .attr("x2", (_, i) => scale(100) * Math.cos(angleSlice * i - Math.PI / 2))
-      .attr("y2", (_, i) => scale(100) * Math.sin(angleSlice * i - Math.PI / 2))
+      .attr("x2", (_, i) => rScale(100) * Math.cos(angleSlice * i - Math.PI / 2))
+      .attr("y2", (_, i) => rScale(100) * Math.sin(angleSlice * i - Math.PI / 2))
       .attr("stroke", "#888")
       .attr("stroke-width", 1);
 
@@ -81,51 +84,56 @@ const RadarChart: React.FC<{ data: RadarData[] }> = ({ data }) => {
     const line = d3
       .lineRadial<RadarData>()
       .curve(d3.curveLinearClosed)
-      .radius((d) => scale(d.value))
+      .radius((d) => rScale(d.value))
       .angle((_, i) => i * angleSlice);
 
-    svg
-      .append("path")
-      .datum(data)
-      .attr("d", line)
-      .attr("fill", "rgba(20, 108, 148, 0.60)")
-      .attr("stroke", "#004260")
-      .attr("stroke-width", 2);
+    const initialData = data.map(d => ({ name: d.name, value: 0 }));
 
-    // 🟢 데이터 포인트 원형 점 표시
-    svg
-      .selectAll(".circle")
-      .data(data)
-      .enter()
-      .append("circle")
-      .attr(
-        "cx",
-        (_, i) => scale(data[i].value) * Math.cos(angleSlice * i - Math.PI / 2)
-      )
-      .attr(
-        "cy",
-        (_, i) => scale(data[i].value) * Math.sin(angleSlice * i - Math.PI / 2)
-      )
-      .attr("r", 4)
-      .attr("fill", "#004260");
-    svg
-      .selectAll(".score-text")
-      .data(data)
-      .enter()
-      .append("text")
-      .attr(
-        "x",
-        (_, i) =>
-          scale(data[i].value) * Math.cos(angleSlice * i - Math.PI / 2) + 8
-      )
-      .attr(
-        "y",
-        (_, i) => scale(data[i].value) * Math.sin(angleSlice * i - Math.PI / 2)
-      )
-      .text((d) => d.value)
-      .attr("font-size", "12px")
-      .attr("fill", "#000")
-      .attr("alignment-baseline", "middle");
+    const radarPath = svg.append("path")
+    .datum(initialData)
+    .attr("fill", "rgba(20, 108, 148, 0.60)")
+    .attr("stroke", "#004260")
+    .attr("stroke-width", 2)
+    .attr("d", line);
+  
+  // 점
+  const points = svg.selectAll(".circle-point")
+    .data(initialData)
+    .enter()
+    .append("circle")
+    .attr("class", "circle-point")
+    .attr("r", 4)
+    .attr("fill", "#004260");
+  
+  // 점수 텍스트
+  const labels = svg.selectAll(".score-text")
+    .data(initialData)
+    .enter()
+    .append("text")
+    .attr("class", "score-text")
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .text(d => d.value);
+  
+  // 애니메이션용
+  radarPath.transition()
+    .duration(800)
+    .tween("progress", () => {
+      const interpolate = d3.interpolate(initialData, data);
+      return (t: number) => {
+        const current = interpolate(t);
+        radarPath.attr("d", line(current));
+  
+        points.data(current)
+          .attr("cx", (d, i) => rScale(d.value) * Math.cos(angleSlice * i - Math.PI / 2))
+          .attr("cy", (d, i) => rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2));
+  
+        labels.data(current)
+          .attr("x", (d, i) => (rScale(d.value) + 16) * Math.cos(angleSlice * i - Math.PI / 2))
+          .attr("y", (d, i) => (rScale(d.value) + 16) * Math.sin(angleSlice * i - Math.PI / 2))
+          .text(d => d.value.toFixed(0)); // 점수도 실시간으로 변화
+      };
+    });
   }, [data]);
 
   return <svg ref={svgRef}></svg>;
