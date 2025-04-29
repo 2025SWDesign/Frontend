@@ -148,7 +148,6 @@ const GradePage: React.FC = () => {
     }
   }, [selectedGrade, selectedSemester, selectedSubject, isPeriod, selectedStudent, schoolId]);
 
-  
   useEffect(() => {
     if (selectedStudent) {
       fetchStudentGrades();

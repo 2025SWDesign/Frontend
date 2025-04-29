@@ -15,6 +15,7 @@ import {
   UpdateButton,
   SemesterAttendanceSection,
   SectionTitle,
+  SectionNote,
   AttendanceTableWrapper,
   AttendanceTable,
   AttendanceHeaderCell,
@@ -46,18 +47,12 @@ interface Student {
   img: string;
 }
 
-interface StudentManagementPageProps {
-  role: string;
-  isHomeroom: boolean;
-  selectedStudent: Student | null;
-}
-
 interface AttendanceRecord {
   date: string;
   absent: string;
   late: string;
-  earlyLeave: string;
-  skip: string;
+  early: string;
+  partialAttendance: string;
 }
 
 interface AttendanceSummary {
@@ -69,29 +64,32 @@ interface AttendanceSummary {
   lateIllness: number;
   lateUnauthorized: number;
   lateOther: number;
-  earlyLeaveIllness: number;
-  earlyLeaveUnauthorized: number;
-  earlyLeaveOther: number;
-  skipIllness: number;
-  skipUnauthorized: number;
-  skipOther: number;
+  earlyIllness: number;
+  earlyUnauthorized: number;
+  earlyOther: number;
+  partialAttendanceIllness: number;
+  partialAttendanceUnauthorized: number;
+  partialAttendanceOther: number;
 }
 
 interface ClassAttendanceRecord {
   studentId: number;
-  name: string;
-  number: string;
   absent: string;
   late: string;
-  earlyLeave: string;
-  skip: string;
+  early: string;
+  partialAttendance: string;
 }
 
-const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
-  isHomeroom,
-}) => {
+const StudentManagementPage: React.FC = () => {
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
+  const schoolId = useAuthStore((state) => state.schoolId);
+  const classId = useAuthStore((state) => state.classId);
+  const setSelectedStudent = useStudentStore(
+    (state) => state.setSelectedStudent
+  );
   const role = useAuthStore((state) => state.role);
+  const isHomeroom = useAuthStore((state) => state.isHomeroom);
+  const classStudents = useAuthStore((state) => state.classStudents);
 
   // 학생 기본 정보 상태
   const [basicInfo, setBasicInfo] = useState({
@@ -103,11 +101,10 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
 
   // 상태관리
   const [specialNotes, setSpecialNotes] = useState(""); // 특기사항
-  const [isSpecialNotesEditing, setIsSpeicalNotesEditing] = useState(false); // 특기사항 편집
+  const [isSpecialNotesEditing, setIsSpecialNotesEditing] = useState(false); // 특기사항 편집
   const [isAttendanceEditing, setIsAttendanceEditing] = useState(false); // 개인 출석 편집
   const [isClassAttendanceEditing, setIsClassAttendanceEditing] =
     useState(false); // 담임 모드 출석 편집
-  const [isClassAttendanceLoaded, setIsClassAttendanceLoaded] = useState(false); // 반 출석 데이터 로드 상태
 
   // 학기 출석 데이터
   const [semesterAttendance, setSemesterAttendance] = useState<
@@ -121,8 +118,11 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
   const [classAttendance, setClassAttendance] = useState<
     ClassAttendanceRecord[]
   >([]);
-  const semesterId = 202301; // Example semester ID, should be dynamic in production
-  const classId = 101; // Example class ID (e.g., 1학년 1반), should be dynamic based on TEACHER
+
+  const semesterId = (() => {
+    const m = new Date().getMonth() + 1;
+    return m >= 3 && m < 9 ? 1 : 2;
+  })();
 
   // 기본 정보 변경 핸들러
   const handleBasicInfoChange =
@@ -134,22 +134,42 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
       });
     };
 
-  // 기본 정보 업데이트 핸들러
+  // 기본 정보 업데이트 API
   const handleUpdateBasicInfo = async () => {
-    try {
-      const response = await axios.put("/api/students/basic-info", {
-        studentId: selectedStudent?.studentId,
-        name: basicInfo.name,
-        grade: basicInfo.grade,
-        class: basicInfo.class,
-        number: basicInfo.number,
-      });
+    if (!selectedStudent) return;
 
-      console.log("Updated basic info:", response.data);
-      alert("기본 정보가 업데이트되었습니다.");
-    } catch (error) {
-      console.error("Error updating student info:", error);
-      alert("기본 정보 업데이트 중 오류가 발생했습니다.");
+    try {
+      const token = sessionStorage.getItem("accessToken");
+      const response = await axios.patch(
+        `/api/v1/school/${schoolId}/students/${selectedStudent.studentId}`,
+        {
+          name: basicInfo.name,
+          grade: Number(basicInfo.grade), // 숫자로 변환
+          gradeClass: Number(basicInfo.class), // 기본정보 객체의 `class` → API의 `gradeClass`
+          number: Number(basicInfo.number),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("학생 기본 정보 업데이트 응답:", response.data);
+
+      // 업데이트된 데이터를 상태나 전역 스토어에도 반영
+      const d = response.data.data;
+      const updatedStudent: Student = {
+        studentId: d.studentId,
+        name: d.user.name,
+        grade: d.grade,
+        gradeClass: d.gradeClass,
+        number: d.number,
+        img: d.user.photo || "",
+      };
+      setSelectedStudent(updatedStudent);
+    } catch (err) {
+      console.error("기본 정보 업데이트 실패:", err);
     }
   };
 
@@ -196,14 +216,14 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
       // Save changes when exiting edit mode
       await handleSpecialNotesOperation();
     }
-    setIsSpeicalNotesEditing(!isSpecialNotesEditing);
+    setIsSpecialNotesEditing(!isSpecialNotesEditing);
   };
-  const toggleAttendanceEditMode = async () => {
+  const toggleAttendanceEditMode = () => {
     if (isAttendanceEditing) {
-      // Save changes when exiting edit mode
-      await handleAttendanceOperation();
+      saveSemesterAttendance(); // 저장
+    } else {
+      setIsAttendanceEditing(true); // 수정 모드로 진입
     }
-    setIsAttendanceEditing(!isAttendanceEditing);
   };
   const toggleClassAttendanceEditMode = async () => {
     if (isClassAttendanceEditing) {
@@ -216,12 +236,16 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
   // 출석 정보 입력 핸들러 (학기 출석)
   const handleSemesterAttendanceInput = (
     date: string,
-    field: string,
-    value: string
+    field: keyof AttendanceRecord,
+    rawValue: string
   ) => {
-    // Validate input
+    // 앞뒤 공백을 없애고
+    const value = rawValue.trim();
+    // 유효성 검증
     const isValid =
-      ["1", "2", ""].includes(value) ||
+      value === "" ||
+      value === "1" ||
+      value === "2" ||
       (value.startsWith("3(") && value.endsWith(")"));
     if (!isValid) {
       alert(
@@ -230,406 +254,458 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
       return;
     }
 
-    setSemesterAttendance(
-      semesterAttendance.map((record) => {
-        if (record.date === date) {
-          return {
-            ...record,
-            [field]: value,
-          };
-        }
-        return record;
-      })
+    // 함수형으로 이전 상태를 안전하게 참조해서 업데이트
+    setSemesterAttendance((prev) =>
+      prev.map((rec) => (rec.date === date ? { ...rec, [field]: value } : rec))
     );
+
+    console.log(semesterAttendance);
   };
 
-  // API: Fetch semester attendance
+  // API: 특정 학생 학기 출석 조회 함수
   const fetchSemesterAttendance = async (
     studentId: number,
     semesterId: number
-  ) => {
-    try {
-      const response = await axios.get(
-        `/api/students/${studentId}/attendance/semester/${semesterId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching attendance:", error);
-      throw error;
-    }
-  };
-
-  // API: Create semester attendance
-  const createSemesterAttendance = async (
-    studentId: number,
-    semesterId: number,
-    attendanceData: AttendanceRecord[]
-  ) => {
-    try {
-      const response = await axios.post(
-        `/api/students/${studentId}/attendance/semester/${semesterId}`,
-        { attendance: attendanceData },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating attendance:", error);
-      throw error;
-    }
-  };
-
-  // API: Update semester attendance
-  const updateSemesterAttendance = async (
-    studentId: number,
-    semesterId: number,
-    attendanceData: AttendanceRecord[]
-  ) => {
-    try {
-      const response = await fetch(
-        `/api/students/${studentId}/attendance/semester/${semesterId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ attendance: attendanceData }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+  ): Promise<AttendanceRecord[]> => {
+    const token = sessionStorage.getItem("accessToken");
+    const response = await axios.get<{
+      status: number;
+      message: string;
+      data: Array<{
+        attendanceId: number;
+        studentRecordId: number;
+        date: string;
+        type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+        reason: string;
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }>(
+      `/api/v1/school/${schoolId}/student-record/attendance/students/${studentId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { semester: semesterId },
       }
+    );
+    console.log("학기 출석 데이터", response.data.data);
 
-      return await response.json();
-    } catch (error) {
-      console.error("Error updating attendance:", error);
-      throw error;
-    }
+    return response.data.data.map((rec) => ({
+      date: rec.date,
+      absent: rec.type === "ABSENCE" ? rec.reason : "",
+      late: rec.type === "LATE" ? rec.reason : "",
+      early: rec.type === "EARLY" ? rec.reason : "",
+      partialAttendance: rec.type === "PARTIAL_ATTENDANCE" ? rec.reason : "",
+    }));
   };
 
-  // API: Fetch attendance summary
-  const fetchAttendanceSummary = async (
-    studentId: number,
-    semesterId: number | null = null
-  ) => {
-    try {
-      const response = await axios.get(
-        `/api/students/${studentId}/attendance/summary`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          params: semesterId ? { semesterId } : {},
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching attendance summary:", error);
-      throw error;
-    }
-  };
-
-  // API: Fetch special notes
-  const fetchSpecialNotes = async (studentId: number, semesterId: number) => {
-    try {
-      const response = await axios.get(
-        `/api/students/${studentId}/special-notes/${semesterId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching special notes:", error);
-      throw error;
-    }
-  };
-
-  // API: Create special notes
-  const createSpecialNotes = async (
-    studentId: number,
-    semesterId: number,
-    notes: string
-  ) => {
-    try {
-      const response = await axios.post(
-        `/api/students/${studentId}/special-notes/${semesterId}`,
-        { notes },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating special notes:", error);
-      throw error;
-    }
-  };
-
-  // API: Update special notes
-  const updateSpecialNotes = async (
-    studentId: number,
-    semesterId: number,
-    notes: string
-  ) => {
-    try {
-      const response = await axios.patch(
-        `/api/students/${studentId}/special-notes/${semesterId}`,
-        { notes },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error updating special notes:", error);
-      throw error;
-    }
-  };
-
-  // API: Fetch class attendance
-  const fetchClassAttendance = async (
-    classId: number,
-    semesterId: number,
-    date: string
-  ) => {
-    try {
-      const response = await axios.get(
-        `/api/classes/${classId}/attendance/${semesterId}/${date}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching class attendance:", error);
-      throw error;
-    }
-  };
-
-  // API: Create class attendance
-  const createClassAttendance = async (
-    classId: number,
-    semesterId: number,
-    date: string,
-    attendance: ClassAttendanceRecord[]
-  ) => {
-    try {
-      const response = await axios.post(
-        `/api/classes/${classId}/attendance/${semesterId}/${date}`,
-        { attendance },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating class attendance:", error);
-      throw error;
-    }
-  };
-
-  // API: Update class attendance
-  const updateClassAttendance = async (
-    classId: number,
-    semesterId: number,
-    date: string,
-    attendance: ClassAttendanceRecord[]
-  ) => {
-    try {
-      const response = await axios.patch(
-        `/api/classes/${classId}/attendance/${semesterId}/${date}`,
-        { attendance },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error updating class attendance:", error);
-      throw error;
-    }
-  };
-
-  // Handle attendance operation (create or update for individual student)
-  const handleAttendanceOperation = async () => {
+  // API: 특정 학생 학기 출석 작성/수정 함수
+  const saveSemesterAttendance = async () => {
     if (!selectedStudent) return;
 
+    // payload 만들기: 비어 있지 않은 항목만
+
+    const attendancePayload = semesterAttendance
+      .filter(
+        (rec) => rec.absent || rec.late || rec.early || rec.partialAttendance
+      )
+      .map((rec) => {
+        if (rec.absent) {
+          return { date: rec.date, type: "ABSENCE", reason: rec.absent };
+        }
+        if (rec.late) {
+          return { date: rec.date, type: "LATE", reason: rec.late };
+        }
+        if (rec.early) {
+          return { date: rec.date, type: "EARLY", reason: rec.early };
+        }
+        if (rec.partialAttendance) {
+          return {
+            date: rec.date,
+            type: "PARTIAL_ATTENDANCE",
+            reason: rec.partialAttendance,
+          };
+        }
+        // 안전장치
+        return null;
+      })
+      .filter(
+        (item): item is { date: string; type: string; reason: string } => !!item
+      );
+
     try {
-      const existingRecords = await fetchSemesterAttendance(
-        selectedStudent.studentId,
-        semesterId
+      const token = sessionStorage.getItem("accessToken");
+      const response = await axios.post<{
+        status: number;
+        message: string;
+        data: Array<{
+          attendanceId: number;
+          studentRecordId: number;
+          date: string;
+          type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+          reason: string;
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }>(
+        `/api/v1/school/${schoolId}/student-record/attendance/students/${selectedStudent.studentId}`,
+        {
+          semester: semesterId,
+          attendance: attendancePayload,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
-      // Validate attendance data
-      const isValidData = semesterAttendance.every(
-        (record) =>
-          ["1", "2", ""].includes(record.absent) ||
-          (record.absent.startsWith("3(") &&
-            record.absent.endsWith(")") &&
-            ["1", "2", ""].includes(record.late)) ||
-          (record.late.startsWith("3(") &&
-            record.late.endsWith(")") &&
-            ["1", "2", ""].includes(record.earlyLeave)) ||
-          (record.earlyLeave.startsWith("3(") &&
-            record.earlyLeave.endsWith(")") &&
-            ["1", "2", ""].includes(record.skip)) ||
-          (record.skip.startsWith("3(") && record.skip.endsWith(")"))
+      // 서버 응답으로 돌아온 최신 데이터를 state에 반영
+      const saved = response.data.data.map((rec) => ({
+        date: rec.date,
+        absent: rec.type === "ABSENCE" ? rec.reason : "",
+        late: rec.type === "LATE" ? rec.reason : "",
+        early: rec.type === "EARLY" ? rec.reason : "",
+        partialAttendance: rec.type === "PARTIAL_ATTENDANCE" ? rec.reason : "",
+      }));
+      setSemesterAttendance(saved);
+      setIsAttendanceEditing(false);
+      const updatedSummary = await fetchAttendanceSummary(
+        selectedStudent.studentId
       );
 
-      if (!isValidData) {
-        throw new Error(
-          "Invalid attendance values. Must be '1', '2', '3(임의의 문자열)', or ''"
-        );
-      }
+      // 기본으로 항상 보여줄 1·2·3학년 행
+      const defaultSummaries: AttendanceSummary[] = [
+        {
+          grade: "1학년",
+          totalDays: 240,
+          absentIllness: 0,
+          absentUnauthorized: 0,
+          absentOther: 0,
+          lateIllness: 0,
+          lateUnauthorized: 0,
+          lateOther: 0,
+          earlyIllness: 0,
+          earlyUnauthorized: 0,
+          earlyOther: 0,
+          partialAttendanceIllness: 0,
+          partialAttendanceUnauthorized: 0,
+          partialAttendanceOther: 0,
+        },
+        {
+          grade: "2학년",
+          totalDays: 240,
+          absentIllness: 0,
+          absentUnauthorized: 0,
+          absentOther: 0,
+          lateIllness: 0,
+          lateUnauthorized: 0,
+          lateOther: 0,
+          earlyIllness: 0,
+          earlyUnauthorized: 0,
+          earlyOther: 0,
+          partialAttendanceIllness: 0,
+          partialAttendanceUnauthorized: 0,
+          partialAttendanceOther: 0,
+        },
+        {
+          grade: "3학년",
+          totalDays: 240,
+          absentIllness: 0,
+          absentUnauthorized: 0,
+          absentOther: 0,
+          lateIllness: 0,
+          lateUnauthorized: 0,
+          lateOther: 0,
+          earlyIllness: 0,
+          earlyUnauthorized: 0,
+          earlyOther: 0,
+          partialAttendanceIllness: 0,
+          partialAttendanceUnauthorized: 0,
+          partialAttendanceOther: 0,
+        },
+      ];
 
-      if (existingRecords.data.attendance.length === 0) {
-        await createSemesterAttendance(
-          selectedStudent.studentId,
-          semesterId,
-          semesterAttendance
-        );
-        alert("출석 정보가 생성되었습니다.");
-      } else {
-        await updateSemesterAttendance(
-          selectedStudent.studentId,
-          semesterId,
-          semesterAttendance
-        );
-        alert("출석 정보가 업데이트되었습니다.");
-      }
-    } catch (error) {
-      console.error("Error handling attendance:", error);
-      alert("출석 정보 처리 중 오류가 발생했습니다.");
+      const mergedSummaries = defaultSummaries.map(
+        (def) => updatedSummary.find((u) => u.grade === def.grade) ?? def
+      );
+
+      setAttendanceSummaryData(mergedSummaries);
+    } catch (err) {
+      console.error("출석 정보 저장/수정 실패:", err);
+      alert("출석 정보 저장 중 오류가 발생했습니다.");
     }
+  };
+
+  // API: 학생 출결 정보 함수
+  const fetchAttendanceSummary = async (
+    studentId: number
+  ): Promise<AttendanceSummary[]> => {
+    // 토큰 획득
+    const token = sessionStorage.getItem("accessToken");
+
+    // GET /api/v1/school/:schoolId/student-record/attendance-stats/students/:studentId
+    const response = await axios.get<{
+      status: number;
+      message: string;
+      data: Record<
+        string,
+        {
+          ABSENCE?: Record<"무단" | "질병" | "기타", number>;
+          LATE?: Record<"무단" | "질병" | "기타", number>;
+          EARLY?: Record<"무단" | "질병" | "기타", number>;
+          PARTIAL_ATTENDANCE?: Record<"무단" | "질병" | "기타", number>;
+        }
+      >;
+    }>(
+      `/api/v1/school/${schoolId}/student-record/attendance-stats/students/${studentId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const raw = response.data.data;
+    console.log("학생 출결 정보:", raw);
+    const summaries: AttendanceSummary[] = Object.entries(raw).map(
+      ([gradeStr, types]) => ({
+        grade: `${gradeStr}학년`,
+        totalDays: 240, // 필요에 따라 변경
+        absentIllness: types.ABSENCE?.질병 ?? 0,
+        absentUnauthorized: types.ABSENCE?.무단 ?? 0,
+        absentOther: types.ABSENCE?.기타 ?? 0,
+        lateIllness: types.LATE?.질병 ?? 0,
+        lateUnauthorized: types.LATE?.무단 ?? 0,
+        lateOther: types.LATE?.기타 ?? 0,
+        earlyIllness: types.EARLY?.질병 ?? 0,
+        earlyUnauthorized: types.EARLY?.무단 ?? 0,
+        earlyOther: types.EARLY?.기타 ?? 0,
+        partialAttendanceIllness: types.PARTIAL_ATTENDANCE?.질병 ?? 0,
+        partialAttendanceUnauthorized: types.PARTIAL_ATTENDANCE?.무단 ?? 0,
+        partialAttendanceOther: types.PARTIAL_ATTENDANCE?.기타 ?? 0,
+      })
+    );
+
+    return summaries;
+  };
+
+  // API: 특기사항 조회
+  const fetchSpecialNotes = async (
+    studentId: number,
+    semester: number
+  ): Promise<string> => {
+    const token = sessionStorage.getItem("accessToken");
+    const response = await axios.get<{
+      status: number;
+      message: string;
+      data: {
+        grade: number;
+        semester: number;
+        extraInfo: string;
+      };
+    }>(
+      `/api/v1/school/${schoolId}/student-record/extra-info/students/${studentId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { semester },
+      }
+    );
+    return response.data.data.extraInfo;
+  };
+
+  // API: 특기사항 작성/수정
+  const saveSpecialNotes = async (
+    studentId: number,
+    semester: number,
+    extraInfo: string
+  ): Promise<string> => {
+    const token = sessionStorage.getItem("accessToken");
+    const response = await axios.post<{
+      status: number;
+      message: string;
+      data: {
+        studentRecordId: number;
+        studentId: number;
+        grade: number;
+        semester: number;
+        extraInfo: string;
+        createdAt: string;
+        updatedAt: string;
+      };
+    }>(
+      `/api/v1/school/${schoolId}/student-record/extra-info/students/${studentId}`,
+      {
+        semester,
+        extraInfo,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data.data.extraInfo;
+  };
+
+  // API: 반 출석 조회 함수
+  const fetchClassAttendance = async (
+    classId: number,
+    date: string
+  ): Promise<ClassAttendanceRecord[]> => {
+    const token = sessionStorage.getItem("accessToken");
+    const response = await axios.get<{
+      status: number;
+      message: string;
+      data: Array<{
+        date: string;
+        type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+        reason: string;
+        studentRecord: {
+          studentId: number;
+          student: {
+            classId: number;
+          };
+        };
+      }>;
+    }>(
+      `/api/v1/school/${schoolId}/student-record/attendance/class/${classId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { date: date },
+      }
+    );
+
+    console.log("반 출석 조회 데이터 :", response.data);
+
+    // UI 에 필요한 형태로 변환
+    return response.data.data.map((item) => ({
+      studentId: item.studentRecord.studentId,
+      absent: item.type === "ABSENCE" ? item.reason : "",
+      late: item.type === "LATE" ? item.reason : "",
+      early: item.type === "EARLY" ? item.reason : "",
+      partialAttendance: item.type === "PARTIAL_ATTENDANCE" ? item.reason : "",
+    }));
+  };
+
+  // API : 반 출석 작성/수정 함수
+  const saveClassAttendance = async (
+    classId: number,
+    semester: number,
+    date: string,
+    attendanceList: {
+      studentId: number;
+      type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+      reason: string;
+    }[]
+  ) => {
+    const token = sessionStorage.getItem("accessToken");
+    console.log("date : ", date);
+    console.log("semester : ", semester);
+    console.log("attendanceList : ", attendanceList);
+    const response = await axios.post<{
+      status: number;
+      message: string;
+      data: Array<{
+        attendanceId: number;
+        studentRecordId: number;
+        studentRecord: { studentId: number };
+        date: string;
+        type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+        reason: string;
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }>(
+      `/api/v1/school/${schoolId}/student-record/attendance/class/${classId}`,
+      {
+        date,
+        semester,
+        attendance: attendanceList,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    console.log("반 출석 작성/수정 응답:", response.data);
+    return response.data.data;
   };
 
   // Handle special notes operation (create or update)
   const handleSpecialNotesOperation = async () => {
     if (!selectedStudent) return;
 
-    try {
-      if (!specialNotes.trim()) {
-        throw new Error("특기사항은 비어 있을 수 없습니다.");
-      }
-
-      const existingNotes = await fetchSpecialNotes(
-        selectedStudent.studentId,
-        semesterId
-      );
-
-      if (!existingNotes.data.notes) {
-        await createSpecialNotes(
-          selectedStudent.studentId,
-          semesterId,
-          specialNotes
-        );
-        alert("특기사항이 생성되었습니다.");
-      } else {
-        await updateSpecialNotes(
-          selectedStudent.studentId,
-          semesterId,
-          specialNotes
-        );
-        alert("특기사항이 업데이트되었습니다.");
-      }
-    } catch (error) {
-      console.error("Error handling special notes:", error);
-      alert("특기사항 처리 중 오류가 발생했습니다.");
-    }
+    const info = await saveSpecialNotes(
+      selectedStudent.studentId,
+      semesterId,
+      specialNotes
+    );
+    setSpecialNotes(info);
+    setIsSpecialNotesEditing(false);
   };
 
-  // Handle class attendance operation (create or update)
   const handleClassAttendanceOperation = async () => {
-    if (!isClassAttendanceLoaded) return;
-
     try {
-      // Validate attendance data
-      const isValidData = classAttendance.every(
-        (record) =>
-          ["1", "2", ""].includes(record.absent) ||
-          (record.absent.startsWith("3(") &&
-            record.absent.endsWith(")") &&
-            ["1", "2", ""].includes(record.late)) ||
-          (record.late.startsWith("3(") &&
-            record.late.endsWith(")") &&
-            ["1", "2", ""].includes(record.earlyLeave)) ||
-          (record.earlyLeave.startsWith("3(") &&
-            record.earlyLeave.endsWith(")") &&
-            ["1", "2", ""].includes(record.skip)) ||
-          (record.skip.startsWith("3(") && record.skip.endsWith(")"))
-      );
+      const formattedDate = formatDateForApi(today);
 
-      if (!isValidData) {
-        throw new Error(
-          "Invalid attendance values. Must be '1', '2', '3(임의의 문자열)', or ''"
-        );
+      console.log("classAttendnace : ", classAttendance);
+      const payload = classAttendance
+        .filter(
+          (rec) =>
+            rec.absent !== "" ||
+            rec.late !== "" ||
+            rec.early !== "" ||
+            rec.partialAttendance !== ""
+        )
+        .map((rec) => ({
+          studentId: rec.studentId,
+          type: rec.absent
+            ? ("ABSENCE" as const)
+            : rec.late
+              ? ("LATE" as const)
+              : rec.early
+                ? ("EARLY" as const)
+                : ("PARTIAL_ATTENDANCE" as const),
+          reason: rec.absent || rec.late || rec.early || rec.partialAttendance,
+        }));
+      console.log("payload :", payload);
+
+      if (payload.length === 0) {
+        alert("입력된 출석 정보가 없습니다.");
+        return;
       }
 
-      const formattedDate = formatDateForApi(today); // e.g., "2023-03-02"
-      const existingRecords = await fetchClassAttendance(
+      const savedData = await saveClassAttendance(
         classId,
         semesterId,
-        formattedDate
+        formattedDate,
+        payload
       );
+      console.log("반 출석 작성/수정 :", savedData);
 
-      if (
-        !existingRecords.data.attendance ||
-        existingRecords.data.attendance.length === 0
-      ) {
-        await createClassAttendance(
-          classId,
-          semesterId,
-          formattedDate,
-          classAttendance
-        );
-        alert("반 출석 정보가 생성되었습니다.");
-      } else {
-        await updateClassAttendance(
-          classId,
-          semesterId,
-          formattedDate,
-          classAttendance
-        );
-        alert("반 출석 정보가 업데이트되었습니다.");
-      }
+      const newClassAttendance: ClassAttendanceRecord[] = savedData.map(
+        (item) => ({
+          studentId: item.studentRecord.studentId,
+          absent: item.type === "ABSENCE" ? item.reason : "",
+          late: item.type === "LATE" ? item.reason : "",
+          early: item.type === "EARLY" ? item.reason : "",
+          partialAttendance:
+            item.type === "PARTIAL_ATTENDANCE" ? item.reason : "",
+        })
+      );
+      setClassAttendance(newClassAttendance);
+
+      alert("반 출석 정보가 저장되었습니다.");
+      setIsClassAttendanceEditing(false);
     } catch (error) {
-      console.error("Error handling class attendance:", error);
-      alert("반 출석 정보 처리 중 오류가 발생했습니다.");
+      console.error("Error saving class attendance:", error);
+      alert("반 출석 정보 저장 중 오류가 발생했습니다.");
     }
   };
 
-  // Utility to format date for API (YYYY-MM-DD)
   const formatDateForApi = (date: Date): string => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const month = date.getMonth() + 1;  // 1부터 시작
+    const day   = date.getDate();       // 1부터 시작
+    return `${month}/${day}`;
   };
 
-  // Fetch initial data
+
   useEffect(() => {
+    // 1) 학생 데이터 로드
     if (selectedStudent) {
-      // Update basicInfo when selectedStudent changes
+      // 기본 정보 동기화
       setBasicInfo({
         name: selectedStudent.name || "",
         grade: selectedStudent.grade || "",
@@ -637,199 +713,153 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
         number: selectedStudent.number || "",
       });
 
+      const baseRecords: AttendanceRecord[] = semesterDates.map((date) => ({
+        date,
+        absent: "",
+        late: "",
+        early: "",
+        partialAttendance: "",
+      }));
+
       const loadStudentData = async () => {
         try {
-          // Fetch semester attendance
-          const attendanceResponse = await fetchSemesterAttendance(
+          // a) 해당 학기 출석 조회
+          const fetched = await fetchSemesterAttendance(
             selectedStudent.studentId,
             semesterId
           );
-          setSemesterAttendance(attendanceResponse.data.attendance || []);
+          const merged = baseRecords.map((rec) => {
+            const found = fetched.find((f) => f.date === rec.date);
+            return found || rec;
+          });
+          setSemesterAttendance(merged);
 
-          // Fetch attendance summary
-          const summaryResponse = await fetchAttendanceSummary(
-            selectedStudent.studentId,
-            semesterId
-          );
-          setAttendanceSummaryData(
-            summaryResponse.data && summaryResponse.data.length > 0
-              ? summaryResponse.data
-              : [
-                  {
-                    grade: "1학년",
-                    totalDays: 240,
-                    absentIllness: 0,
-                    absentUnauthorized: 0,
-                    absentOther: 0,
-                    lateIllness: 0,
-                    lateUnauthorized: 0,
-                    lateOther: 0,
-                    earlyLeaveIllness: 0,
-                    earlyLeaveUnauthorized: 0,
-                    earlyLeaveOther: 0,
-                    skipIllness: 0,
-                    skipUnauthorized: 0,
-                    skipOther: 0,
-                  },
-                  {
-                    grade: "2학년",
-                    totalDays: 240,
-                    absentIllness: 0,
-                    absentUnauthorized: 0,
-                    absentOther: 0,
-                    lateIllness: 0,
-                    lateUnauthorized: 0,
-                    lateOther: 0,
-                    earlyLeaveIllness: 0,
-                    earlyLeaveUnauthorized: 0,
-                    earlyLeaveOther: 0,
-                    skipIllness: 0,
-                    skipUnauthorized: 0,
-                    skipOther: 0,
-                  },
-                  {
-                    grade: "3학년",
-                    totalDays: 240,
-                    absentIllness: 0,
-                    absentUnauthorized: 0,
-                    absentOther: 0,
-                    lateIllness: 0,
-                    lateUnauthorized: 0,
-                    lateOther: 0,
-                    earlyLeaveIllness: 0,
-                    earlyLeaveUnauthorized: 0,
-                    earlyLeaveOther: 0,
-                    skipIllness: 0,
-                    skipUnauthorized: 0,
-                    skipOther: 0,
-                  },
-                ]
+          // b) 출결 요약 조회
+          const rawSummary = await fetchAttendanceSummary(
+            selectedStudent.studentId
           );
 
-          // Fetch special notes
+          const completeSummary: AttendanceSummary[] = [1, 2, 3].map((g) => {
+            const found = rawSummary.find((s) => s.grade === `${g}학년`);
+            return (
+              found || {
+                grade: `${g}학년`,
+                totalDays: 240,
+                absentIllness: 0,
+                absentUnauthorized: 0,
+                absentOther: 0,
+                lateIllness: 0,
+                lateUnauthorized: 0,
+                lateOther: 0,
+                earlyIllness: 0,
+                earlyUnauthorized: 0,
+                earlyOther: 0,
+                partialAttendanceIllness: 0,
+                partialAttendanceUnauthorized: 0,
+                partialAttendanceOther: 0,
+              }
+            );
+          });
+
+          setAttendanceSummaryData(completeSummary);
+
+          // c) 특기사항 조회
           const notesResponse = await fetchSpecialNotes(
             selectedStudent.studentId,
             semesterId
           );
-          setSpecialNotes(notesResponse.data.notes || "");
+          setSpecialNotes(notesResponse || "");
         } catch (error) {
-          console.error("Error fetching student data:", error);
-          setSemesterAttendance(
-            semesterDates.map((date) => ({
-              date,
-              absent: "",
-              late: "",
-              earlyLeave: "",
-              skip: "",
+          // 에러 시 기본값 초기화
+          console.error("학기 출석 불러오기 실패", error);
+
+          setSemesterAttendance(baseRecords);
+
+          setAttendanceSummaryData(
+            [1, 2, 3].map((g) => ({
+              grade: `${g}학년`,
+              totalDays: 240,
+              absentIllness: 0,
+              absentUnauthorized: 0,
+              absentOther: 0,
+              lateIllness: 0,
+              lateUnauthorized: 0,
+              lateOther: 0,
+              earlyIllness: 0,
+              earlyUnauthorized: 0,
+              earlyOther: 0,
+              partialAttendanceIllness: 0,
+              partialAttendanceUnauthorized: 0,
+              partialAttendanceOther: 0,
             }))
           );
-          setAttendanceSummaryData([
-            {
-              grade: "1학년",
-              totalDays: 240,
-              absentIllness: 0,
-              absentUnauthorized: 0,
-              absentOther: 0,
-              lateIllness: 0,
-              lateUnauthorized: 0,
-              lateOther: 0,
-              earlyLeaveIllness: 0,
-              earlyLeaveUnauthorized: 0,
-              earlyLeaveOther: 0,
-              skipIllness: 0,
-              skipUnauthorized: 0,
-              skipOther: 0,
-            },
-            {
-              grade: "2학년",
-              totalDays: 240,
-              absentIllness: 0,
-              absentUnauthorized: 0,
-              absentOther: 0,
-              lateIllness: 0,
-              lateUnauthorized: 0,
-              lateOther: 0,
-              earlyLeaveIllness: 0,
-              earlyLeaveUnauthorized: 0,
-              earlyLeaveOther: 0,
-              skipIllness: 0,
-              skipUnauthorized: 0,
-              skipOther: 0,
-            },
-            {
-              grade: "3학년",
-              totalDays: 240,
-              absentIllness: 0,
-              absentUnauthorized: 0,
-              absentOther: 0,
-              lateIllness: 0,
-              lateUnauthorized: 0,
-              lateOther: 0,
-              earlyLeaveIllness: 0,
-              earlyLeaveUnauthorized: 0,
-              earlyLeaveOther: 0,
-              skipIllness: 0,
-              skipUnauthorized: 0,
-              skipOther: 0,
-            },
-          ]);
           setSpecialNotes("");
         }
       };
+
       loadStudentData();
     }
 
+    // 2) 담임 모드일 때 반 출석 조회
     if (isHomeroom) {
-      const loadClassAttendance = async () => {
+
+      // 반 학생 전원을 “빈 값”으로 먼저 세팅
+      const blank: ClassAttendanceRecord[] = classStudents.map((stu) => ({
+        studentId: stu.studentId,
+        absent: "",
+        late: "",
+        early: "",
+        partialAttendance: "",
+      }));
+      setClassAttendance(blank);
+
+      // 서버에 오늘 날짜 출석 조회 → 받은 값으로 덮어쓰기(merge)
+      const load = async () => {
         try {
-          const formattedDate = formatDateForApi(today);
-          const attendanceResponse = await fetchClassAttendance(
-            classId,
-            semesterId,
-            formattedDate
+          const today = formatDateForApi(new Date());
+          const server = await fetchClassAttendance(classId, today);
+
+          setClassAttendance((prev) =>
+            prev.map(
+              (rec) => server.find((s) => s.studentId === rec.studentId) ?? rec
+            )
           );
-          if (
-            attendanceResponse.data.attendance &&
-            attendanceResponse.data.attendance.length > 0
-          ) {
-            setClassAttendance(attendanceResponse.data.attendance);
-            setIsClassAttendanceLoaded(true);
-          } else {
-            setClassAttendance([]);
-            setIsClassAttendanceLoaded(false);
-          }
-        } catch (error) {
-          console.error("Error fetching class attendance:", error);
-          setClassAttendance([]);
-          setIsClassAttendanceLoaded(false);
+        } catch (e) {
+          console.error("반 출석 조회 실패", e);
         }
       };
-      loadClassAttendance();
+
+      load();
     }
-  }, [selectedStudent, isHomeroom]);
+  }, [selectedStudent, isHomeroom, classStudents]);
 
   // 현재 날짜 구하기
   const today = new Date();
   const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
 
   // 학기 출석 날짜
-  const semesterDates = [
-    "3/2",
-    "3/3",
-    "3/4",
-    "3/5",
-    "3/6",
-    "3/9",
-    "3/10",
-    "3/11",
-    "3/12",
-    "3/13",
-    "3/16",
-    "3/17",
-    "3/18",
-    "3/19",
-    "3/20",
-  ];
+  // 학기별 평일 날짜 계산 (1학기: 3/2~7/30, 2학기: 9/1~12/30)
+  const semesterDates = (() => {
+    const year = new Date().getFullYear();
+    const start =
+      semesterId === 1
+        ? new Date(year, 2, 2) // 3월 2일
+        : new Date(year, 8, 1); // 9월 1일
+    const end =
+      semesterId === 1
+        ? new Date(year, 6, 30) // 7월 30일
+        : new Date(year, 11, 30); // 12월 30일
+
+    const dates: string[] = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const day = d.getDay();
+      // 0=일요일, 6=토요일 제외
+      if (day !== 0 && day !== 6) {
+        dates.push(`${d.getMonth() + 1}/${d.getDate()}`);
+      }
+    }
+    return dates;
+  })();
 
   const attendanceCategories = ["결석", "지각", "조퇴", "결과"];
 
@@ -838,15 +868,15 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
     const totals = {
       absent: 0,
       late: 0,
-      earlyLeave: 0,
-      skip: 0,
+      early: 0,
+      partialAttendance: 0,
     };
 
     semesterAttendance.forEach((record) => {
       if (record.absent) totals.absent += 1;
       if (record.late) totals.late += 1;
-      if (record.earlyLeave) totals.earlyLeave += 1;
-      if (record.skip) totals.skip += 1;
+      if (record.early) totals.early += 1;
+      if (record.partialAttendance) totals.partialAttendance += 1;
     });
 
     return totals;
@@ -900,7 +930,10 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
 
           {/* 해당 학기 출석 섹션 */}
           <SemesterAttendanceSection role={role}>
-            <SectionTitle>해당 학기 출석</SectionTitle>
+            <SectionTitle>
+              해당 학기 출석
+              <SectionNote>[1: 무단 2:질병 3:기타(사유)]</SectionNote>
+            </SectionTitle>
             <AttendanceTableWrapper>
               <AttendanceTable>
                 <thead>
@@ -926,8 +959,8 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
                               : category === "지각"
                                 ? "late"
                                 : category === "조퇴"
-                                  ? "earlyLeave"
-                                  : "skip"
+                                  ? "early"
+                                  : "partialAttendance"
                           ]
                         }
                       </AttendanceCell>
@@ -941,8 +974,8 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
                             : category === "지각"
                               ? "late"
                               : category === "조퇴"
-                                ? "earlyLeave"
-                                : "skip";
+                                ? "early"
+                                : "partialAttendance";
                         return (
                           <AttendanceCell
                             key={`${category}-${date}`}
@@ -986,17 +1019,20 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
                   <SummaryHeaderCell colSpan={3}>결과</SummaryHeaderCell>
                 </tr>
                 <tr>
-                  <SummarySubHeaderCell>질병</SummarySubHeaderCell>
                   <SummarySubHeaderCell>무단</SummarySubHeaderCell>
+                  <SummarySubHeaderCell>질병</SummarySubHeaderCell>
                   <SummarySubHeaderCell>기타</SummarySubHeaderCell>
-                  <SummarySubHeaderCell>질병</SummarySubHeaderCell>
+
                   <SummarySubHeaderCell>무단</SummarySubHeaderCell>
+                  <SummarySubHeaderCell>질병</SummarySubHeaderCell>
                   <SummarySubHeaderCell>기타</SummarySubHeaderCell>
-                  <SummarySubHeaderCell>질병</SummarySubHeaderCell>
+
                   <SummarySubHeaderCell>무단</SummarySubHeaderCell>
+                  <SummarySubHeaderCell>질병</SummarySubHeaderCell>
                   <SummarySubHeaderCell>기타</SummarySubHeaderCell>
-                  <SummarySubHeaderCell>질병</SummarySubHeaderCell>
+
                   <SummarySubHeaderCell>무단</SummarySubHeaderCell>
+                  <SummarySubHeaderCell>질병</SummarySubHeaderCell>
                   <SummarySubHeaderCell>기타</SummarySubHeaderCell>
                 </tr>
               </thead>
@@ -1005,18 +1041,25 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
                   <tr key={rowIndex}>
                     <SummaryCell>{row.grade}</SummaryCell>
                     <SummaryCell>{row.totalDays}</SummaryCell>
-                    <SummaryCell>{row.absentIllness}</SummaryCell>
-                    <SummaryCell>{row.absentUnauthorized}</SummaryCell>
-                    <SummaryCell>{row.absentOther}</SummaryCell>
-                    <SummaryCell>{row.lateIllness}</SummaryCell>
+                    {/* 결석 */}
+                    <SummaryCell>{row.absentUnauthorized}</SummaryCell>{" "}
+                    {/* 무단 */}
+                    <SummaryCell>{row.absentIllness}</SummaryCell> {/* 질병 */}
+                    <SummaryCell>{row.absentOther}</SummaryCell> {/* 기타 */}
+                    {/* 지각 */}
                     <SummaryCell>{row.lateUnauthorized}</SummaryCell>
+                    <SummaryCell>{row.lateIllness}</SummaryCell>
                     <SummaryCell>{row.lateOther}</SummaryCell>
-                    <SummaryCell>{row.earlyLeaveIllness}</SummaryCell>
-                    <SummaryCell>{row.earlyLeaveUnauthorized}</SummaryCell>
-                    <SummaryCell>{row.earlyLeaveOther}</SummaryCell>
-                    <SummaryCell>{row.skipIllness}</SummaryCell>
-                    <SummaryCell>{row.skipUnauthorized}</SummaryCell>
-                    <SummaryCell>{row.skipOther}</SummaryCell>
+                    {/* 조퇴 */}
+                    <SummaryCell>{row.earlyUnauthorized}</SummaryCell>
+                    <SummaryCell>{row.earlyIllness}</SummaryCell>
+                    <SummaryCell>{row.earlyOther}</SummaryCell>
+                    {/* 결과 */}
+                    <SummaryCell>
+                      {row.partialAttendanceUnauthorized}
+                    </SummaryCell>
+                    <SummaryCell>{row.partialAttendanceIllness}</SummaryCell>
+                    <SummaryCell>{row.partialAttendanceOther}</SummaryCell>
                   </tr>
                 ))}
               </tbody>
@@ -1045,7 +1088,8 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
       ) : isHomeroom ? (
         <div>
           <ClassSectionTitle>{formattedDate} - 반 출석 관리</ClassSectionTitle>
-          {isClassAttendanceLoaded ? (
+
+          {classStudents.length > 0 ? (
             <>
               <ClassAttendanceTableWrapper>
                 <ClassAttendanceTable>
@@ -1072,71 +1116,81 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {classAttendance.map((student) => (
-                      <tr key={student.studentId}>
-                        <ClassAttendanceCell>
-                          {student.number}
-                        </ClassAttendanceCell>
-                        <ClassAttendanceCell>
-                          {student.name}
-                        </ClassAttendanceCell>
-                        <ClassAttendanceCell
-                          contentEditable={isClassAttendanceEditing}
-                          suppressContentEditableWarning={true}
-                          onBlur={(e) =>
-                            handleAttendanceInput(
-                              student.studentId,
-                              "absent",
-                              e.currentTarget.textContent || ""
-                            )
-                          }
-                        >
-                          {student.absent}
-                        </ClassAttendanceCell>
-                        <ClassAttendanceCell
-                          contentEditable={isClassAttendanceEditing}
-                          suppressContentEditableWarning={true}
-                          onBlur={(e) =>
-                            handleAttendanceInput(
-                              student.studentId,
-                              "late",
-                              e.currentTarget.textContent || ""
-                            )
-                          }
-                        >
-                          {student.late}
-                        </ClassAttendanceCell>
-                        <ClassAttendanceCell
-                          contentEditable={isClassAttendanceEditing}
-                          suppressContentEditableWarning={true}
-                          onBlur={(e) =>
-                            handleAttendanceInput(
-                              student.studentId,
-                              "earlyLeave",
-                              e.currentTarget.textContent || ""
-                            )
-                          }
-                        >
-                          {student.earlyLeave}
-                        </ClassAttendanceCell>
-                        <ClassAttendanceCell
-                          contentEditable={isClassAttendanceEditing}
-                          suppressContentEditableWarning={true}
-                          onBlur={(e) =>
-                            handleAttendanceInput(
-                              student.studentId,
-                              "skip",
-                              e.currentTarget.textContent || ""
-                            )
-                          }
-                        >
-                          {student.skip}
-                        </ClassAttendanceCell>
-                      </tr>
-                    ))}
+                    {classStudents.map((stu) => {
+                      const rec: ClassAttendanceRecord = classAttendance.find(
+                        (r) => r.studentId === stu.studentId
+                      ) ?? {
+                        studentId: stu.studentId,
+                        absent: "",
+                        late: "",
+                        early: "",
+                        partialAttendance: "",
+                      };
+                      return (
+                        <tr key={stu.studentId}>
+                          <ClassAttendanceCell>
+                            {stu.number}
+                          </ClassAttendanceCell>
+                          <ClassAttendanceCell>{stu.name}</ClassAttendanceCell>
+                          <ClassAttendanceCell
+                            contentEditable={isClassAttendanceEditing}
+                            suppressContentEditableWarning
+                            onBlur={(e) =>
+                              handleAttendanceInput(
+                                stu.studentId,
+                                "absent",
+                                e.currentTarget.textContent || ""
+                              )
+                            }
+                          >
+                            {rec.absent || ""}
+                          </ClassAttendanceCell>
+                          <ClassAttendanceCell
+                            contentEditable={isClassAttendanceEditing}
+                            suppressContentEditableWarning
+                            onBlur={(e) =>
+                              handleAttendanceInput(
+                                stu.studentId,
+                                "late",
+                                e.currentTarget.textContent || ""
+                              )
+                            }
+                          >
+                            {rec.late || ""}
+                          </ClassAttendanceCell>
+                          <ClassAttendanceCell
+                            contentEditable={isClassAttendanceEditing}
+                            suppressContentEditableWarning
+                            onBlur={(e) =>
+                              handleAttendanceInput(
+                                stu.studentId,
+                                "early",
+                                e.currentTarget.textContent || ""
+                              )
+                            }
+                          >
+                            {rec.early || ""}
+                          </ClassAttendanceCell>
+                          <ClassAttendanceCell
+                            contentEditable={isClassAttendanceEditing}
+                            suppressContentEditableWarning
+                            onBlur={(e) =>
+                              handleAttendanceInput(
+                                stu.studentId,
+                                "partialAttendance",
+                                e.currentTarget.textContent || ""
+                              )
+                            }
+                          >
+                            {rec.partialAttendance || ""}
+                          </ClassAttendanceCell>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </ClassAttendanceTable>
               </ClassAttendanceTableWrapper>
+
               <ClassAttendanceEditButton
                 onClick={toggleClassAttendanceEditMode}
               >
@@ -1144,7 +1198,7 @@ const StudentManagementPage: React.FC<StudentManagementPageProps> = ({
               </ClassAttendanceEditButton>
             </>
           ) : (
-            <GuideMessage>반 학생 정보를 받아오지 못했습니다.</GuideMessage>
+            <GuideMessage>반 학생 정보가 없습니다.</GuideMessage>
           )}
         </div>
       ) : (
