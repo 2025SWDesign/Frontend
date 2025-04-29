@@ -69,6 +69,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const setSelectedStudent = useStudentStore(
     (state) => state.setSelectedStudent
   );
+  const setClassStudents = useAuthStore(state => state.setClassStudents);
 
   const accessToken = useAuthStore((state) => state.accessToken);
   // 유저 정보 불러오기
@@ -129,8 +130,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             img: "/assets/img/photo.png", // 기본 이미지 경로 설정
           })
         );
+        console.log("반 학생:", studentsData);
 
+        studentsData.sort((a: Student, b: Student) => a.number - b.number)
         setStudents(studentsData);
+        setClassStudents(studentsData);
       }
     } catch (error) {
       console.error("반 학생 목록 조회 실패:", error);

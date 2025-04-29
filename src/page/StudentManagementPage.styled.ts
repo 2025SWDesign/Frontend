@@ -24,13 +24,24 @@ export const Line = styled.div`
 `;
 
 export const SectionTitle = styled.div`
-  height: 2rem;
-  width: 12rem;
   color: #000;
   font-family: "Noto Sans";
   font-size: 1.25rem;
   font-style: normal;
   font-weight: 600;
+
+  white-space: normal;
+  word-break: break-all;
+  overflow-wrap: break-word;
+`;
+
+export const SectionNote = styled.span`
+  color: #000;
+  font-family: "Noto Sans";
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 600;
+  margin-left: 0.2rem;
 `;
 
 // 학생 기본정보 수정 섹션
@@ -46,12 +57,13 @@ export const InfoRow = styled.div`
   height: 2rem;
   gap: 1rem;
   width: 50rem;
+  margin-left : 1rem;
 `;
 
 export const InfoContent = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.7rem;
   align-items: center;
 `;
 
