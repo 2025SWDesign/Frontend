@@ -18,6 +18,7 @@ import {
   GuideMessage,
 } from "./FeedbackPage.styled";
 
+//props 수정
 interface FeedbackItem {
   schoolYear: number;
   category: "GRADE" | "BEHAVIOR" | "ATTENDANCE" | "ATTITUDE";
