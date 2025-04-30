@@ -18,21 +18,6 @@ import {
   GuideMessage,
 } from "./FeedbackPage.styled";
 
-interface Student {
-  studentId: number;
-  name: string;
-  grade: number;
-  gradeClass: number;
-  number: number;
-  img: string;
-}
-
-interface FeedbackPageProps {
-  role: string;
-  isHomeroom: boolean;
-  selectedStudent: Student | null;
-}
-
 interface FeedbackItem {
   schoolYear: number;
   category: "GRADE" | "BEHAVIOR" | "ATTENDANCE" | "ATTITUDE";
@@ -40,7 +25,7 @@ interface FeedbackItem {
   updatedAt: string;
 }
 
-const FeedbackPage: React.FC<FeedbackPageProps> = () => {
+const FeedbackPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [feedbacks, setFeedbacks] = useState({
     GRADE: "",
