@@ -21,7 +21,7 @@ interface AuthState {
   schoolName: string;
   userName: string;
   classStudents: StudentSummary[];
-
+  subject: string;
   grade: number;
   gradeClass: number;
   setUserName: (name: string) => void;
@@ -31,8 +31,7 @@ interface AuthState {
   setAuthTokens: (access: string, refresh: string) => void;
   setSchoolAndClass: (schoolId: number, classId: number) => void;
   setGradeAndClass: (grade: number, gradeClass: number) => void;
-  
-  // 신규 액션: 반 학생 목록 설정
+  setSubject: (subject: string) => void;
   setClassStudents: (students: StudentSummary[]) => void;
   clearClassStudents: () => void;
 
@@ -51,7 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   classStudents: [],
   grade: 0,
   gradeClass: 0,
-
+  subject: "",
   setUserName: (userName) => set({ userName }),
   setSchoolName: (schoolName) => set({ schoolName }),
   setRole: (role) => set({ role }),
@@ -61,6 +60,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     sessionStorage.setItem("refreshToken", refreshToken);
     set({ accessToken, refreshToken });
   },
+  setSubject: (subject) => set({ subject }),
   setSchoolAndClass: (schoolId, classId) => set({ schoolId, classId }),
   setClassStudents: (students) => set({ classStudents: students }),
   clearClassStudents: () => set({ classStudents: [] }),
