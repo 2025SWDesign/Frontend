@@ -46,6 +46,7 @@ const CounselingPage: React.FC = () => {
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
   const role = useAuthStore((state) => state.role);
   const schoolId = useAuthStore((state) => state.schoolId);
+  const subject = useAuthStore((state) => state.subject);
 
   // 상태 관리
   const [posts, setPosts] = useState<Post[]>([]);
@@ -106,6 +107,9 @@ const CounselingPage: React.FC = () => {
 
   // 검색 필터링
   const filteredPosts = posts.filter((post) => {
+    if (post.isPublicToSubject && post.subject !== subject) {
+      return false;
+    }
     if (searchType === "period" && selectedDate) {
       const postLocalDate = toLocalDateString(post.date);
       return postLocalDate === selectedDate;

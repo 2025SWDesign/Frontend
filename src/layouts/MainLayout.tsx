@@ -71,6 +71,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     (state) => state.setSelectedStudent
   );
   const setClassStudents = useAuthStore(state => state.setClassStudents);
+  const setSubject = useAuthStore(state => state.setSubject);
 
   const accessToken = useAuthStore((state) => state.accessToken);
   // 유저 정보 불러오기
@@ -89,6 +90,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         setIsHomeroom(teacher?.isHomeroom ?? false);
         setSchoolName(school?.schoolName || "");
         setGradeAndClass(teacher?.class.grade, teacher?.class.gradeClass);
+        setSubject(teacher?.subject || "");
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
       }
@@ -103,6 +105,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     setIsHomeroom,
     setSchoolName,
     setGradeAndClass,
+    setSubject,
   ]);
 
   // 반 학생 목록 가져오기
