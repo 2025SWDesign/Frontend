@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import axios from "../api/axiosInstance";
 import {
   Line,
   MainContainer,
@@ -23,32 +24,39 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import * as xlsx from "xlsx";
 import { saveAs } from "file-saver";
+import { useAuthStore } from "../stores/authStore";
 
-const semesterGradeData = [
-  { name: "1학년 1학기", 국어: 80, 영어: 70, 수학: 90, 과학: 60, 사회: 85 },
-  { name: "1학년 2학기", 국어: 82, 영어: 74, 수학: 88, 과학: 65, 사회: 83 },
-  { name: "2학년 1학기", 국어: 78, 영어: 68, 수학: 92, 과학: 62, 사회: 80 },
-  { name: "2학년 2학기", 국어: 85, 영어: 72, 수학: 94, 과학: 68, 사회: 86 },
-  { name: "3학년 1학기", 국어: 90, 영어: 77, 수학: 91, 과학: 70, 사회: 89 },
-  { name: "3학년 2학기", 국어: 88, 영어: 80, 수학: 89, 과학: 72, 사회: 90 },
-];
+interface StudentGrade {
+  subject: string;
+  score: number;
+  schoolYear: number;
+  semester: number;
+}
 
 interface ScoreRow {
+  subject: string;
+  score: number;
+  grade: number;
+}
+
+type ScoreExcelRow = {
   과목: string;
   점수: number;
   등급: number;
-}
+};
 
-interface CounselingRow {
+type CounselingExcelRow = {
   제목: string;
   담당자: string;
   내용: string;
-}
+};
 
-interface FeedbackRow {
+type FeedbackExcelRow = {
   항목: string;
   내용: string;
-}
+}; 
+
+const subjects = ["국어", "영어", "수학", "과학", "사회"];
 
 const ReportPage: React.FC = () => {
   const [selectedGrade, setSelectedGrade] = useState("1");
@@ -58,25 +66,67 @@ const ReportPage: React.FC = () => {
   const reportRef = useRef<HTMLDivElement>(null);
 
   //성적 보고서 용
-  const fullSemester = `${selectedGrade}학년 ${selectedSemester}학기`;
-  const selectedData = semesterGradeData.find((d) => d.name === fullSemester);
+  const [semesterTableData, setSemesterTableData] = useState<ScoreRow[]>([]);
+  const [radarSemesterData, setRadarSemesterData] = useState<{ name: string; value: number }[]>([]);
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
+  const schoolId = useAuthStore((state) => state.schoolId);
 
-  const semesterTableData = selectedData
-    ? Object.entries(selectedData)
-        .filter(([key]) => key !== "name")
-        .map(([subject, score]) => ({
-          subject,
-          score: Number(score),
-          grade: Math.ceil((100 - Number(score)) / 10),
-        }))
-    : [];
+  useEffect(() => {
+    const fetchGradeData = async () => {
+      if (!selectedStudent) return;
+      try {
+        const response = await axios.get(
+          `/school/${schoolId}/grades/students/${selectedStudent.studentId}`,
+          {
+            params: {
+              schoolYear: selectedGrade,
+              semester: selectedSemester,
+            },
+          }
+        );
 
-  const radarSemesterData = selectedData
-    ? Object.entries(selectedData)
-        .filter(([key]) => key !== "name")
-        .map(([name, value]) => ({ name, value: Number(value) }))
-    : [];
+        const grades = response.data.grades as StudentGrade[];
+
+        const gradeMap = new Map(grades.map(g => [g.subject, g.score]));
+
+        const merged = subjects.map((subj) => {
+          const score = gradeMap.get(subj) ?? 0;
+          return {
+            subject: subj,
+            score,
+            grade: Math.ceil((100 - score) / 10),
+          };
+        });
+
+        setSemesterTableData(merged);
+        setRadarSemesterData(
+          merged.map((g) => ({
+            name: g.subject,
+            value: g.score,
+          }))
+        );
+      } catch (err) {
+        console.error("성적 데이터 불러오기 실패", err);
+        const empty = subjects.map((subj) => ({
+          subject: subj,
+          score: 0,
+          grade: 10,
+        }));
+        setSemesterTableData(empty);
+        setRadarSemesterData(
+          empty.map((g) => ({
+            name: g.subject,
+            value: g.score,
+          }))
+        );
+      }
+    };
+
+    if (selectedType === "score") {
+      fetchGradeData();
+    }
+  }, [selectedGrade, selectedSemester, selectedStudent, selectedType, schoolId]);
+
 
   const getPdfFileName = () => {
     if (!selectedStudent) return "report.pdf";
@@ -162,9 +212,9 @@ const ReportPage: React.FC = () => {
   //excel 생성
   const generateExcel = () => {
     if (!selectedStudent) return;
-
-    let data: ScoreRow[] | CounselingRow[] | FeedbackRow[] = [];
-
+  
+    let data: ScoreExcelRow[] | CounselingExcelRow[] | FeedbackExcelRow[] = [];
+  
     if (selectedType === "score") {
       data = semesterTableData.map((row) => ({
         과목: row.subject,
