@@ -15,9 +15,9 @@ import {
   SearchButton,
   GuideContainer,
 } from "./ReportPage.styled";
-import ScoreReport from "../temp/ScoreReport";
-import CounselingReport from "../temp/CounselingReport";
-import FeedBackReport from "../temp/FeedbackReport";
+import ScoreReport from "../components/ScoreReport";
+import CounselingReport from "../components/CounselingReport";
+import FeedBackReport from "../components/FeedbackReport";
 import { useStudentStore } from "../stores/studentStore";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";

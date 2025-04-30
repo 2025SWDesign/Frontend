@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import RadarChart from "../temp/RadarChart";
+import RadarChart from "../components/RadarChart";
 import { useAuthStore } from "../stores/authStore";
 import { useStudentStore } from "../stores/studentStore";
 import axios from "../api/axiosInstance";
