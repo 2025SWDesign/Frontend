@@ -401,12 +401,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   }, [isUserDropdownOpen, isNoteDropdownOpen]);
 
   return (
-    <LayoutWrapper>
-      <Header>
-        <LogoContainer onClick={() => navigate("/main")}>
-          <img className="logo-img" src={Logo} alt="logo" />
+    <LayoutWrapper data-testid="layout-wrapper">
+      <Header data-testid="header">
+        <LogoContainer
+          onClick={() => navigate("/main")}
+          data-testid="logo-link"
+        >
+          <img src={Logo} alt="logo" data-testid="logo" />
         </LogoContainer>
-        <UserArea>
+        <UserArea data-testid="user-area">
           <div>
             <p>
               {userName} {role === "TEACHER" ? "선생님" : "학생"}
@@ -526,15 +529,19 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   <StudentName>{selectedStudent.name} 학생</StudentName>
                 </>
               )}
-              <SearchBox>
+              <SearchBox data-testid="search-box">
                 <input
+                  data-testid="student-search-input"
                   type="text"
                   placeholder="학생 이름을 검색하세요"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
-                <SearchButton onClick={handleSearch}>
+                <SearchButton
+                  data-testid="search-button"
+                  onClick={handleSearch}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -547,7 +554,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   </svg>
                 </SearchButton>
               </SearchBox>
-              <StudentList $isStudentSelected={!!selectedStudent}>
+              <StudentList
+                data-testid="student-list"
+                $isStudentSelected={!!selectedStudent}
+              >
                 <table>
                   <thead>
                     <tr>
@@ -609,8 +619,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </SideBar>
 
         <MainArea>
-          <TabArea>
+          <TabArea data-testid="tab-area">
             <TabButton
+              data-testid="tab-student-info"
               $isActive={location.pathname === "/student-info"}
               onClick={() => navigate("/student-info")}
             >
@@ -629,6 +640,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <p>학생 정보</p>
             </TabButton>
             <TabButton
+              data-testid="tab-student-manage"
               $isActive={location.pathname === "/student-manage"}
               onClick={() => navigate("/student-manage")}
             >
@@ -647,6 +659,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <p>학생부 관리</p>
             </TabButton>
             <TabButton
+              data-testid="tab-grade-manage"
               $isActive={location.pathname === "/grade"}
               onClick={() => {
                 navigate("/grade");
@@ -667,6 +680,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <p>학생 성적 관리</p>
             </TabButton>
             <TabButton
+              data-testid="tab-counseling"
               $isActive={location.pathname === "/counseling"}
               onClick={() => navigate("/counseling")}
             >
@@ -691,6 +705,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <p>상담 내역</p>
             </TabButton>
             <TabButton
+              data-testid="tab-feedback"
               $isActive={location.pathname === "/feedback"}
               onClick={() => navigate("/feedback")}
             >
@@ -709,6 +724,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <p>피드백 내역</p>
             </TabButton>
             <TabButton
+              data-testid="tab-report"
               $isActive={location.pathname === "/report"}
               onClick={() => navigate("/report")}
             >
@@ -727,7 +743,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <p>보고서 생성</p>
             </TabButton>
           </TabArea>
-          <PageArea>{children}</PageArea>
+          <PageArea data-testid="page-area">{children}</PageArea>
         </MainArea>
       </MainContainer>
       {isMyPageOpen && <MyPage onClose={() => setIsMyPageOpen(false)} />}
