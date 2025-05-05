@@ -17,8 +17,8 @@ export const ModalContainer = styled.div`
   transform: translate(-50%, -50%);
   background: white;
   border-radius: 0.625rem;
-  width: 78.125rem;
-  height: 55rem;
+  width: 78.25rem;
+  max-height: 60rem;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   z-index: 1001;
 `;
@@ -84,6 +84,73 @@ export const InfoRow = styled.div`
 export const Line = styled.div`
   border-bottom: 0.0625rem solid black;
   margin-bottom: 1rem;
+`;
+
+export const InputArea = styled.div`
+  width: 23rem;
+  height: 2.5rem;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  border-radius: 0.625rem;
+  border: solid 1px #424242;
+  margin: 0.25rem 0 1rem 0;
+
+  input {
+    border: none;
+    width: 23rem;
+    margin: 0 0.5rem 0 1rem;
+    background-color: transparent;
+    font-size: 1rem;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #858585;
+  }
+`;
+
+export const ImageArea = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  margin-bottom: 1rem;
+`;
+
+export const PreviewImg = styled.img`
+  width: 5rem;
+  height: 6.5rem;
+  border-radius: 0.625rem;
+  border: 1px solid #000;
+`;
+
+export const FileButton = styled.button`
+  width: 5rem;
+  height: 1.5rem;
+  background: #004260;
+  border-radius: 0.625rem;
+  border: none;
+  color: #fff;
+  font-family: "Inter";
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 0.8rem;
+  cursor: pointer;
+`;
+
+export const ToggleButton = styled.button.attrs({ type: "button" })`
+  background: none;
+  border: none;
+  margin-right: 1rem;
+  cursor: pointer;
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: #424242;
+  }
 `;
 
 export const Input = styled.input`
