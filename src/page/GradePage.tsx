@@ -25,7 +25,7 @@ import {
   ButtonArea,
   GuideMessage,
   StudentsTableArea,
-  StudentGradeTable
+  StudentGradeTable,
 } from "./GradePage.styled";
 
 interface GradeItem {
@@ -52,7 +52,6 @@ interface GroupedStudent {
   scores: Record<string, number>;
 }
 
-
 const subjects = ["국어", "영어", "수학", "과학", "사회"];
 
 const GradePage: React.FC = () => {
@@ -61,10 +60,14 @@ const GradePage: React.FC = () => {
   const [selectedSemester, setSelectedSemester] = useState("1");
   const [selectedSubject, setSelectedSubject] = useState("국어");
   const [isEditing, setIsEditing] = useState(false);
-  
+
   const [studentGrades, setStudentGrades] = useState<GradeItem[]>([]);
-  const [backupStudentGrades, setBackupStudentGrades] = useState<GradeItem[]>([]);
-  const [initiallyFetchedGrades, setInitiallyFetchedGrades] = useState<StudentGrade[]>([]);
+  const [backupStudentGrades, setBackupStudentGrades] = useState<GradeItem[]>(
+    []
+  );
+  const [initiallyFetchedGrades, setInitiallyFetchedGrades] = useState<
+    StudentGrade[]
+  >([]);
   const [classGrades, setClassGrades] = useState<StudentGrade[]>([]);
 
   const role = useAuthStore((state) => state.role);
@@ -74,13 +77,15 @@ const GradePage: React.FC = () => {
 
   const teacherGrade = useAuthStore((state) => state.grade);
   const teacherClass = useAuthStore((state) => state.gradeClass);
-  
-  const loadClassGrades =useCallback(async () => {
+
+  const loadClassGrades = useCallback(async () => {
     try {
       if (isHomeroom) {
         const classId = Number(sessionStorage.getItem("classId"));
         const semester = `${selectedSemester}`;
-        const response = await axios.get(`/school/${schoolId}/grades/class/${classId}?semester=${semester}`);
+        const response = await axios.get(
+          `/school/${schoolId}/grades/class/${classId}?semester=${semester}`
+        );
         setClassGrades(response.data.grades);
       }
     } catch (err) {
@@ -88,18 +93,21 @@ const GradePage: React.FC = () => {
     }
   }, [isHomeroom, schoolId, selectedSemester]);
 
-  const groupedByStudent = classGrades.reduce((acc: Record<number, GroupedStudent>, curr) => {
-    const { student } = curr;
-    const studentId = student.studentId;
-    if (!acc[studentId]) {
-      acc[studentId] = {
-        name: curr.student.user.name,
-        scores: {},
-      };
-    }
-    acc[studentId].scores[curr.subject] = curr.score;
-    return acc;
-  }, {});
+  const groupedByStudent = classGrades.reduce(
+    (acc: Record<number, GroupedStudent>, curr) => {
+      const { student } = curr;
+      const studentId = student.studentId;
+      if (!acc[studentId]) {
+        acc[studentId] = {
+          name: curr.student.user.name,
+          scores: {},
+        };
+      }
+      acc[studentId].scores[curr.subject] = curr.score;
+      return acc;
+    },
+    {}
+  );
 
   const fetchStudentGrades = useCallback(async () => {
     if (!selectedStudent) return;
@@ -107,7 +115,9 @@ const GradePage: React.FC = () => {
       const response = await axios.get(
         `/school/${schoolId}/grades/students/${selectedStudent.studentId}`,
         isPeriod
-          ? { params: { schoolYear: selectedGrade, semester: selectedSemester } }
+          ? {
+              params: { schoolYear: selectedGrade, semester: selectedSemester },
+            }
           : { params: { subject: selectedSubject } }
       );
       const serverGrades = response.data.grades as StudentGrade[];
@@ -118,10 +128,10 @@ const GradePage: React.FC = () => {
           const found = serverGrades.find((g) => g.subject === subject);
           return {
             subject,
-            score: found?.score, 
+            score: found?.score,
           };
         });
-        
+
         setStudentGrades(merged);
       } else {
         const semesterOrder = [
@@ -146,7 +156,14 @@ const GradePage: React.FC = () => {
     } catch (err) {
       console.error("성적 조회 실패", err);
     }
-  }, [selectedGrade, selectedSemester, selectedSubject, isPeriod, selectedStudent, schoolId]);
+  }, [
+    selectedGrade,
+    selectedSemester,
+    selectedSubject,
+    isPeriod,
+    selectedStudent,
+    schoolId,
+  ]);
 
   useEffect(() => {
     if (selectedStudent) {
@@ -154,7 +171,16 @@ const GradePage: React.FC = () => {
     } else if (isHomeroom) {
       loadClassGrades();
     }
-  }, [selectedStudent, selectedGrade, selectedSemester, selectedSubject, isPeriod, isHomeroom, fetchStudentGrades, loadClassGrades]);
+  }, [
+    selectedStudent,
+    selectedGrade,
+    selectedSemester,
+    selectedSubject,
+    isPeriod,
+    isHomeroom,
+    fetchStudentGrades,
+    loadClassGrades,
+  ]);
 
   const handleEdit = () => {
     setBackupStudentGrades(JSON.parse(JSON.stringify(studentGrades)));
@@ -168,13 +194,15 @@ const GradePage: React.FC = () => {
 
   const handleSave = async () => {
     if (!selectedStudent) return;
-  
+
     const patchPayload = [];
     const postPayload = [];
-  
+
     for (const g of studentGrades) {
       if (isPeriod) {
-        const found = initiallyFetchedGrades.find((f) => f.subject === g.subject);
+        const found = initiallyFetchedGrades.find(
+          (f) => f.subject === g.subject
+        );
         if (found) {
           if (found.score !== g.score && g.score !== undefined) {
             patchPayload.push({
@@ -195,7 +223,12 @@ const GradePage: React.FC = () => {
           }
         }
       } else {
-        const found = initiallyFetchedGrades.find((f) => f.subject === selectedSubject && f.schoolYear === Number(g.semester?.[0]) && f.semester === Number(g.semester?.[4]));
+        const found = initiallyFetchedGrades.find(
+          (f) =>
+            f.subject === selectedSubject &&
+            f.schoolYear === Number(g.semester?.[0]) &&
+            f.semester === Number(g.semester?.[4])
+        );
         if (found) {
           if (found.score !== g.score && g.score !== undefined) {
             patchPayload.push({
@@ -217,13 +250,19 @@ const GradePage: React.FC = () => {
         }
       }
     }
-  
+
     try {
       if (postPayload.length > 0) {
-        await axios.post(`/school/${schoolId}/grades/students/${selectedStudent.studentId}`, postPayload);
+        await axios.post(
+          `/school/${schoolId}/grades/students/${selectedStudent.studentId}`,
+          postPayload
+        );
       }
       if (patchPayload.length > 0) {
-        await axios.patch(`/school/${schoolId}/grades/students/${selectedStudent.studentId}`, patchPayload);
+        await axios.patch(
+          `/school/${schoolId}/grades/students/${selectedStudent.studentId}`,
+          patchPayload
+        );
       }
       alert("성적 저장 완료");
       setIsEditing(false);
@@ -232,7 +271,7 @@ const GradePage: React.FC = () => {
       console.error("성적 저장 실패", err);
       alert("성적 저장 실패");
     }
-  };  
+  };
 
   const handleScoreChange = (idx: number, value: string) => {
     const updated = [...studentGrades];
@@ -240,10 +279,11 @@ const GradePage: React.FC = () => {
     setStudentGrades(updated);
   };
 
-  const radarSemesterData:{ name: string; value: number }[] = studentGrades.map((g) => ({
-    name: (isPeriod ? g.subject : g.semester) ?? "N/A",
-    value: g.score === undefined  ? 0 : Number(g.score),
-  }));
+  const radarSemesterData: { name: string; value: number }[] =
+    studentGrades.map((g) => ({
+      name: (isPeriod ? g.subject : g.semester) ?? "N/A",
+      value: g.score === undefined ? 0 : Number(g.score),
+    }));
 
   if (role === "TEACHER" && !isHomeroom && !selectedStudent) {
     return (
@@ -265,30 +305,44 @@ const GradePage: React.FC = () => {
         <GradeContainer>
           <StudentsTableArea>
             <h2>{`${new Date().getFullYear()}학년도 ${selectedSemester}학기 성적 - ${teacherGrade}학년 ${teacherClass}반`}</h2>
-            <StudentGradeTable>
+            <StudentGradeTable data-testid="class-grade-table">
               <table>
                 <thead>
                   <tr>
                     <th>이름</th>
-                    {subjects.map((subj) => (<th key={subj}>{subj}</th>))}
+                    {subjects.map((subj) => (
+                      <th key={subj}>{subj}</th>
+                    ))}
                     <th>평균</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(groupedByStudent).map(([studentId, { name, scores }]) => {
-                    const subjectScores = subjects.map((subject) => scores[subject] ?? "-");
-                    const validScores = subjectScores.filter((s) => typeof s === "number") as number[];
-                    const average = validScores.length > 0
-                      ? (validScores.reduce((sum, v) => sum + v, 0) / validScores.length).toFixed(1)
-                      : "-";
-                    return (
-                      <tr key={studentId}>
-                        <td>{name}</td>
-                        {subjectScores.map((score, idx) => (<td key={idx}>{score}</td>))}
-                        <td>{average}</td>
-                      </tr>
-                    );
-                  })}
+                  {Object.entries(groupedByStudent).map(
+                    ([studentId, { name, scores }]) => {
+                      const subjectScores = subjects.map(
+                        (subject) => scores[subject] ?? "-"
+                      );
+                      const validScores = subjectScores.filter(
+                        (s) => typeof s === "number"
+                      ) as number[];
+                      const average =
+                        validScores.length > 0
+                          ? (
+                              validScores.reduce((sum, v) => sum + v, 0) /
+                              validScores.length
+                            ).toFixed(1)
+                          : "-";
+                      return (
+                        <tr key={studentId} data-testid="class-grade-row">
+                          <td>{name}</td>
+                          {subjectScores.map((score, idx) => (
+                            <td key={idx}>{score}</td>
+                          ))}
+                          <td>{average}</td>
+                        </tr>
+                      );
+                    }
+                  )}
                 </tbody>
               </table>
             </StudentGradeTable>
@@ -311,25 +365,42 @@ const GradePage: React.FC = () => {
           <DropdownBox>
             {isPeriod ? (
               <>
-                <DropDown value={selectedGrade} onChange={(e) => setSelectedGrade(e.target.value)} disabled={isEditing}>
+                <DropDown
+                  data-testid="grade-select"
+                  value={selectedGrade}
+                  onChange={(e) => setSelectedGrade(e.target.value)}
+                  disabled={isEditing}
+                >
                   <option value="1">1학년</option>
                   <option value="2">2학년</option>
                   <option value="3">3학년</option>
                 </DropDown>
-                <DropDown value={selectedSemester} onChange={(e) => setSelectedSemester(e.target.value)} disabled={isEditing} id="semester">
+                <DropDown
+                  data-testid="semester-select"
+                  value={selectedSemester}
+                  onChange={(e) => setSelectedSemester(e.target.value)}
+                  disabled={isEditing}
+                  id="semester"
+                >
                   <option value="1">1학기</option>
                   <option value="2">2학기</option>
                 </DropDown>
               </>
             ) : (
-              <DropDown value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} disabled={isEditing}>
+              <DropDown
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                disabled={isEditing}
+              >
                 {subjects.map((subject) => (
-                  <option key={subject} value={subject}>{subject}</option>
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
                 ))}
               </DropDown>
             )}
           </DropdownBox>
-          <GradeTable>
+          <GradeTable data-testid="period-grade-table">
             <table>
               <thead>
                 <tr>
@@ -338,22 +409,31 @@ const GradePage: React.FC = () => {
                   <th>등급</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody data-testid="period-grade-rows">
                 {studentGrades.map((g, idx) => (
-                  <tr key={idx}>
+                  <tr key={idx} data-testid={`period-grade-row-${idx}`}>
                     <td>{isPeriod ? g.subject : g.semester}</td>
                     <td>
                       {isEditing ? (
                         <ScoreInput
+                          data-testid={`period-score-input-${idx}`}
                           type="number"
                           value={g.score === undefined ? "" : g.score}
-                          onChange={(e) => handleScoreChange(idx, e.target.value)}
+                          onChange={(e) =>
+                            handleScoreChange(idx, e.target.value)
+                          }
                         />
                       ) : (
-                        g.score
+                        <span data-testid={`period-score-text-${idx}`}>
+                          {g.score}
+                        </span>
                       )}
                     </td>
-                    <td>{g.score !== undefined  ? Math.ceil((100 - Number(g.score)) / 10) : "-"}</td>
+                    <td>
+                      {g.score !== undefined
+                        ? Math.ceil((100 - Number(g.score)) / 10)
+                        : "-"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -362,17 +442,33 @@ const GradePage: React.FC = () => {
           <ButtonArea>
             {isEditing ? (
               <>
-                <CancleButton onClick={handleCancel}>수정 취소</CancleButton>
-                <SaveButton onClick={handleSave}>수정 완료</SaveButton>
+                <CancleButton
+                  data-testid="grade-cancel-button"
+                  onClick={handleCancel}
+                >
+                  수정 취소
+                </CancleButton>
+                <SaveButton
+                  data-testid="grade-save-button"
+                  onClick={handleSave}
+                >
+                  수정 완료
+                </SaveButton>
               </>
             ) : (
-              <EditButton onClick={handleEdit}>성적관리</EditButton>
+              <EditButton data-testid="grade-edit-button" onClick={handleEdit}>
+                성적관리
+              </EditButton>
             )}
           </ButtonArea>
         </TableArea>
         <ChartArea>
-          <ChartTitle>{isPeriod ? `${selectedGrade}학년 ${selectedSemester}학기 통계` : `${selectedSubject} 성적 통계`}</ChartTitle>
-          <ChartBox>
+          <ChartTitle data-testid="grade-chart-title">
+            {isPeriod
+              ? `${selectedGrade}학년 ${selectedSemester}학기 통계`
+              : `${selectedSubject} 성적 통계`}
+          </ChartTitle>
+          <ChartBox data-testid="grade-chart-box">
             <RadarChart data={radarSemesterData} />
           </ChartBox>
         </ChartArea>
