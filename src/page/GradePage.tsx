@@ -47,9 +47,16 @@ interface StudentGrade {
   };
 }
 
-interface GroupedStudent {
+interface StudentInfo {
+  studentId: number;
+  name: string;
+  number: number;
+}
+
+interface GroupedStudentAverage {
   name: string;
   scores: Record<string, number>;
+  average: number | string;
 }
 
 const subjects = ["국어", "영어", "수학", "과학", "사회"];
@@ -69,6 +76,7 @@ const GradePage: React.FC = () => {
     StudentGrade[]
   >([]);
   const [classGrades, setClassGrades] = useState<StudentGrade[]>([]);
+  const [classStudents, setClassStudents] = useState<StudentInfo[]>([]);
 
   const role = useAuthStore((state) => state.role);
   const isHomeroom = useAuthStore((state) => state.isHomeroom);
@@ -78,36 +86,44 @@ const GradePage: React.FC = () => {
   const teacherGrade = useAuthStore((state) => state.grade);
   const teacherClass = useAuthStore((state) => state.gradeClass);
 
+  const fetchClassStudents = useCallback(async () => {
+    try {
+      const classId = Number(sessionStorage.getItem("classId"));
+      const response = await axios.get(
+        `/school/${schoolId}/class/${classId}/students`
+      );
+      if (response.data.status === 200) {
+        const data = response.data.data.map(
+          (item: {
+            studentId: number;
+            number: number;
+            user: { name: string };
+          }) => ({
+            studentId: item.studentId,
+            name: item.user.name,
+            number: item.number,
+          })
+        );
+        data.sort((a: StudentInfo, b: StudentInfo) => a.number - b.number);
+        setClassStudents(data);
+      }
+    } catch (err) {
+      console.error("반 학생 조회 실패", err);
+    }
+  }, [schoolId]);
+
   const loadClassGrades = useCallback(async () => {
     try {
-      if (isHomeroom) {
-        const classId = Number(sessionStorage.getItem("classId"));
-        const semester = `${selectedSemester}`;
-        const response = await axios.get(
-          `/school/${schoolId}/grades/class/${classId}?semester=${semester}`
-        );
-        setClassGrades(response.data.grades);
-      }
+      const classId = Number(sessionStorage.getItem("classId"));
+      const semester = `${selectedSemester}`;
+      const response = await axios.get(
+        `/school/${schoolId}/grades/class/${classId}?semester=${semester}`
+      );
+      setClassGrades(response.data.grades);
     } catch (err) {
       console.error("반 학생 성적 조회 실패", err);
     }
-  }, [isHomeroom, schoolId, selectedSemester]);
-
-  const groupedByStudent = classGrades.reduce(
-    (acc: Record<number, GroupedStudent>, curr) => {
-      const { student } = curr;
-      const studentId = student.studentId;
-      if (!acc[studentId]) {
-        acc[studentId] = {
-          name: curr.student.user.name,
-          scores: {},
-        };
-      }
-      acc[studentId].scores[curr.subject] = curr.score;
-      return acc;
-    },
-    {}
-  );
+  }, [schoolId, selectedSemester]);
 
   const fetchStudentGrades = useCallback(async () => {
     if (!selectedStudent) return;
@@ -131,6 +147,7 @@ const GradePage: React.FC = () => {
             score: found?.score,
           };
         });
+
 
         setStudentGrades(merged);
       } else {
@@ -165,22 +182,42 @@ const GradePage: React.FC = () => {
     schoolId,
   ]);
 
+  //반 학생 목록 요청
   useEffect(() => {
-    if (selectedStudent) {
-      fetchStudentGrades();
-    } else if (isHomeroom) {
+    if (isHomeroom && !selectedStudent) {
+      fetchClassStudents();
+    }
+  }, [isHomeroom, selectedStudent, fetchClassStudents]);
+
+  //반 학생 성적 요청
+  useEffect(() => {
+    if (isHomeroom && !selectedStudent && classStudents.length > 0) {
       loadClassGrades();
     }
-  }, [
-    selectedStudent,
-    selectedGrade,
-    selectedSemester,
-    selectedSubject,
-    isPeriod,
-    isHomeroom,
-    fetchStudentGrades,
-    loadClassGrades,
-  ]);
+  }, [isHomeroom, selectedStudent, classStudents, loadClassGrades]);
+
+  const groupedByStudent = classStudents.reduce(
+    (acc: Record<number, GroupedStudentAverage>, student) => {
+      const scores: Record<string, number> = {};
+      let sum = 0;
+      let count = 0;
+      classGrades.forEach((grade) => {
+        if (grade.student.studentId === student.studentId) {
+          scores[grade.subject] = grade.score;
+          sum += grade.score;
+          count++;
+        }
+      });
+      const average = count > 0 ? parseFloat((sum / count).toFixed(1)) : "-";
+      acc[student.studentId] = { name: student.name, scores, average };
+      return acc;
+    },
+    {}
+  );
+
+  useEffect(() => {
+    if (selectedStudent) fetchStudentGrades();
+  }, [selectedStudent, fetchStudentGrades]);
 
   const handleEdit = () => {
     setBackupStudentGrades(JSON.parse(JSON.stringify(studentGrades)));
@@ -317,32 +354,18 @@ const GradePage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(groupedByStudent).map(
-                    ([studentId, { name, scores }]) => {
-                      const subjectScores = subjects.map(
-                        (subject) => scores[subject] ?? "-"
-                      );
-                      const validScores = subjectScores.filter(
-                        (s) => typeof s === "number"
-                      ) as number[];
-                      const average =
-                        validScores.length > 0
-                          ? (
-                              validScores.reduce((sum, v) => sum + v, 0) /
-                              validScores.length
-                            ).toFixed(1)
-                          : "-";
-                      return (
-                        <tr key={studentId} data-testid="class-grade-row">
-                          <td>{name}</td>
-                          {subjectScores.map((score, idx) => (
-                            <td key={idx}>{score}</td>
-                          ))}
-                          <td>{average}</td>
-                        </tr>
-                      );
-                    }
-                  )}
+                  {classStudents.map((student) => {
+                    const data = groupedByStudent[student.studentId];
+                    return (
+                      <tr key={student.studentId}>
+                        <td>{data?.name ?? student.name}</td>
+                        {subjects.map((subject, idx) => (
+                          <td key={idx}>{data?.scores[subject] ?? "-"}</td>
+                        ))}
+                        <td>{data?.average ?? "-"}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </StudentGradeTable>
@@ -366,7 +389,6 @@ const GradePage: React.FC = () => {
             {isPeriod ? (
               <>
                 <DropDown
-                  data-testid="grade-select"
                   value={selectedGrade}
                   onChange={(e) => setSelectedGrade(e.target.value)}
                   disabled={isEditing}
@@ -376,7 +398,6 @@ const GradePage: React.FC = () => {
                   <option value="3">3학년</option>
                 </DropDown>
                 <DropDown
-                  data-testid="semester-select"
                   value={selectedSemester}
                   onChange={(e) => setSelectedSemester(e.target.value)}
                   disabled={isEditing}
@@ -463,12 +484,12 @@ const GradePage: React.FC = () => {
           </ButtonArea>
         </TableArea>
         <ChartArea>
-          <ChartTitle data-testid="grade-chart-title">
+          <ChartTitle>
             {isPeriod
               ? `${selectedGrade}학년 ${selectedSemester}학기 통계`
               : `${selectedSubject} 성적 통계`}
           </ChartTitle>
-          <ChartBox data-testid="grade-chart-box">
+          <ChartBox>
             <RadarChart data={radarSemesterData} />
           </ChartBox>
         </ChartArea>
@@ -478,3 +499,4 @@ const GradePage: React.FC = () => {
 };
 
 export default GradePage;
+
