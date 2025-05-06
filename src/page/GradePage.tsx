@@ -327,7 +327,7 @@ const GradePage: React.FC = () => {
       <MainContainer>
         <h1>학생성적관리</h1>
         <Line />
-        <GuideMessage>
+        <GuideMessage data-testid="grade-guide-message">
           좌측 검색창에서 성적을 조회할 학생을 검색하세요.
         </GuideMessage>
       </MainContainer>
@@ -357,7 +357,7 @@ const GradePage: React.FC = () => {
                   {classStudents.map((student) => {
                     const data = groupedByStudent[student.studentId];
                     return (
-                      <tr key={student.studentId}>
+                      <tr key={student.studentId} data-testid="class-grade-row">
                         <td>{data?.name ?? student.name}</td>
                         {subjects.map((subject, idx) => (
                           <td key={idx}>{data?.scores[subject] ?? "-"}</td>
@@ -389,6 +389,7 @@ const GradePage: React.FC = () => {
             {isPeriod ? (
               <>
                 <DropDown
+                data-testid="grade-select"
                   value={selectedGrade}
                   onChange={(e) => setSelectedGrade(e.target.value)}
                   disabled={isEditing}
@@ -398,6 +399,7 @@ const GradePage: React.FC = () => {
                   <option value="3">3학년</option>
                 </DropDown>
                 <DropDown
+                data-testid="semester-select"
                   value={selectedSemester}
                   onChange={(e) => setSelectedSemester(e.target.value)}
                   disabled={isEditing}
@@ -484,12 +486,12 @@ const GradePage: React.FC = () => {
           </ButtonArea>
         </TableArea>
         <ChartArea>
-          <ChartTitle>
+          <ChartTitle data-testid="grade-chart-title">
             {isPeriod
               ? `${selectedGrade}학년 ${selectedSemester}학기 통계`
               : `${selectedSubject} 성적 통계`}
           </ChartTitle>
-          <ChartBox>
+          <ChartBox data-testid="grade-chart-box">
             <RadarChart data={radarSemesterData} />
           </ChartBox>
         </ChartArea>
