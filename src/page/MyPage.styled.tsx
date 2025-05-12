@@ -18,7 +18,7 @@ export const ModalContainer = styled.div`
   background: white;
   border-radius: 0.625rem;
   width: 78.25rem;
-  max-height: 60rem;
+  max-height: 63rem;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   z-index: 1001;
 `;
@@ -246,4 +246,52 @@ export const ChangeButton = styled.button`
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+`;
+
+export const KakaoButton = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 20rem;
+  height: 3rem;
+  background: #fee500;
+  border-radius: 0.75rem;
+  padding: 0 1.5rem 0 1.5rem;
+  margin: 0.5rem 0 2rem 0;
+  cursor: pointer;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.85);
+    text-align: center;
+    font-family: "Inter";
+    font-size: 1rem;
+    font-weight: 400;
+  }
+`;
+
+export const CreateButton = styled.button`
+  width: 23rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  border-radius: 0.625rem;
+  background: #146c94;
+  color: #fff;
+  text-align: center;
+  font-family: "Inter";
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+`;
+
+export const PasswordTitle = styled.h1`
+  text-align: center;
 `;
