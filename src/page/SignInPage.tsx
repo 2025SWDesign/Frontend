@@ -170,14 +170,45 @@ const SignInPage: React.FC = () => {
   //인증코드 발송
   const SendVerificationCode = async () => {
     try {
-      await axios.get(`/api/v1/email/code`, {
-        params: { email },
-      });
+      await axios.post("/api/v1/email/code", { email });
       alert("인증 코드가 이메일로 전송되었습니다.");
       setMode("verification");
     } catch (err) {
       console.error("인증 코드 발송 실패", err);
       alert("인증 코드 발송에 실패했습니다.");
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    try {
+      await axios.post("/api/v1/email/find-password", {
+        code: verificationCode,
+        email,
+      });
+      alert("인증이 완료되었습니다.");
+      setMode("resetPassword");
+    } catch (err) {
+      console.error("인증 코드 확인 실패", err);
+      alert("인증 코드가 올바르지 않습니다.");
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (password !== confirmPassword) {
+      return alert("비밀번호가 일치하지 않습니다.");
+    }
+
+    try {
+      await axios.patch("/api/v1/email/new-password", {
+        newPassword: password,
+        newPasswordVerified: confirmPassword,
+        email,
+      });
+      alert("비밀번호가 재설정되었습니다.");
+      setMode("signIn");
+    } catch (err) {
+      console.error("비밀번호 재설정 실패", err);
+      alert("비밀번호 재설정에 실패했습니다.");
     }
   };
 
@@ -275,7 +306,7 @@ const SignInPage: React.FC = () => {
               <InputArea>
                 <input
                   data-testid="login-email-input"
-                  placeholder="example@email.com"
+                  placeholder="아이디를 입력하세요"
                   type="email"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
@@ -343,7 +374,7 @@ const SignInPage: React.FC = () => {
                 onChange={(e) => setVerificationCode(e.target.value)}
               />
             </InputArea>
-            <SignButton onClick={() => setMode("resetPassword")}>
+            <SignButton onClick={() => handleVerifyCode()}>
               <p>인증하기</p>
             </SignButton>
           </>
@@ -382,7 +413,7 @@ const SignInPage: React.FC = () => {
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </ToggleButton>
             </InputArea>
-            <SignButton onClick={() => setMode("resetPassword")}>
+            <SignButton onClick={() => handleResetPassword()}>
               <p>비밀번호 재설정</p>
             </SignButton>
           </>
