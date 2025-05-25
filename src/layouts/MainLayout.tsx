@@ -218,6 +218,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         `/school/${schoolId}/class/${classId}/students`
       );
 
+      console.log("반 학생 목록 조회", response.data);
+
       if (response.data.status === 200) {
         // API 응답 구조에 맞게 데이터 변환
         const studentsData = response.data.data.map(
@@ -573,9 +575,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <UserArea data-testid="user-area">
           <div>
             <p>
-              {userName} {role === "TEACHER" ? "선생님" : "학생"}
+              {userName}{" "}
+              {role === "TEACHER"
+                ? "선생님"
+                : role === "PARENT"
+                  ? "학생 부모님"
+                  : "학생"}
             </p>
-            <UserIconContainer data-testid="user-icon" id="userDropdown" onClick={toggleUserDropdown}>
+            <UserIconContainer
+              data-testid="user-icon"
+              id="userDropdown"
+              onClick={toggleUserDropdown}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="44"
@@ -610,7 +621,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         />
                       </svg>
                       <p>
-                        {userName} {role === "TEACHER" ? "선생님" : "학생"}
+                        {userName}{" "}
+                        {role === "TEACHER"
+                          ? "선생님"
+                          : role === "PARENT"
+                            ? "학생 부모님"
+                            : "학생"}
                       </p>
                     </DropdownFlexContainer>
                     <UserDropdownButtons>
@@ -688,13 +704,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </Header>
       <MainContainer>
         <SideBar>
-          {role === "STUDENT" ? (
+          {(role === "STUDENT" || role === "PARENT") ? (
             <>
               <StudentImg src="/assets/img/photo.png" alt="image" />
               <StudentClass>
                 {grade}학년 {gradeClass}반
               </StudentClass>
-              <StudentName>{userName} 학생</StudentName>
+              <StudentName>{userName} {role === "PARENT" ? "학생 부모님" : "학생"}</StudentName>
             </>
           ) : (
             <>
@@ -704,7 +720,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   <StudentClass>
                     {selectedStudent.grade}학년 {selectedStudent.gradeClass}반
                   </StudentClass>
-                  <StudentName>{selectedStudent.name} 학생</StudentName>
+                  <StudentName>{selectedStudent.name} </StudentName>
                 </>
               )}
               <SearchBox data-testid="search-box">
