@@ -107,9 +107,13 @@ const CounselingPage: React.FC = () => {
 
   // 검색 필터링
   const filteredPosts = posts.filter((post) => {
-    if (post.isPublicToSubject && post.subject !== subject) {
-      return false;
-    }
+    if (
+    role === "TEACHER" &&             
+    post.isPublicToSubject &&
+    post.subject !== subject
+  ) {
+    return false;
+  }
     if (searchType === "period" && selectedDate) {
       const postLocalDate = toLocalDateString(post.date);
       return postLocalDate === selectedDate;

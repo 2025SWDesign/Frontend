@@ -68,7 +68,13 @@ const MainPage: React.FC = () => {
       <h1>LearnBridge</h1>
       <Line />
       <GuideMessage>
-        {userName} {role === "TEACHER" ? "선생님" : "학생"}, 환영합니다.
+        {userName}{" "}
+        {role === "TEACHER"
+          ? "선생님"
+          : role === "PARENT"
+            ? "학생 부모님"
+            : "학생"}
+        , 환영합니다.
       </GuideMessage>
     </MainContainer>
   );
