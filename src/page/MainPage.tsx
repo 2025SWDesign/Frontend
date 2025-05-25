@@ -1,7 +1,8 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 import { styled } from "styled-components";
+import { media } from "../styles/media";
 
 const MainContainer = styled.div`
   display: flex;
@@ -18,7 +19,20 @@ const MainContainer = styled.div`
     display: flex;
     margin: 1rem 0 1rem 3rem;
   }
+
+  ${media.mobile} {
+    h1 {
+      align-self: center;
+      color: #000;
+      font-family: "Noto Sans";
+      font-size: 1.25rem;
+      font-style: normal;
+      font-weight: bold;
+      margin: 1rem 0 1rem 0;
+    }
+  }
 `;
+
 const GuideMessage = styled.div`
   height: 42.75rem;
   display: flex;
@@ -29,6 +43,9 @@ const GuideMessage = styled.div`
   font-size: 1.5rem;
   font-weight: 400;
   margin-top: 20.3rem;
+  ${media.mobile} {
+    font-size: 1rem;
+  }
 `;
 
 export const Line = styled.div`
