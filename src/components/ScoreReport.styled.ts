@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const MainContainer = styled.div`
   width: 61.5rem;
@@ -8,6 +9,9 @@ export const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  ${media.mobile} {
+    width: 100%;
+  }
 `;
 
 export const Header = styled.header`
@@ -30,6 +34,10 @@ export const Header = styled.header`
   p {
     margin: 0;
   }
+  ${media.mobile} {
+    width: 22rem;
+    height: 4rem;
+  }
 `;
 
 export const TitleArea = styled.div`
@@ -46,6 +54,15 @@ export const TitleArea = styled.div`
     font-size: 2.5rem;
     font-weight: 400;
     margin: 0 1rem;
+  }
+
+  ${media.mobile} {
+    h1 {
+      font-size: 1.5rem;
+    }
+    p {
+      font-size: 1.5rem;
+    }
   }
 `;
 
@@ -68,6 +85,9 @@ export const Line = styled.div`
   height: 0.0625rem;
   border-bottom: 0.0625rem solid black;
   margin-bottom: 1.4rem;
+  ${media.mobile} {
+    width: 25rem;
+  }
 `;
 
 export const GradeTable = styled.div`
@@ -115,6 +135,17 @@ export const GradeTable = styled.div`
   table tr:last-child td:last-child {
     border-bottom-right-radius: 0.5rem;
   }
+  ${media.mobile} {
+    table {
+      width: 24.5rem;
+      border: 1px solid #b9b9b9;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      table-layout: fixed;
+    }
+  }
 `;
 
 export const ChartBox = styled.div`
@@ -122,4 +153,7 @@ export const ChartBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  ${media.mobile} {
+    margin-top: 0.5rem;
+  }
 `;

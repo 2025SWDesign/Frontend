@@ -586,7 +586,7 @@ const ReportPage: React.FC = () => {
           {selectedType === "counseling" &&
             !selectedCounseling &&
             counselingResults.length > 0 && (
-              <div data-testid="counseling-search-table"> 
+              <div data-testid="counseling-search-table">
                 <CounselingSearchTable
                   data={counselingResults}
                   onSelect={(post) => {
@@ -601,7 +601,6 @@ const ReportPage: React.FC = () => {
             selectedCounseling && (
               <div data-testid="counseling-detail">
                 <CounselingReport
-                  
                   student={selectedStudent}
                   data={[selectedCounseling]}
                 />
