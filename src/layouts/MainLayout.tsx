@@ -473,7 +473,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   const handleLogoClick = async () => {
     await fetchNotifications();
-    setSelectedStudent(null);
+    if (role === "TEACHER") {
+      setSelectedStudent(null);
+    }
     navigate("/main");
   };
 
@@ -1123,13 +1125,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </Header>
       <MainContainer>
         <SideBar>
-          {(role === "STUDENT" || role === "PARENT") ? (
+          {role === "STUDENT" || role === "PARENT" ? (
             <>
               <StudentImg src="/assets/img/photo.png" alt="image" />
               <StudentClass>
                 {grade}학년 {gradeClass}반
               </StudentClass>
-              <StudentName>{userName} {role === "PARENT" ? "학생 부모님" : "학생"}</StudentName>
+              <StudentName>
+                {userName} {role === "PARENT" ? "학생 부모님" : "학생"}
+              </StudentName>
             </>
           ) : (
             <>
