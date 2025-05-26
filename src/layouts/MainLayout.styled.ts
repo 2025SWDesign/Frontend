@@ -522,6 +522,7 @@ export const PageArea = styled.div`
   border-radius: 0rem 0rem 1.25rem 1.25rem;
   border: 1px solid #000;
   background: #fff;
+  
   ${media.mobile} {
     width: 25.75rem;
     height: 50rem;
