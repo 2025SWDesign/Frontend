@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const MainContainer = styled.div`
   width: 61.5rem;
@@ -8,6 +9,9 @@ export const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  ${media.mobile} {
+    width: 100%;
+  }
 `;
 
 export const Header = styled.header`
@@ -30,6 +34,10 @@ export const Header = styled.header`
   p {
     margin: 0;
   }
+  ${media.mobile} {
+    width: 22rem;
+    height: 4rem;
+  }
 `;
 
 export const TitleArea = styled.div`
@@ -46,6 +54,15 @@ export const TitleArea = styled.div`
     font-size: 2.5rem;
     font-weight: 400;
     margin: 0 1rem;
+  }
+
+  ${media.mobile} {
+    h1 {
+      font-size: 1.5rem;
+    }
+    p {
+      font-size: 1.5rem;
+    }
   }
 `;
 
@@ -68,6 +85,9 @@ export const Line = styled.div`
   height: 0.0625rem;
   border-bottom: 0.0625rem solid black;
   margin-bottom: 1.4rem;
+  ${media.mobile} {
+    width: 25rem;
+  }
 `;
 
 export const FeedbackArea = styled.div`
@@ -78,6 +98,9 @@ export const FeedbackArea = styled.div`
   border-radius: 0.25rem;
   border: 1px solid #b9b9b9;
   margin-bottom: 1.5rem;
+  ${media.mobile} {
+    width: 25rem;
+  }
 `;
 
 export const FeedbackTitle = styled.div`
@@ -93,6 +116,10 @@ export const FeedbackTitle = styled.div`
   font-weight: 700;
   font-size: 1rem;
   padding: 0.25rem 0.25rem 0.25rem 0.7rem;
+  ${media.mobile} {
+    height: 1.5rem;
+    font-size: 0.75rem;
+  }
 `;
 
 export const FeedbackContent = styled.div`
@@ -104,4 +131,7 @@ export const FeedbackContent = styled.div`
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.5;
+  ${media.mobile} {
+    font-size: 0.75rem;
+  }
 `;

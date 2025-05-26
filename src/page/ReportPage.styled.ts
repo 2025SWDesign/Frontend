@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const MainContainer = styled.div`
   display: flex;
@@ -15,12 +16,26 @@ export const MainContainer = styled.div`
     display: flex;
     margin: 1rem 0 1rem 3rem;
   }
+  ${media.mobile} {
+    h1 {
+      align-self: center;
+      color: #000;
+      font-family: "Noto Sans";
+      font-size: 1.25rem;
+      font-style: normal;
+      font-weight: bold;
+      margin: 1rem 0 1rem 0;
+    }
+  }
 `;
 
 export const Line = styled.div`
   width: 90rem;
   height: 0.0625rem;
   border-bottom: 0.0625rem solid black;
+  ${media.mobile} {
+    width: 100%;
+  }
 `;
 
 export const ReportContainer = styled.div`
@@ -31,6 +46,10 @@ export const ReportContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   overflow-y: scroll;
+  ${media.mobile} {
+    margin-top: 1rem;
+    width: 100%;
+  }
 `;
 
 export const GuideContainer = styled.div`
@@ -43,12 +62,19 @@ export const GuideContainer = styled.div`
   font-family: "Noto Sans";
   font-size: 1.5rem;
   font-weight: 400;
+  ${media.mobile} {
+    width: 100%;
+  }
 `;
 export const ControlContainer = styled.div`
   width: 90rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  ${media.mobile} {
+    width: 100%;
+    flex-direction: column;
+  }
 `;
 
 export const DropdownBox = styled.div`
@@ -87,6 +113,17 @@ export const DropDown = styled.select<{ id?: string }>`
   ${(props) => props.id === "grade" && `margin-left: 2rem;`}
   ${(props) => props.id === "semester" && `margin-left: 0.8rem;`}
   ${(props) => props.id === "type" && `width: 12rem; padding-left: 1rem;`}
+
+  ${media.mobile} {
+    width: 6rem;
+    height: 2.25rem;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    margin: 0 1rem 0 0.5rem;
+    ${(props) => props.id === "grade" && `margin-left: 0.5rem;`}
+    ${(props) => props.id === "semester" && `margin-left: 0.25rem;`}
+    ${(props) => props.id === "type" && `width: 9rem; padding-left: 1rem;`}
+  }
 `;
 
 export const SearchBox = styled.div`
@@ -112,6 +149,17 @@ export const SearchBox = styled.div`
       font-weight: 400;
     }
   }
+
+  ${media.mobile} {
+    width: 8rem;
+    height: 2.25rem;
+    margin-left: 2rem;
+    input {
+      width: 10rem;
+      height: 2rem;
+      font-size: 0.75rem;
+    }
+  }
 `;
 
 export const SearchButton = styled.button`
@@ -124,6 +172,14 @@ export const SearchButton = styled.button`
   svg {
     width: 1.5rem;
     height: 1.5rem;
+  }
+  ${media.mobile} {
+    width: 3rem;
+    height: 2.25rem;
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
   }
 `;
 
@@ -140,6 +196,11 @@ export const ToggleWrapper = styled.div`
   border-radius: 3.125rem;
   position: relative;
   margin-top: 1.5rem;
+  ${media.mobile} {
+    width: 10rem;
+    height: 2.25rem;
+    margin-top: 1rem;
+  }
 `;
 
 export const ToggleButton = styled.div<{ $isExcel: boolean }>`
@@ -152,6 +213,11 @@ export const ToggleButton = styled.div<{ $isExcel: boolean }>`
   left: ${({ $isExcel }) => ($isExcel ? "0.1rem" : "5.9rem")};
   transition: left 0.3s ease-in-out;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  ${media.mobile} {
+    width: 5rem;
+    height: 2rem;
+    left: ${({ $isExcel }) => ($isExcel ? "0.1rem" : "5rem")};
+  }
 `;
 
 export const OptionButton = styled.div<{ $isActive: boolean }>`
@@ -176,6 +242,12 @@ export const SaveButton = styled.button`
   border: none;
   background: none;
   cursor: pointer;
+  ${media.mobile} {
+    svg {
+      height: 2rem;
+    }
+    margin-top: 1rem;
+  }
 `;
 
 export const SelectedArea = styled.div`
