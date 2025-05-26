@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 interface FeedbackPageProps {
   role: string;
@@ -14,6 +15,11 @@ export const FeedbackHeader = styled.p`
   font-weight: bold;
   display: flex;
   margin: 1rem 0 1rem 3rem;
+
+  ${media.mobile} {
+    margin-left: 10.5rem;
+    font-size: 1.3rem;
+  }
 `;
 
 export const Line = styled.div`
@@ -46,6 +52,12 @@ export const GradeSelect = styled.select`
     font-style: normal;
     font-weight: 600;
   }
+
+  ${media.mobile} {
+    width: 20%;
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+  }
 `;
 
 export const FeedbackContentContainer = styled.div`
@@ -56,6 +68,12 @@ export const FeedbackContentContainer = styled.div`
   flex-direction: column;
   gap: 0.5rem;
   margin-left: 3rem;
+
+  ${media.mobile} {
+    width: 95%;
+    height: 100%;
+    margin-left: 0.5rem;
+  }
 `;
 
 export const ContentBox = styled.div<FeedbackPageProps>`
@@ -85,6 +103,10 @@ export const ContentTitle = styled.div`
   font-style: normal;
   font-weight: 700;
   line-height: 40%;
+
+  ${media.mobile} {
+    font-size: 1.1rem;
+    padding: 0.8rem 
 `;
 
 export const ContentForm = styled.textarea<FeedbackPageProps>`
@@ -130,6 +152,12 @@ export const ContentForm = styled.textarea<FeedbackPageProps>`
     `
     height: 4.4rem;
   `}
+
+  ${media.mobile} {
+    width: 100%;
+    font-size: 0.7rem;
+    height: 5.3rem;
+  }
 `;
 export const ButtonContainer = styled.div`
   margin-left: 77rem;
@@ -145,7 +173,6 @@ export const ButtonContainer = styled.div`
 `;
 
 export const EditButton = styled.button`
-  
   height: 2.5rem;
   width: 8rem;
   background-color: #146c94;
