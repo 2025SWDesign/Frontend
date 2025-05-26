@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const StdInfoContainer = styled.div``;
 
@@ -10,12 +11,21 @@ export const StdInfoHeader = styled.p`
   font-weight: bold;
   display: flex;
   margin: 1rem 0 1rem 3rem;
+
+  ${media.mobile} {
+    margin-left: 10.5rem;
+    font-size: 1.3rem;
+  }
 `;
 export const Line = styled.div`
   width: 90rem;
   height: 0.0625rem;
   border-bottom: 1px solid black;
   width: 100%;
+
+  ${media.mobile} {
+    width: 100%;
+  }
 `;
 
 export const StdInfoContent = styled.div`
@@ -40,6 +50,11 @@ export const Table = styled.table`
   margin-left: 3rem;
   width: 46rem;
   border-collapse: collapse;
+
+  ${media.mobile} {
+    width: 100%;
+    margin-left: 0;
+  }
 `;
 
 export const TableRow = styled.tr``;
@@ -52,6 +67,10 @@ export const HeaderCell = styled.td`
   border: 0.0625rem solid #ddd;
   text-align: center;
   font-weight: bold;
+
+  ${media.mobile} {
+    width: 30%;
+  }
 `;
 
 export const DataCell = styled.td`
