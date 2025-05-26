@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const Overlay = styled.div`
   position: fixed;
@@ -21,6 +22,10 @@ export const ModalContainer = styled.div`
   max-height: 63rem;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   z-index: 1001;
+  ${media.mobile} {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 export const TitleArea = styled.div`
@@ -36,6 +41,9 @@ export const TitleArea = styled.div`
     font-size: 2rem;
     font-weight: 700;
     margin: 0;
+    ${media.mobile} {
+      font-size: 1.5rem;
+    }
   }
 `;
 
@@ -72,6 +80,9 @@ export const SectionTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
+  ${media.mobile} {
+    font-size: 1rem;
+  }
 `;
 
 export const InfoRow = styled.div`
@@ -110,6 +121,10 @@ export const InputArea = styled.div`
 
   &::placeholder {
     color: #858585;
+  }
+  ${media.mobile} {
+    width: 18.5rem;
+    height: 2.5rem;
   }
 `;
 
@@ -246,6 +261,12 @@ export const ChangeButton = styled.button`
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+  ${media.mobile} {
+    width: 6.25rem;
+    height: 2rem;
+    font-size: 0.75rem;
+    margin-bottom: 0;
+  }
 `;
 
 export const KakaoButton = styled.div`
@@ -276,6 +297,17 @@ export const KakaoButton = styled.div`
     font-size: 1rem;
     font-weight: 400;
   }
+
+  ${media.mobile} {
+    width: 18.75rem;
+    height: 2.5rem;
+    padding: 0 1rem 0 1rem;
+    margin: 0.5rem 0 1rem 0;
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
 `;
 
 export const CreateButton = styled.button`
@@ -290,6 +322,12 @@ export const CreateButton = styled.button`
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+  ${media.mobile} {
+    width: 20.75rem;
+    height: 2.5rem;
+    padding: 0 1rem 0 1rem;
+    margin: 0.5rem 0 0.5rem 0;
+  }
 `;
 
 export const PasswordTitle = styled.h1`

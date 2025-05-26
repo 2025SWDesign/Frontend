@@ -979,6 +979,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <MobileContentArea>
           <PageArea data-testid="page-area">{children}</PageArea>
         </MobileContentArea>
+        {isMyPageOpen && <MyPage onClose={() => setIsMyPageOpen(false)} />}
       </MobileLayoutWrapper>
     );
   }
