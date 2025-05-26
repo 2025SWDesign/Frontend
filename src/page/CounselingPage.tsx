@@ -195,18 +195,21 @@ const CounselingPage: React.FC = () => {
                     <TableHeader
                       data-testid="counseling-header-author"
                       width="10rem"
+                      className="hideOnMobile"
                     >
                       작성자
                     </TableHeader>
                     <TableHeader
                       data-testid="counseling-header-subject"
                       width="5rem"
+                      className="hideOnMobile"  
                     >
                       담당과목
                     </TableHeader>
                     <TableHeader
                       data-testid="counseling-header-date"
                       width="13rem"
+                      className="hideOnMobile"
                     >
                       상담일자
                     </TableHeader>
@@ -225,13 +228,13 @@ const CounselingPage: React.FC = () => {
                       <TitleCell data-testid="counseling-cell-title">
                         {post.title}
                       </TitleCell>
-                      <TableCell data-testid="counseling-cell-author">
+                      <TableCell className="hideOnMobile" data-testid="counseling-cell-author">
                         {post.author}
                       </TableCell>
-                      <TableCell data-testid="counseling-cell-subject">
+                      <TableCell className="hideOnMobile" data-testid="counseling-cell-subject">
                         {post.subject}
                       </TableCell>
-                      <TableCell data-testid="counseling-cell-date">
+                      <TableCell className="hideOnMobile"data-testid="counseling-cell-date">
                         {new Date(post.date).toLocaleDateString()}
                       </TableCell>
                     </TableRow>
