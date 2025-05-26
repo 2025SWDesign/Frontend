@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const CounselingWriteContainer = styled.div``;
 
@@ -10,6 +11,11 @@ export const CounselingWriteHeader = styled.p`
   font-weight: bold;
   display: flex;
   margin: 1rem 0 1rem 3rem;
+
+  ${media.mobile} {
+    margin-left: 10.5rem;
+    font-size: 1.3rem;
+  }
 `;
 
 export const Line = styled.div`
@@ -20,6 +26,10 @@ export const Line = styled.div`
 
 export const Container = styled.div`
   padding: 0 0 0 3rem;
+
+  ${media.mobile} {
+    padding: 0 0 0 1rem;
+  }
 `;
 
 export const Header = styled.div`
@@ -28,6 +38,12 @@ export const Header = styled.div`
   height: 3.75rem;
   display: flex;
   align-items: center;
+
+  ${media.mobile} {
+    width: 100%;
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
 `;
 
 export const TitleInput = styled.input`
@@ -45,21 +61,54 @@ export const TitleInput = styled.input`
   &:focus {
     border-color: #146c94;
   }
+
+  ${media.mobile} {
+    width: 90%;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    padding: 0.5rem 0.75rem;
+  }
 `;
+
+export const DatePrivacyWrapper = styled.div`
+  display: flex;
+  width: 45%;
+  justify-content: flex-start;
+  gap: 1rem;
+
+  ${media.mobile} {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 0.2rem;
+    margin-bottom: 0.5rem;
+  }
+`;
+
 
 export const DateSection = styled.div`
   margin-left: 1rem;
   display: flex;
   align-items: center;
+
+  ${media.mobile} {
+    margin-left: 0.2rem;
+    width: 50%;
+  }
 `;
 
 export const DateLabel = styled.label`
   width: 8rem;
   font-family: Inter;
   font-size: 1.2rem;
-  font-style: normal; 
+  font-style: normal;
   font-weight: 700;
   line-height: normal;
+
+  ${media.mobile} {
+    width: 5rem;
+    font-size: 0.8rem;
+  }
 `;
 
 export const DateInput = styled.input`
@@ -75,12 +124,22 @@ export const DateInput = styled.input`
   &:focus {
     border-color: #146c94;
   }
+
+  ${media.mobile} {
+    width: 5.5rem;
+    font-size: 0.8rem;
+    margin-left: 0.3rem;
 `;
 
 export const PrivacySection = styled.div`
   padding-left: 1rem;
   display: flex;
   align-items: center;
+
+  ${media.mobile} {
+    width: 50%;
+    padding-left: 0.2rem;
+  }
 `;
 
 export const CheckboxLabel = styled.label`
@@ -92,12 +151,22 @@ export const CheckboxLabel = styled.label`
   cursor: pointer;
   font-family: Inter;
   font-size: 1.2rem;
+
+  ${media.mobile} {
+    width: 11rem;
+    font-size: 0.8rem;
+  }
 `;
 
 export const Checkbox = styled.input`
   width: 1.8rem;
   height: 1.8rem;
   cursor: pointer;
+
+  ${media.mobile} {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
 `;
 
 export const ContentArea = styled.textarea`
@@ -120,13 +189,20 @@ export const ContentArea = styled.textarea`
   &:focus {
     border-color: #146c94;
   }
+
+  ${media.mobile} {
+    width: 90%;
+    height: 38rem;
+    font-size: 1rem;
+  }
 `;
 
 export const ButtonGroup = styled.div`
   width: 84rem;
-  display: flex;  
+  display: flex;
   justify-content: space-between;
   margin-top: 0.5rem;
+
 `;
 
 export const SaveButton = styled.button`
@@ -166,5 +242,10 @@ export const CancelButton = styled.button`
 
   &:hover {
     background-color: #0d5270;
+  }
+
+  ${media.mobile} {
+    padding: 0.4rem 1.5rem;
+    font-size: 0.8rem;
   }
 `;
