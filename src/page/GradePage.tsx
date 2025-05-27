@@ -231,6 +231,15 @@ const GradePage: React.FC = () => {
     setIsEditing(false);
   };
 
+  const parseSemester = (semesterStr: string) => {
+    const match = semesterStr.match(/(\d)학년 (\d)학기/);
+    if (!match) return { schoolYear: 0, semester: 0 };
+    return {
+      schoolYear: Number(match[1]),
+      semester: Number(match[2]),
+    };
+  };
+
   const handleSave = async () => {
     if (!selectedStudent) return;
 
@@ -252,41 +261,39 @@ const GradePage: React.FC = () => {
               updatedAt: found.updatedAt,
             });
           }
-        } else {
-          if (g.score !== undefined) {
-            postPayload.push({
-              subject: g.subject!,
-              schoolYear: Number(selectedGrade),
-              semester: Number(selectedSemester),
-              score: Number(g.score),
-            });
-          }
+        } else if (g.score !== undefined) {
+          postPayload.push({
+            subject: g.subject!,
+            schoolYear: Number(selectedGrade),
+            semester: Number(selectedSemester),
+            score: Number(g.score),
+          });
         }
       } else {
+        const { schoolYear, semester } = parseSemester(g.semester ?? "");
         const found = initiallyFetchedGrades.find(
           (f) =>
             f.subject === selectedSubject &&
-            f.schoolYear === Number(g.semester?.[0]) &&
-            f.semester === Number(g.semester?.[4])
+            f.schoolYear === schoolYear &&
+            f.semester === semester
         );
         if (found) {
           if (found.score !== g.score && g.score !== undefined) {
             patchPayload.push({
               subject: selectedSubject,
-              schoolYear: Number(g.semester?.[0]),
-              semester: Number(g.semester?.[4]),
+              schoolYear,
+              semester,
               score: Number(g.score),
+              updatedAt: found.updatedAt,
             });
           }
-        } else {
-          if (g.score !== undefined) {
-            postPayload.push({
-              subject: selectedSubject,
-              schoolYear: Number(g.semester?.[0]),
-              semester: Number(g.semester?.[4]),
-              score: Number(g.score),
-            });
-          }
+        } else if (g.score !== undefined) {
+          postPayload.push({
+            subject: selectedSubject,
+            schoolYear,
+            semester,
+            score: Number(g.score),
+          });
         }
       }
     }
