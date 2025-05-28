@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const MainContainer = styled.div`
   display: flex;
@@ -14,6 +15,17 @@ export const MainContainer = styled.div`
     font-weight: bold;
     display: flex;
     margin: 1rem 0 1rem 3rem;
+  }
+  ${media.mobile} {
+    h1 {
+      align-self: center;
+      color: #000;
+      font-family: "Noto Sans";
+      font-size: 1.25rem;
+      font-style: normal;
+      font-weight: bold;
+      margin: 1rem 0 1rem 0;
+    }
   }
 `;
 
@@ -37,6 +49,10 @@ export const GuideMessage = styled.div`
 export const GradeContainer = styled.div`
   display: flex;
   flex-direction: row;
+
+  ${media.mobile} {
+    flex-direction: column;
+  }
 `;
 
 export const TableArea = styled.div`
@@ -46,6 +62,11 @@ export const TableArea = styled.div`
   flex-direction: column;
   align-items: start;
   padding-left: 3rem;
+  ${media.mobile} {
+    width: 25.75rem;
+    height: auto;
+    padding-left: 1.5rem;
+  }
 `;
 
 export const StudentsTableArea = styled.div`
@@ -97,6 +118,16 @@ export const DropDown = styled.select<{ id?: string }>`
   }
 
   ${(props) => props.id === "semester" && `margin-left: 0.8rem;`}
+
+  ${media.mobile} {
+    width: 6rem;
+    height: 2rem;
+    padding: 0.25rem 0 0.25rem 1rem;
+    font-size: 0.75rem;
+    &:option {
+      font-size: 0.75rem;
+    }
+  }
 `;
 
 export const GradeTable = styled.div`
@@ -143,6 +174,33 @@ export const GradeTable = styled.div`
 
   table tr:last-child td:last-child {
     border-bottom-right-radius: 0.5rem;
+  }
+
+  ${media.mobile} {
+    table {
+      width: 25rem;
+      border-radius: 0.25rem;
+    }
+
+    tr {
+      height: 1.75rem;
+    }
+
+    table tr:first-child th:first-child {
+      border-top-left-radius: 0.25rem;
+    }
+
+    table tr:first-child th:last-child {
+      border-top-right-radius: 0.25rem;
+    }
+
+    table tr:last-child td:first-child {
+      border-bottom-left-radius: 0.25rem;
+    }
+
+    table tr:last-child td:last-child {
+      border-bottom-right-radius: 0.25rem;
+    }
   }
 `;
 
@@ -214,6 +272,11 @@ export const ToggleWrapper = styled.div`
   border-radius: 3.125rem;
   position: relative;
   margin-top: 1.5rem;
+  ${media.mobile} {
+    border-radius: 3rem;
+    width: 9rem;
+    height: 2rem;
+  }
 `;
 
 export const ToggleButton = styled.div<{ $isPeriod: boolean }>`
@@ -226,6 +289,13 @@ export const ToggleButton = styled.div<{ $isPeriod: boolean }>`
   left: ${({ $isPeriod }) => ($isPeriod ? "0.1rem" : "4.9rem")};
   transition: left 0.3s ease-in-out;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+
+  ${media.mobile} {
+    border-radius: 3rem;
+    width: 4.5rem;
+    height: 1.75rem;
+    left: ${({ $isPeriod }) => ($isPeriod ? "0.1rem" : "4.4rem")};
+  }
 `;
 
 export const OptionButton = styled.div<{ $isActive: boolean }>`
@@ -295,6 +365,11 @@ export const ChartArea = styled.div`
   width: 32.5rem;
   height: 48.2rem;
   border-left: 0.0625rem solid #000;
+  ${media.mobile} {
+    border: none;
+    width: 100%;
+    height: auto;
+  }
 `;
 
 export const ChartTitle = styled.div`
@@ -307,6 +382,13 @@ export const ChartTitle = styled.div`
   font-weight: 700;
   border-bottom: 1px solid black;
   padding: 1rem 0 1rem 1rem;
+
+  ${media.mobile} {
+    font-size: 1rem;
+    width: 25.75rem;
+    margin-top: 3rem;
+    padding: 0 0 0.5rem 2.25rem;
+  }
 `;
 
 export const ChartBox = styled.div`
@@ -314,4 +396,9 @@ export const ChartBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  ${media.mobile} {
+    margin: 1rem 0 0 1.5rem;
+    width: 25.75rem;
+  }
 `;

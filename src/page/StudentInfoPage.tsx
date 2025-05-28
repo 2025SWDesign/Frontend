@@ -16,6 +16,8 @@ import { useStudentStore } from "../stores/studentStore";
 const StudentInfoPage: React.FC = () => {
   const role = useAuthStore((state) => state.role);
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
+
+
   return (
     <StdInfoContainer>
       <StdInfoHeader>학생 정보</StdInfoHeader>

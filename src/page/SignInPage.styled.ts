@@ -1,11 +1,17 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
-// SplitScreen: 전체 레이아웃
 export const SplitScreen = styled.div`
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  ${media.mobile} {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    flex-direction: column;
+  }
 `;
 
 export const LeftCard = styled.div`
@@ -24,6 +30,10 @@ export const LeftCard = styled.div`
     margin: 2rem 0;
     font-weight: normal;
   }
+  ${media.mobile} {
+    height: 3.5rem;
+    background: none;
+  }
 `;
 
 export const Title = styled.h1`
@@ -32,11 +42,19 @@ export const Title = styled.h1`
   font-family: "Inter";
   font-size: 2.5rem;
   font-weight: 700;
+  ${media.mobile} {
+    font-size: 2rem;
+    margin: 0;
+  }
 `;
 
 export const WelcomeLogo = styled.img`
   width: 45.75rem;
   height: 25.5rem;
+  ${media.mobile} {
+    width: 9rem;
+    height: 3.25rem;
+  }
 `;
 
 export const RightCard = styled.div`
@@ -46,6 +64,10 @@ export const RightCard = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  ${media.mobile} {
+    width: 100%;
+    max-height: calc(100vh - 3.5rem);
+  }
 `;
 
 export const InnerContent = styled.div`
@@ -60,6 +82,10 @@ export const InnerContent = styled.div`
     color: white;
     font-weight: bold;
     font-size: 3.5rem;
+  }
+  ${media.mobile} {
+    width: 100%;
+    height: auto;
   }
 `;
 
@@ -91,6 +117,13 @@ export const DropDown = styled.select`
   }
 `;
 
+export const PasswordTitle = styled.h1`
+  text-align: center;
+  ${media.mobile} {
+    font-size: 1.5rem;
+  }
+`;
+
 export const InputText = styled.div`
   margin: 1rem 0 0.5rem 0.5rem;
   color: #000;
@@ -98,6 +131,9 @@ export const InputText = styled.div`
   font-family: "Inter";
   font-size: 1.25rem;
   font-weight: 700;
+  ${media.mobile} {
+    font-size: 1rem;
+  }
 `;
 
 export const InputArea = styled.div`
@@ -119,6 +155,18 @@ export const InputArea = styled.div`
 
   input:focus {
     outline: none;
+  }
+
+  ${media.mobile} {
+    width: 22rem;
+    height: 2.75rem;
+    input {
+      border: none;
+      width: 20rem;
+      margin: 0 0.5rem 0 1.5rem;
+      background-color: transparent;
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -169,6 +217,13 @@ export const ToggleButton = styled.button.attrs({ type: "button" })`
     height: 1.5rem;
     stroke: #424242;
   }
+  ${media.mobile} {
+    margin-right: 0.75rem;
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
 `;
 
 export const SignButton = styled.button`
@@ -186,6 +241,16 @@ export const SignButton = styled.button`
     font-size: 1.5rem;
     font-weight: bold;
     color: white;
+  }
+
+  ${media.mobile} {
+    width: 22rem;
+    height: 3rem;
+    margin-top: 2rem;
+    border-radius: 0.75rem;
+    p {
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -217,6 +282,14 @@ export const KakaoButton = styled.div`
     font-size: 1.25rem;
     font-weight: 400;
   }
+  ${media.mobile} {
+    width: 18.5rem;
+    height: 3rem;
+    margin-top: 3rem;
+    div {
+      font-size: 1rem;
+    }
+  }
 `;
 
 export const EmailButton = styled.div`
@@ -245,6 +318,13 @@ export const EmailButton = styled.div`
     font-family: "Inter";
     font-size: 1.25rem;
     font-weight: 400;
+  }
+  ${media.mobile} {
+    width: 18.5rem;
+    height: 3rem;
+    div {
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -279,6 +359,14 @@ export const SecondaryArea = styled.div`
     color: #146c94;
     font-weight: 700;
     text-decoration: underline;
+  }
+  ${media.mobile} {
+    p {
+      font-size: 0.75rem;
+    }
+    a {
+      font-size: 0.75rem;
+    }
   }
 `;
 

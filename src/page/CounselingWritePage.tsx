@@ -39,6 +39,7 @@ import {
   DateInput,
   DateLabel,
   DateSection,
+  DatePrivacyWrapper,
 } from "./CounselingWritePage.styled";
 import { useAuthStore } from "../stores/authStore";
 import { useStudentStore } from "../stores/studentStore";
@@ -127,28 +128,29 @@ const CounselingWritePage: React.FC = () => {
             onChange={(e) => setTitle(e.target.value)}
             disabled={viewOnly}
           />
-
-          <DateSection>
-            <DateLabel>다음 상담 기간</DateLabel>
-            <DateInput
-              type="date"
-              value={nextCounselingDate}
-              onChange={(e) => setNextCounselingDate(e.target.value)}
-              disabled={viewOnly}
-            />
-          </DateSection>
-
-          <PrivacySection>
-            <CheckboxLabel>
-              <strong>동일 과목 교사에게만 공개</strong>
-              <Checkbox
-                type="checkbox"
-                checked={isPrivate}
-                onChange={() => setIsPrivate(!isPrivate)}
+          <DatePrivacyWrapper>
+            <DateSection>
+              <DateLabel>다음 상담 기간</DateLabel>
+              <DateInput
+                type="date"
+                value={nextCounselingDate}
+                onChange={(e) => setNextCounselingDate(e.target.value)}
                 disabled={viewOnly}
               />
-            </CheckboxLabel>
-          </PrivacySection>
+            </DateSection>
+
+            <PrivacySection>
+              <CheckboxLabel>
+                <strong>동일 과목 교사에게만 공개</strong>
+                <Checkbox
+                  type="checkbox"
+                  checked={isPrivate}
+                  onChange={() => setIsPrivate(!isPrivate)}
+                  disabled={viewOnly}
+                />
+              </CheckboxLabel>
+            </PrivacySection>
+          </DatePrivacyWrapper>
         </Header>
 
         <ContentArea

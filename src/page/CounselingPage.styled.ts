@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const CounselingContainer = styled.div``;
 
@@ -10,6 +11,10 @@ export const CounselingHeader = styled.p`
   font-weight: bold;
   display: flex;
   margin: 1rem 0 1rem 3rem;
+  ${media.mobile} {
+    margin-left: 10.5rem;
+    font-size: 1.3rem;
+  }
 `;
 
 export const Line = styled.div`
@@ -25,6 +30,10 @@ export const BoardTable = styled.table`
   border-collapse: collapse;
   margin: 1.25rem auto;
   font-size: 1rem;
+
+  ${media.mobile} {
+    width: 97%;
+    margin-top : 0.5rem;
 `;
 
 export const TableHeader = styled.th<{ width?: string }>`
@@ -35,6 +44,12 @@ export const TableHeader = styled.th<{ width?: string }>`
   text-align: center;
   font-weight: bold;
   width: ${(props) => props.width || "auto"};
+
+  &.hideOnMobile {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
 `;
 
 export const TableCell = styled.td<{ isBold?: boolean }>`
@@ -42,6 +57,16 @@ export const TableCell = styled.td<{ isBold?: boolean }>`
   border: 0.0625rem solid #ddd;
   text-align: center;
   font-weight: ${(props) => (props.isBold ? "bold" : "normal")};
+
+   &.hideOnMobile {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  ${media.mobile} {
+    font-size: 0.875rem;
+    height: 2.5rem;
 `;
 
 export const TableRow = styled.tr`
@@ -91,6 +116,10 @@ export const Footer = styled.div`
   width: 82.25rem;
   margin-left: auto;
   margin-right: auto;
+
+  ${media.mobile} {
+    margin-top: 3.5rem;
+  }
 `;
 
 export const SearchContainer = styled.div`
@@ -120,6 +149,11 @@ export const SearchSelect = styled.select`
     font-style: normal;
     font-weight: 600;
   }
+
+  ${media.mobile} {
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+  }
 `;
 
 export const SearchInput = styled.input`
@@ -139,6 +173,17 @@ export const SearchInput = styled.input`
     font-size: 1rem;
     font-weight: 700;
   }
+
+  ${media.mobile} {
+    height: 2.2rem;
+    font-size: 1.2rem;
+    padding-left: 0.5rem;
+    width: 14.5rem;
+
+    &::placeholder {
+      font-size: 0.8rem;
+    }
+  }
 `;
 
 export const SearchButton = styled.button`
@@ -154,6 +199,11 @@ export const SearchButton = styled.button`
   svg {
     width: 1.75rem;
     height: 1.75rem;
+  }
+
+  ${media.mobile} {
+    width: 3.5rem;
+    height: 2.5rem;
   }
 `;
 
