@@ -876,7 +876,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <TabButton
               data-testid="tab-student-info"
               $isActive={location.pathname === "/student-info"}
-              onClick={() => navigate("/student-info")}
+              onClick={() => {
+                navigate("/student-info");
+                setIsSidebarOpen(false);
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -895,7 +898,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <TabButton
               data-testid="tab-student-manage"
               $isActive={location.pathname === "/student-manage"}
-              onClick={() => navigate("/student-manage")}
+              onClick={() => {
+                navigate("/student-manage");
+                setIsSidebarOpen(false);
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -916,6 +922,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               $isActive={location.pathname === "/grade"}
               onClick={() => {
                 navigate("/grade");
+                setIsSidebarOpen(false);
               }}
             >
               <svg
@@ -935,7 +942,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <TabButton
               data-testid="tab-counseling"
               $isActive={location.pathname === "/counseling"}
-              onClick={() => navigate("/counseling")}
+              onClick={() => {
+                navigate("/counseling");
+                setIsSidebarOpen(false);
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -960,7 +970,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <TabButton
               data-testid="tab-feedback"
               $isActive={location.pathname === "/feedback"}
-              onClick={() => navigate("/feedback")}
+              onClick={() => {
+                navigate("/feedback");
+                setIsSidebarOpen(false);
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -979,7 +992,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <TabButton
               data-testid="tab-report"
               $isActive={location.pathname === "/report"}
-              onClick={() => navigate("/report")}
+              onClick={() => {
+                navigate("/report");
+                setIsSidebarOpen(false);
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1001,6 +1017,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <MobileContentArea>
           <PageArea data-testid="page-area">{children}</PageArea>
         </MobileContentArea>
+        {isMyPageOpen && <MyPage onClose={() => setIsMyPageOpen(false)} />}
       </MobileLayoutWrapper>
     );
   }

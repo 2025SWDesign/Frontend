@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "/assets/img/Logo_2w.png";
+import LogoO from "/assets/img/Logo.png";
 import {
   SplitScreen,
   LeftCard,
@@ -18,12 +19,13 @@ import {
   EmailButton,
   KakaoButton,
   Title,
+  PasswordTitle,
 } from "./SignInPage.styled";
 import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { MdOutlineMail } from "react-icons/md";
 import { useAuthStore } from "../stores/authStore";
-import { PasswordTitle } from "./MyPage.styled";
+import { useMobile } from "../hooks/UseMobile";
 
 interface School {
   schoolId: number;
@@ -59,6 +61,7 @@ const SignInPage: React.FC = () => {
   const setSchoolAndClass = useAuthStore((state) => state.setSchoolAndClass);
 
   const searchTimeoutRef = useRef<number | null>(null);
+  const isMobile = useMobile();
 
   const handleSchoolSearch = (query: string) => {
     setSchoolQuery(query);
@@ -145,7 +148,7 @@ const SignInPage: React.FC = () => {
 
   const handleKakaoLogin = () => {
     window.location.href =
-      "http://3.38.130.125:3000/api/v1/auth/kakao/sign-in/callback";
+      "http://3.38.130.125:3000/api/v1/auth/kakao/sign-in";
   };
 
   //카카오 리디렉션 후 전역 상태 세팅 및 추가정보 분기
@@ -452,7 +455,7 @@ const SignInPage: React.FC = () => {
             <SecondaryArea>
               <div>
                 <p>비밀번호가 기억나셨나요?</p>
-                <a onClick={() => setMode("signIn")}>로그인 하기</a>
+                <a onClick={() => setMode("selectSignIn")}>로그인 하기</a>
               </div>
             </SecondaryArea>
           </>
@@ -464,7 +467,7 @@ const SignInPage: React.FC = () => {
     <div>
       <SplitScreen>
         <LeftCard>
-          <WelcomeLogo src={Logo} />
+          <WelcomeLogo src={isMobile ? LogoO : Logo} />
         </LeftCard>
         <RightCard>
           <InnerContent>

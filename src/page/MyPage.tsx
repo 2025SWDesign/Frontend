@@ -39,6 +39,8 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(DEFAULT_IMAGE_URL);
 
+  const accessToken = useAuthStore((state) => state.accessToken);
+
   const handlePasswordChange = async () => {
     setPasswordError("");
 
@@ -122,8 +124,8 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
   };
 
   const handleKakaoLogin = () => {
-    window.location.href =
-      "http://3.38.130.125:3000/api/v1/auth/kakao/connect/callback";
+  if (!accessToken) return alert("로그인이 필요합니다.");
+    window.location.href = `http://3.38.130.125:3000/api/v1/auth/kakao/connect?token=${accessToken}`;
   };
 
   return (

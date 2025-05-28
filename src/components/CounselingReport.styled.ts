@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 export const MainContainer = styled.div`
   width: 61.5rem;
@@ -8,6 +9,9 @@ export const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  ${media.mobile} {
+    width: 100%;
+  }
 `;
 
 export const Header = styled.header`
@@ -30,6 +34,10 @@ export const Header = styled.header`
   p {
     margin: 0;
   }
+  ${media.mobile} {
+    width: 22rem;
+    height: 4rem;
+  }
 `;
 
 export const TitleArea = styled.div`
@@ -46,6 +54,14 @@ export const TitleArea = styled.div`
     font-size: 2.5rem;
     font-weight: 400;
     margin: 0 1rem;
+  }
+  ${media.mobile} {
+    h1 {
+      font-size: 1.5rem;
+    }
+    p {
+      font-size: 1.5rem;
+    }
   }
 `;
 
@@ -68,6 +84,9 @@ export const Line = styled.div`
   height: 0.0625rem;
   border-bottom: 0.0625rem solid black;
   margin-bottom: 1.4rem;
+  ${media.mobile} {
+    width: 25rem;
+  }
 `;
 
 export const CouncelingArea = styled.div`
@@ -75,6 +94,9 @@ export const CouncelingArea = styled.div`
   height: 32rem;
   border-radius: 0.625rem;
   border: 1px solid #b9b9b9;
+  ${media.mobile} {
+    width: 25rem;
+  }
 `;
 
 export const CouncelingTitle = styled.div`
@@ -96,6 +118,14 @@ export const CouncelingTitle = styled.div`
     font-size: 1.25rem;
     margin: 0 1rem 0 0;
   }
+  ${media.mobile} {
+    h3 {
+      font-size: 1rem;
+    }
+    p {
+      font-size: 1rem;
+    }
+  }
 `;
 
 export const CouncelingContent = styled.div`
@@ -104,4 +134,7 @@ export const CouncelingContent = styled.div`
   font-family: Inter;
   font-size: 1rem;
   font-weight: 400;
+  ${media.mobile} {
+    font-size: 0.75rem;
+  }
 `;
