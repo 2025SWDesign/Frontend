@@ -103,6 +103,7 @@ const ReportPage: React.FC = () => {
   const [selectedCounseling, setSelectedCounseling] =
     useState<CounselingItem | null>(null);
   const subject = useAuthStore((state) => state.subject);
+  const role = useAuthStore((state) => state.role);
 
   //피드백 보고서 용
   const [feedbacks, setFeedbacks] = useState<
@@ -190,10 +191,17 @@ const ReportPage: React.FC = () => {
       );
 
       if (response.data.status === 200) {
-        const filtered = response.data.data.filter(
-          (item: CounselingItem) =>
-            !item.isPublicToSubject || item.subject === subject
-        );
+        const filtered = response.data.data.filter((item: CounselingItem) => {
+          if (
+            role === "TEACHER" &&
+            item.isPublicToSubject &&
+            item.subject !== subject
+          ) {
+            return false;
+          }
+          return true;
+        });
+
         setCounselingResults(filtered);
         setSelectedCounseling(null);
       }
