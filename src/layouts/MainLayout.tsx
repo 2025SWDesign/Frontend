@@ -177,7 +177,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           `/school/${schoolId}/users/me`
         );
         console.log("유저 정보 불러오기 성공:", response.data);
-        const { name, role, teacher, student, school } = response.data.data;
+        const { name, role, teacher, student, Parents = [], school } = response.data.data;
         setUserName(name);
         setRole(role);
         setIsHomeroom(teacher?.isHomeroom ?? false);
@@ -199,6 +199,24 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             gradeClass: student.gradeClass,
             number: student.number,
             img: "",
+          });
+        }
+        else if(role === "PARENT") {
+          // 부모의 첫 번째 자녀 정보 설정
+          const firstChild = Parents.student[0];
+          setStudentInfo({
+            studentId: firstChild.studentId,
+            grade: firstChild.grade,
+            gradeClass: firstChild.gradeClass,
+            number: firstChild.number,
+          });
+          setSelectedStudent({
+            studentId: firstChild.studentId,
+            name: name,
+            grade: firstChild.grade,
+            gradeClass: firstChild.gradeClass,
+            number: firstChild.number,
+            img: "", 
           });
         }
       } catch (err) {
@@ -234,13 +252,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       if (response.data.status === 200) {
         // API 응답 구조에 맞게 데이터 변환
-        const studentsData = response.data.data.map(
+        let studentsData = response.data.data.map(
           (item: {
             studentId: number;
             grade: number;
             gradeClass: number;
-            number: number;
-            user: { name: string; schoolId?: number };
+                number: number;
+                user: { name: string; schoolId?: number };
           }) => ({
             studentId: item.studentId,
             name: item.user.name,
@@ -252,7 +270,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         );
         // console.log("반 학생:", studentsData);
 
-        studentsData.sort((a: Student, b: Student) => a.number - b.number);
+        studentsData.sort((a: Student, b: Student) => a.name.localeCompare(b.name, 'ko'));
+        studentsData = studentsData.map((student: Student, index : number) => ({
+          ...student,
+          number: index + 1,
+        }));
         setStudents(studentsData);
         setClassStudents(studentsData);
       }

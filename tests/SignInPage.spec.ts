@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("homeroom teacher", () => {
+test.describe("all", () => {
   test.beforeEach(async ({ page, baseURL }) => {
     // baseURL은 playwright.config.ts에서 설정되어 있다면 생략 가능
     await page.goto(baseURL ?? "http://localhost:5173");
@@ -154,3 +154,5 @@ test.describe("homeroom teacher", () => {
   });
   
 });
+
+

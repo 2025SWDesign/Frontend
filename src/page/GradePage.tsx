@@ -105,7 +105,7 @@ const GradePage: React.FC = () => {
             number: item.number,
           })
         );
-        data.sort((a: StudentInfo, b: StudentInfo) => a.number - b.number);
+        data.sort((a: StudentInfo, b: StudentInfo) => a.name.localeCompare(b.name, "ko"));
         setClassStudents(data);
       }
     } catch (err) {

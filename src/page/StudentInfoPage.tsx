@@ -24,7 +24,7 @@ const StudentInfoPage: React.FC = () => {
       <Line />
       {role === "TEACHER" && !selectedStudent ? (
         <GuideMessage>
-          좌측 검색창에서 성적을 조회할 학생을 검색하세요.
+          좌측 검색창에서 학생정보를 조회할 학생을 검색하세요.
         </GuideMessage>
       ) : (
         <StdInfoContent>
