@@ -183,7 +183,30 @@ test.describe("parent", () => {
     await page.getByRole("button", { name: "로그인" }).click();
   });
 
-  
+   test("헤더와 로고, 사용자 영역이 렌더링된다", async ({ page }) => {
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("logo")).toBeVisible();
+  });
+
+  test("로고 클릭 시 /main 으로 네비게이션 된다", async ({ page }) => {
+    await page.getByTestId("logo-link").click();
+    await expect(page).toHaveURL(/\/main$/);
+  });
+
+  test("탭 버튼 클릭으로 올바른 경로로 이동한다", async ({ page }) => {
+    await page.getByTestId("tab-student-manage").click();
+    await expect(page).toHaveURL("/student-manage");
+    await page.getByTestId("tab-student-info").click();
+    await expect(page).toHaveURL("/student-info");
+    await page.getByTestId("tab-grade-manage").click();
+    await expect(page).toHaveURL("/grade");
+    await page.getByTestId("tab-counseling").click();
+    await expect(page).toHaveURL("/counseling");
+    await page.getByTestId("tab-feedback").click();
+    await expect(page).toHaveURL("/feedback");
+    await page.getByTestId("tab-report").click();
+    await expect(page).toHaveURL("/report");
+  });
 });
 
 test.describe("student", () => {

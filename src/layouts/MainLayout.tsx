@@ -202,8 +202,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           });
         }
         else if(role === "PARENT") {
-          // 부모의 첫 번째 자녀 정보 설정
-          const firstChild = Parents.student[0];
+          const firstChild = Parents.Student[0];
           setStudentInfo({
             studentId: firstChild.studentId,
             grade: firstChild.grade,

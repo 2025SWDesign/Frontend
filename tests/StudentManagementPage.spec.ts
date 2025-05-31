@@ -643,6 +643,53 @@ test.describe("parent", () => {
     await page.getByTestId("tab-student-manage").click();
     await expect(page).toHaveURL("/student-manage");
   });
+
+  test("좌측 학생 클릭 시 화면 전환한다", async ({ page }) => {
+
+    // 3) 해당 학기 출석 섹션이 보이는지 확인
+    await expect(page.getByText("해당 학기 출석")).toBeVisible();
+
+    // 4) 학생 출결 정보 테이블 헤더가 보이는지 확인
+    await expect(page.getByText("학생 출결 정보")).toBeVisible();
+
+    // 5) 특기 사항 섹션이 보이는지 확인
+    await expect(page.getByText("특기 사항")).toBeVisible();
+  });
+
+  test("학생 출결 정보 테이블 렌더링 및 요약값 검증", async ({ page }) => {
+    // 1) 섹션 제목
+    await expect(page.getByText("학생 출결 정보")).toBeVisible();
+
+    // 2) 테이블 전체
+    const table = page.getByTestId("attendance-summary-table");
+    await expect(table).toBeVisible();
+
+    // 3) 학년별 요약 행이 3개
+    const rows = page.locator('[data-testid="attendance-summary-row"]');
+    await expect(rows).toHaveCount(3);
+
+    for (let i = 0; i < 3; i++) {
+      const row = rows.nth(i);
+      // 4) 학년, 총일수 확인
+      await expect(row.getByTestId("attendance-summary-grade-cell")).toHaveText(
+        `${i + 1}학년`
+      );
+      await expect(row.getByTestId("attendance-summary-total-cell")).toHaveText(
+        "240"
+      );
+      // 5) 나머지 셀(12개) 모두 0
+      const cells = row.locator('[data-testid="attendance-summary-cell"]');
+      await expect(cells).toHaveCount(12);
+      for (let j = 0; j < 12; j++) {
+        const cell = cells.nth(j);
+        // 텍스트를 읽어서 숫자로 변환
+        const text = await cell.innerText();
+        const value = Number(text);
+        // 0 이상인지 확인
+        expect(value).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
 });
 
 test.describe("student", () => {

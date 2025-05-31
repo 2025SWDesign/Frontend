@@ -73,6 +73,7 @@ const AdminAssignPage: React.FC = () => {
 
   const [classes, setClasses] = useState<ClassInfo[]>([]); // 학급 목록
   const [selectedClass, setSelectedClass] = useState<ClassInfo | null>(null); // 선택된 학급
+  const [initialStudentIds, setInitialStudentIds] = useState<number[]>([]); // 초기 학생 ID 목록 (학생 추가/제거 시 비교용)
   const [students, setStudents] = useState<StudentInfo[]>([]); // 현재 학생 목록
   const [candidateStudents, setCandidateStudents] = useState<StudentInfo[]>([]); // 추가 가능한 학생 목록
   const [homeroom, setHomeroom] = useState<TeacherInfo | null>(null); // 현재 담임
@@ -122,11 +123,11 @@ const AdminAssignPage: React.FC = () => {
         console.log("교사", homeroomRes.data.data);
 
         // ---------- 학생 ----------
-        setStudents(
-          sortAndNumber(
-            inClassRes.data.data.map((st: any) => mapStudent(st, cls.classId))
-          )
+        const mappedStudents = sortAndNumber(
+          inClassRes.data.data.map((st: any) => mapStudent(st, cls.classId))
         );
+        setStudents(mappedStudents);
+        setInitialStudentIds(mappedStudents.map((st) => st.studentId));
 
         setCandidateStudents(
           unassignedRes.data.data.map((st: any) => mapStudent(st, null))
@@ -198,18 +199,22 @@ const AdminAssignPage: React.FC = () => {
   const handleSave = async () => {
     if (!selectedClass) return;
 
-    // 학생 추가/제거 처리
-    const addedStudentIds = students
-      .filter((student) => student.classId === selectedClass.classId)
-      .map((student) => student.studentId);
-
-    const removedStudentIds = students
-      .filter((student) => student.classId !== selectedClass.classId)
-      .map((student) => student.studentId);
+    // diffs 체크
+    const currentIds = students.map((s) => s.studentId);
+    const addedStudentIds = currentIds.filter(
+      (id) => !initialStudentIds.includes(id)
+    );
+    const removedStudentIds = initialStudentIds.filter(
+      (id) => !currentIds.includes(id)
+    );
 
     try {
       // 1. 반 학생 관리 저장
       if (addedStudentIds.length || removedStudentIds.length) {
+        console.log("반 학생 관리 저장", {
+          addedStudentIds,
+          removedStudentIds,
+        });
         await axiosInstance.patch(
           `/school/${schoolId}/users/class/${selectedClass.classId}/managestudent`,
           {
@@ -231,6 +236,7 @@ const AdminAssignPage: React.FC = () => {
         console.log("반 교사 저장 완료");
       }
 
+      setInitialStudentIds(currentIds);
       setIsDirty(false);
       alert("저장되었습니다!");
     } catch (error) {
@@ -280,12 +286,13 @@ const AdminAssignPage: React.FC = () => {
     <PageWrapper>
       <ClassListWrapper>
         <h2>학급 목록</h2>
-        <ResetButton onClick={() => setShowReset(true)}>반 초기화</ResetButton>
+        <ResetButton data-testid="reset-btn" onClick={() => setShowReset(true)}>반 초기화</ResetButton>
 
         <ClassListScroll>
           {classes.map((c) => (
             <ClassItem
               key={c.classId}
+              data-testid={`class-item-${c.classId}`}
               $active={selectedClass?.classId === c.classId}
               onClick={() => setSelectedClass(c)}
             >
@@ -302,7 +309,11 @@ const AdminAssignPage: React.FC = () => {
               {selectedClass.grade}학년 {selectedClass.gradeClass}반 관리
             </ClassTitle>
 
-            <SaveButton disabled={!isDirty} onClick={handleSave}>
+            <SaveButton
+              data-testid="save-btn"
+              disabled={!isDirty}
+              onClick={handleSave}
+            >
               서버에 저장
             </SaveButton>
           </Header>
@@ -350,6 +361,7 @@ const AdminAssignPage: React.FC = () => {
                             <td>{st.name}</td>
                             <td>
                               <AssignButton
+                                data-testid={`remove-stu-${st.studentId}`}
                                 onClick={() => removeStudent(st.studentId)}
                               >
                                 X
@@ -391,7 +403,10 @@ const AdminAssignPage: React.FC = () => {
                             <td>{s.studentId}</td>
                             <td>{s.name}</td>
                             <td>
-                              <AssignButton onClick={() => addStudent(s)}>
+                              <AssignButton
+                                data-testid={`add-stu-${s.studentId}`}
+                                onClick={() => addStudent(s)}
+                              >
                                 +
                               </AssignButton>
                             </td>
@@ -429,7 +444,7 @@ const AdminAssignPage: React.FC = () => {
                           <td>{homeroom.teacherId}</td>
                           <td>{homeroom.name}</td>
                           <td>
-                            <AssignButton onClick={removeTeacher}>
+                            <AssignButton data-testid="remove-tch" onClick={removeTeacher}>
                               X
                             </AssignButton>
                           </td>
@@ -468,7 +483,7 @@ const AdminAssignPage: React.FC = () => {
                             <td>{t.teacherId}</td>
                             <td>{t.name}</td>
                             <td>
-                              <AssignButton onClick={() => addTeacher(t)}>
+                              <AssignButton data-testid={`add-tch-${t.teacherId}`} onClick={() => addTeacher(t)}>
                                 +
                               </AssignButton>
                             </td>
@@ -501,6 +516,7 @@ const AdminAssignPage: React.FC = () => {
               <ModalRow key={g}>
                 <label>{g}학년</label>
                 <ModalNumberInput
+                data-testid={`reset-g${g}`}
                   type="number"
                   min="0"
                   placeholder="0"
@@ -513,8 +529,8 @@ const AdminAssignPage: React.FC = () => {
             ))}
 
             <ModalActionRow>
-              <ModalBtn onClick={() => setShowReset(false)}>취소</ModalBtn>
-              <ModalBtn onClick={handleResetClass}>확인</ModalBtn>
+              <ModalBtn data-testid="reset-confirm" onClick={handleResetClass}>확인</ModalBtn>
+              <ModalBtn data-testid="reset-cancel" onClick={() => setShowReset(false)}>취소</ModalBtn>     
             </ModalActionRow>
           </ModalBox>
         </ModalBackdrop>

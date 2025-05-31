@@ -25,8 +25,9 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    baseURL: 'http://localhost:5173', // dev server URL
-    //baseURL: 'https://software-design-frontend-for-vercel-ixgf.vercel.app/',
+    viewport: { width: 1920, height: 1080 },
+    // baseURL: 'http://localhost:5173', // dev server URL
+    baseURL: 'https://software-design-frontend-for-vercel-ixgf.vercel.app/',
     trace: 'on-first-retry',
   },
 
