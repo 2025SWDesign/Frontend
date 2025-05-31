@@ -667,6 +667,166 @@ test.describe("parent", () => {
     await page.getByTestId("tab-grade-manage").click();
     await expect(page).toHaveURL("/grade");
   });
+
+  test("학생 선택 시 기간별 과목별 테이블과 레이더 차트가 제대로 렌더링된다", async ({
+    page,
+  }) => {
+
+    // 1) 테이블 헤더 확인
+    const headers = page.getByTestId("period-grade-table").locator("thead th");
+    await expect(headers.nth(0)).toHaveText("과목");
+    await expect(headers.nth(1)).toHaveText("성적");
+    await expect(headers.nth(2)).toHaveText("등급");
+
+    // 2) 과목별(5개) 행 개수
+    const rows = page.locator('[data-testid="period-grade-rows"] tr');
+    await expect(rows).toHaveCount(5);
+
+    // 3) 차트 타이틀 & 컨테이너
+    await expect(page.getByTestId("grade-chart-title")).toContainText("통계");
+    await expect(page.getByTestId("grade-chart-box")).toBeVisible();
+  });
+
+  test("레이더 차트 레이블이 과목별 점수와 정확히 일치하는지 확인", async ({
+    page,
+  }) => {
+
+    // 차트 렌더링 대기
+    await page.waitForTimeout(1500);
+
+    // 1) 테이블에서 과목별 점수들 수집
+    const scoreCells = page.locator(
+      '[data-testid="period-grade-rows"] tr td:nth-child(2)'
+    );
+    const rowCount = await scoreCells.count();
+    const expectedScores: string[] = [];
+    for (let i = 0; i < rowCount; i++) {
+      expectedScores.push((await scoreCells.nth(i).innerText()).trim());
+    }
+
+    // 2) 차트 내 모든 <text> 엘리먼트에서 텍스트 수집 (Element[] 타입)
+    const chartLabels = await page.$$eval(
+      '[data-testid="grade-chart-box"] text',
+      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+    );
+    const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
+
+    // 3) 각 예상 점수가 차트 레이블에 포함되어 있는지 확인
+    for (const score of expectedScores) {
+      expect(numericLabels).toContain(score);
+    }
+  });
+
+  test("학년/학기 드롭다운 선택에 따라 차트 제목이 업데이트된다", async ({
+    page,
+  }) => {
+    // 학년을 '1학년', 학기를 '1학기'로 선택
+    await page.selectOption('[data-testid="grade-select"]', "1");
+    await page.selectOption('[data-testid="semester-select"]', "1");
+
+    // 변경된 값 반영 대기
+    await page.waitForTimeout(200);
+
+    // 차트 제목이 "1학년 1학기 통계"로 정확히 표시되는지 확인
+    await expect(page.getByTestId("grade-chart-title")).toHaveText(
+      "1학년 1학기 통계"
+    );
+
+    // 다른 조합 예시: 2학년 2학기
+    await page.selectOption('[data-testid="grade-select"]', "2");
+    await page.selectOption('[data-testid="semester-select"]', "2");
+    await page.waitForTimeout(200);
+    await expect(page.getByTestId("grade-chart-title")).toHaveText(
+      "2학년 2학기 통계"
+    );
+  });
+
+  test("과목별 모드에서 테이블 헤더와 학기별 행이 제대로 렌더링된다", async ({
+    page,
+  }) => {
+    // 학기 모드로 전환
+    await page.getByText("과목별").click();
+    await page.waitForTimeout(2000); // 렌더링 대기
+
+    // 1) 테이블 헤더 확인
+    const headers = page.getByTestId("period-grade-table").locator("thead th");
+    await expect(headers.nth(0)).toHaveText("학기");
+    await expect(headers.nth(1)).toHaveText("성적");
+    await expect(headers.nth(2)).toHaveText("등급");
+    
+    await page.waitForTimeout(2000); // 렌더링 대기
+    await page.getByTestId("period-grade-table");
+
+    // 2) 학기별(6개: 1-1,1-2,2-1,2-2,3-1,3-2) 행 개수 확인
+    const rows = page.locator('[data-testid="period-grade-table"] tbody tr');
+    await expect(rows).toHaveCount(6);
+
+    // 3) 차트 제목과 컨테이너
+    await expect(page.getByTestId("grade-chart-title")).toContainText(
+      "성적 통계"
+    );
+    await expect(page.getByTestId("grade-chart-box")).toBeVisible();
+  });
+
+  test("레이더 차트 레이블이 학기별 점수와 정확히 일치하는지 확인", async ({
+    page,
+  }) => {
+
+    // 과목별 모드로 전환
+    await page.getByText("과목별").click();
+
+    // 렌더링 대기 (약 1.5초)
+    await page.waitForTimeout(1500);
+
+    // 1) 테이블에서 학기별 점수 추출 (빈 문자열은 "0"으로 처리)
+    const scoreCells = page
+      .getByTestId("period-grade-table")
+      .locator("tbody tr td:nth-child(2)");
+    const rowCount = await scoreCells.count();
+    const expectedScores: string[] = [];
+    for (let i = 0; i < rowCount; i++) {
+      const raw = (await scoreCells.nth(i).innerText()).trim();
+      expectedScores.push(raw === "" ? "0" : raw);
+    }
+
+    // 2) 차트 내 <text> 요소에서 숫자 레이블만 추출
+    const chartLabels = await page.$$eval(
+      '[data-testid="grade-chart-box"] text',
+      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+    );
+    const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
+
+    // 3) 각 예상 점수가 차트 레이블에 포함되어 있는지 확인
+    for (const score of expectedScores) {
+      expect(numericLabels).toContain(score);
+    }
+  });
+
+  test("과목 선택 드롭다운 변경에 따라 차트 제목이 업데이트된다", async ({
+    page,
+  }) => {
+    // 학기 모드로 전환
+    await page.getByText("과목별").click();
+
+    // 기본: '국어' 가 선택되어 있다고 가정
+    await expect(page.getByTestId("grade-chart-title")).toHaveText(
+      "국어 성적 통계"
+    );
+
+    // 1) 드롭다운에서 '과학' 선택
+    await page
+      .getByRole("combobox")
+      .filter({ hasText: /국어/ })
+      .selectOption("과학");
+
+    // 반영 대기
+    await page.waitForTimeout(200);
+
+    // 2) 차트 제목 확인
+    await expect(page.getByTestId("grade-chart-title")).toHaveText(
+      "과학 성적 통계"
+    );
+  });
 });
 
 test.describe("student", () => {

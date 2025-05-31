@@ -134,7 +134,32 @@ test.describe("parent", () => {
     await expect(page.getByTestId("mypage-modal")).toBeVisible();
   });
 
+  test("사진 변경 섹션과 학부모 계정 생성 섹션, 비밀번호 변경 섹션, 카카오 연동 버튼이 보여진다", async ({
+    page,
+  }) => {
+    await expect(page.getByTestId("photo-section")).toBeHidden();
+    await expect(page.getByTestId("password-section")).toBeVisible();
+    await expect(page.getByTestId("kakao-button")).toBeVisible();
+    await expect(page.getByTestId("parent-section")).toBeHidden();
+  });
 
+  test("빈 비밀번호 입력 후 변경 버튼 클릭 시 오류 메시지가 표시된다", async ({
+    page,
+  }) => {
+    await page.getByTestId("password-change-button").click();
+    await expect(page.getByTestId("password-error")).toBeVisible();
+  });
+
+  test("비밀번호 표시 토글 클릭 시 입력 타입이 password→text 로 변경된다", async ({
+    page,
+  }) => {
+    const current = page.getByTestId("input-current-password");
+    await expect(current).toHaveAttribute("type", "password");
+
+    // 토글 버튼 클릭
+    await page.getByTestId("password-toggle-visibility").click();
+    await expect(current).toHaveAttribute("type", "text");
+  });
 });
 
 test.describe("student", () => {

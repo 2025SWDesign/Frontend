@@ -321,12 +321,26 @@ test.describe("parent", () => {
     // 로그인 버튼 클릭
     await page.getByRole("button", { name: "로그인" }).click();
 
-    // 상담 페이지로 이동
-    await page.getByTestId("tab-counseling").click();
-    await expect(page).toHaveURL("/counseling");
+    // 피드백 페이지로 이동
+    await page.getByTestId("tab-feedback").click();
+    await expect(page).toHaveURL("/feedback");
   });
 
+  test("피드백 폼 4가지가 전부 렌더링되어 있는지 확인", async ({ page }) => {
 
+    // 폼이 모두 비활성화된 상태로 존재하는지 확인
+    await expect(page.getByTestId("feedback-form-grade")).toBeVisible();
+    await expect(page.getByTestId("feedback-form-grade")).toBeDisabled();
+
+    await expect(page.getByTestId("feedback-form-behavior")).toBeVisible();
+    await expect(page.getByTestId("feedback-form-behavior")).toBeDisabled();
+
+    await expect(page.getByTestId("feedback-form-attendance")).toBeVisible();
+    await expect(page.getByTestId("feedback-form-attendance")).toBeDisabled();
+
+    await expect(page.getByTestId("feedback-form-attitude")).toBeVisible();
+    await expect(page.getByTestId("feedback-form-attitude")).toBeDisabled();
+  });
 });
 
 test.describe("student", () => {

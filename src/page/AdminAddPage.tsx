@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios"; 
+import axios from "axios";
 import {
   Page,
   Column,
@@ -101,9 +101,10 @@ const AdminAddPage: React.FC = () => {
       {/* 학생 폼 */}
       <Column>
         <h2>학생</h2>
-        <Form onSubmit={submitStudent}>
+        <Form data-testid="student-form" onSubmit={submitStudent}>
           <Label>이름</Label>
           <Input
+            data-testid="stu-name"
             name="name"
             value={stuForm.name}
             onChange={handleStuChange}
@@ -111,6 +112,7 @@ const AdminAddPage: React.FC = () => {
           />
           <Label>이메일</Label>
           <Input
+            data-testid="stu-email"
             type="email"
             name="email"
             value={stuForm.email}
@@ -119,6 +121,7 @@ const AdminAddPage: React.FC = () => {
           />
           <Label>학년</Label>
           <Input
+            data-testid="stu-grade"
             name="grade"
             type="number"
             value={stuForm.grade}
@@ -127,6 +130,7 @@ const AdminAddPage: React.FC = () => {
           />
           <Label>전화번호</Label>
           <Input
+            data-testid="stu-phone"
             name="phonenumber"
             value={stuForm.phonenumber}
             onChange={handleStuChange}
@@ -134,6 +138,7 @@ const AdminAddPage: React.FC = () => {
           />
           <Label>집주소</Label>
           <Input
+            data-testid="stu-address"
             name="address"
             value={stuForm.address}
             onChange={handleStuChange}
@@ -141,21 +146,23 @@ const AdminAddPage: React.FC = () => {
           />
           <Label>부모님 연락처</Label>
           <Input
+            data-testid="stu-homephone"
             name="homenumber"
             value={stuForm.homenumber}
             onChange={handleStuChange}
             required
           />
-          <SubmitButton type="submit">계정 생성</SubmitButton>
+          <SubmitButton data-testid="stu-submit" type="submit">계정 생성</SubmitButton>
         </Form>
       </Column>
 
       {/* 교사 폼 */}
       <Column>
         <h2>담임</h2>
-        <Form onSubmit={submitTeacher}>
+        <Form data-testid="teacher-form" onSubmit={submitTeacher}>
           <Label>이름</Label>
           <Input
+            data-testid="tch-name"
             name="name"
             value={tchForm.name}
             onChange={handleTchChange}
@@ -163,6 +170,7 @@ const AdminAddPage: React.FC = () => {
           />
           <Label>이메일</Label>
           <Input
+            data-testid="tch-email"
             type="email"
             name="email"
             value={tchForm.email}
@@ -171,6 +179,7 @@ const AdminAddPage: React.FC = () => {
           />
           <Label>담당과목</Label>
           <Select
+            data-testid="tch-subject"
             name="subject"
             value={tchForm.subject}
             onChange={handleTchChange}
@@ -181,7 +190,9 @@ const AdminAddPage: React.FC = () => {
             <option>과학</option>
             <option>사회</option>
           </Select>
-          <SubmitButton type="submit">계정 생성</SubmitButton>
+          <SubmitButton data-testid="tch-submit" type="submit">
+            계정 생성
+          </SubmitButton>
         </Form>
       </Column>
     </Page>

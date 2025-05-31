@@ -161,6 +161,27 @@ test.describe("parent", () => {
     await page.getByTestId("tab-student-info").click();
     await expect(page).toHaveURL("/student-info");
   });
+
+  test("학생 선택 시 상세정보 테이블이 표시된다", async ({ page }) => {
+    // 3초대기
+    await page.waitForTimeout(3000);
+
+    // 2) 학생 정보 테이블이 렌더링되는지 확인합니다.
+    await expect(page.getByText("전화번호")).toBeVisible();
+    await expect(page.getByText("집주소")).toBeVisible();
+    await expect(page.getByText("부모님 연락처")).toBeVisible();
+
+    const phones = page.getByText("010-1234-5678");
+    // 두 개가 맞는지 먼저 확인
+    await expect(phones).toHaveCount(2);
+    // 각각 visible 여부 검사
+    await expect(phones.nth(0)).toBeVisible();
+    await expect(phones.nth(1)).toBeVisible();
+
+    await expect(
+      page.getByText("인천광역시 연수구 신송로 312-1")
+    ).toBeVisible();
+  });
 });
 
 test.describe("student", () => {
