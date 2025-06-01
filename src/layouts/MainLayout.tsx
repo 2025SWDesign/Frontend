@@ -160,7 +160,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const grade = useAuthStore((state) => state.grade);
   const gradeClass = useAuthStore((state) => state.gradeClass);
   const setStudentInfo = useAuthStore((state) => state.setStudentInfo);
-
+  const setKakaoEmail = useAuthStore((state) => state.setKakaoEmail);
   const accessToken = useAuthStore((state) => state.accessToken);
 
   // 모바일 용
@@ -177,13 +177,23 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           `/school/${schoolId}/users/me`
         );
         console.log("유저 정보 불러오기 성공:", response.data);
-        const { name, role, teacher, student, Parents = [], school } = response.data.data;
+        const {
+          name,
+          role,
+          teacher,
+          student,
+          Parents = [],
+          school,
+          kakaoEmail,
+        } = response.data.data;
         setUserName(name);
         setRole(role);
         setIsHomeroom(teacher?.isHomeroom ?? false);
         setSchoolName(school?.schoolName ?? "");
         setGradeAndClass(teacher?.class.grade, teacher?.class.gradeClass);
+
         setSubject(teacher?.subject ?? "");
+        setKakaoEmail(kakaoEmail ?? null);
 
         if (role === "STUDENT" && student) {
           setStudentInfo({
@@ -200,8 +210,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             number: student.number,
             img: "",
           });
-        }
-        else if(role === "PARENT") {
+        } else if (role === "PARENT") {
           const firstChild = Parents.Student[0];
           setStudentInfo({
             studentId: firstChild.studentId,
@@ -215,7 +224,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             grade: firstChild.grade,
             gradeClass: firstChild.gradeClass,
             number: firstChild.number,
-            img: "", 
+            img: "",
           });
         }
       } catch (err) {
@@ -235,6 +244,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     setSubject,
     setStudentInfo,
     setSelectedStudent,
+    setKakaoEmail,
   ]);
 
   // 반 학생 목록 가져오기
@@ -256,8 +266,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             studentId: number;
             grade: number;
             gradeClass: number;
-                number: number;
-                user: { name: string; schoolId?: number };
+            number: number;
+            user: { name: string; schoolId?: number };
           }) => ({
             studentId: item.studentId,
             name: item.user.name,
@@ -269,8 +279,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         );
         // console.log("반 학생:", studentsData);
 
-        studentsData.sort((a: Student, b: Student) => a.name.localeCompare(b.name, 'ko'));
-        studentsData = studentsData.map((student: Student, index : number) => ({
+        studentsData.sort((a: Student, b: Student) =>
+          a.name.localeCompare(b.name, "ko")
+        );
+        studentsData = studentsData.map((student: Student, index: number) => ({
           ...student,
           number: index + 1,
         }));

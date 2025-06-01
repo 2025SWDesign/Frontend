@@ -1,9 +1,12 @@
 {
-    "rewrites": [
-      {
-        "source": "/api/(.*)",
-        "destination": "http://3.38.130.125:3000/api/$1"
-      }
-    ]
-  }
-  
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "http://3.38.130.125:3000/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

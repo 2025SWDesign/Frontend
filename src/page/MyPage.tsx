@@ -41,6 +41,7 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
   const [previewUrl, setPreviewUrl] = useState<string>(DEFAULT_IMAGE_URL);
 
   const accessToken = useAuthStore((state) => state.accessToken);
+  const kakaoEmail = useAuthStore((state) => state.kakaoEmail);
 
   const handlePasswordChange = async () => {
     setPasswordError("");
@@ -124,7 +125,7 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
     }
   };
 
-  const handleKakaoLogin = () => {
+  const handleKakaoConnect = () => {
     if (!accessToken) return alert("로그인이 필요합니다.");
     window.location.href = `http://3.38.130.125:3000/api/v1/auth/kakao/connect?token=${accessToken}`;
   };
@@ -133,10 +134,12 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
     const params = new URLSearchParams(location.search);
     const kakaoStatus = params.get("kakaoStatus");
 
-    if (kakaoStatus === "success") {
-      alert("카카오 계정 연동에 성공했습니다.");
+    if (kakaoStatus === "already") {
+      alert("이미 연동된 계정입니다.");
+    } else if (kakaoStatus === "success") {
+      alert("카카오 계정이 성공적으로 연동되었습니다.");
     } else if (kakaoStatus === "failure") {
-      alert("카카오 계정 연동에 실패했습니다.");
+      alert("연동에 실패했습니다.");
     }
   }, []);
 
@@ -246,7 +249,12 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
         <Section data-testid="kakao-section">
           <SectionTitle>카카오 계정 연동</SectionTitle>
           <Line />
-          <KakaoButton data-testid="kakao-button" onClick={handleKakaoLogin}>
+          {kakaoEmail && <p>이미 연동된 계정입니다</p>}
+          <KakaoButton
+            data-testid="kakao-button"
+            onClick={handleKakaoConnect}
+            disabled={!!kakaoEmail}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="36"
