@@ -143,6 +143,28 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
     }
   }, []);
 
+  const handleCreateParentAccount = async () => {
+    try {
+      const accessToken = sessionStorage.getItem("accessToken");
+      if (!accessToken) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      const response = await axios.post(`/auth/parents-sign-up`);
+
+      if (response.data.status === 201) {
+        alert("학부모 계정이 성공적으로 생성되었습니다.");
+        console.log("학부모 계정:", response.data.data);
+      } else {
+        alert("학부모 계정 생성에 실패했습니다.");
+      }
+    } catch (err) {
+      console.error("학부모 계정 생성 오류:", err);
+      alert("계정 생성 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <Overlay data-testid="mypage-overlay" onClick={onClose}>
       <ModalContainer
@@ -283,7 +305,10 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
           <Section data-testid="parent-section">
             <SectionTitle>학부모 계정 생성</SectionTitle>
             <Line />
-            <CreateButton data-testid="parent-create-button">
+            <CreateButton
+              data-testid="parent-create-button"
+              onClick={handleCreateParentAccount}
+            >
               학부모 계정 생성
             </CreateButton>
           </Section>
