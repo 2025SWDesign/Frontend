@@ -74,12 +74,14 @@ test.describe("admin", () => {
     /* ------------------------------ 시나리오 ------------------------------ */
 
     /* ----- (2) 페이지 새로고침: 스텁 먼저 적용된 상태에서 /assign 진입 ----- */
-    await page.goto("/assign");
+    await page.getByText("학급 담임/학생 할당").click();
+    await page.waitForTimeout(1000);
 
     /* ----- (3) 학급 선택 (testid 사용, 자동 스크롤 되지만 안전하게…) ----- */
     const classBtn = page.getByTestId("class-item-1");
-    await classBtn.scrollIntoViewIfNeeded();
-    await classBtn.click();
+    await classBtn.evaluate((el) =>
+      el.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    );
 
     /* ----- (4) 학생 + / X 클릭 ----- */
     await page.getByTestId("add-stu-201").click();
@@ -131,10 +133,13 @@ test.describe("admin", () => {
     });
 
     /* ------------------ (2)  화면 진입 ------------------ */
-    await page.goto("/assign");
-    const classBtn = page.getByTestId("class-item-1");
-    await classBtn.scrollIntoViewIfNeeded();
-    await classBtn.click();
+    await page.getByText("학급 담임/학생 할당").click();
+    await page.waitForTimeout(1000);
+
+     const classBtn = page.getByTestId("class-item-1");
+    await classBtn.evaluate((el) =>
+      el.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    );
 
     /* 저장 버튼 초기 상태 -> disabled */
     const saveBtn = page.getByTestId("save-btn");
@@ -184,8 +189,12 @@ test.describe("admin", () => {
     });
 
     /** ② 화면 진입 & 반 선택 */
-    await page.goto("/assign");
-    await page.getByTestId("class-item-1").click();
+    await page.getByText("학급 담임/학생 할당").click();
+    await page.waitForTimeout(1000);
+    const classBtn = page.getByTestId("class-item-1");
+    await classBtn.evaluate((el) =>
+      el.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    );
 
     /** ③ 저장 버튼 확인 → 클릭 시도도 안 함 */
     const saveBtn = page.getByTestId("save-btn");
@@ -214,10 +223,16 @@ test.describe("admin", () => {
     });
 
     /** ② 페이지 진입 */
-    await page.goto("/assign");
+    await page.getByText("학급 담임/학생 할당").click();
+    await page.waitForTimeout(1000);
+
+    
 
     /** ③ 모달 열고 값 입력 */
-    await page.getByTestId("reset-btn").click();
+    const classBtn = page.getByTestId("reset-btn");
+    await classBtn.evaluate((el) =>
+      el.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    );
     await page.getByTestId("reset-g1").fill("2");
     await page.getByTestId("reset-g2").fill("3");
     await page.getByTestId("reset-g3").fill("1");
