@@ -41,6 +41,7 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
   const [previewUrl, setPreviewUrl] = useState<string>(DEFAULT_IMAGE_URL);
 
   const accessToken = useAuthStore((state) => state.accessToken);
+  const kakaoEmail = useAuthStore((state) => state.kakaoEmail);
 
   const handlePasswordChange = async () => {
     setPasswordError("");
@@ -137,7 +138,7 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
       alert("이미 연동된 계정입니다.");
     } else if (kakaoStatus === "success") {
       alert("카카오 계정이 성공적으로 연동되었습니다.");
-    } else {
+    } else if (kakaoStatus === "failure") {
       alert("연동에 실패했습니다.");
     }
   }, []);
@@ -248,7 +249,12 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
         <Section data-testid="kakao-section">
           <SectionTitle>카카오 계정 연동</SectionTitle>
           <Line />
-          <KakaoButton data-testid="kakao-button" onClick={handleKakaoConnect}>
+          {kakaoEmail && <p>이미 연동된 계정입니다</p>}
+          <KakaoButton
+            data-testid="kakao-button"
+            onClick={handleKakaoConnect}
+            disabled={!!kakaoEmail}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="36"

@@ -310,7 +310,7 @@ const SignInPage: React.FC = () => {
                 <input
                   data-testid="login-email-input"
                   placeholder="아이디를 입력하세요"
-                  type="email"
+                  type="id"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                 />

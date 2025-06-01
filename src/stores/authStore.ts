@@ -26,6 +26,8 @@ interface AuthState {
   gradeClass: number | null;
   studentId: number | null;
   number: number | null;
+  kakaoEmail: string | null;
+
   setUserName: (name: string) => void;
   setSchoolName: (name: string) => void;
   setRole: (role: RoleType) => void;
@@ -43,6 +45,7 @@ interface AuthState {
     gradeClass: number;
     number: number;
   }) => void;
+  setKakaoEmail: (email: string | null) => void;
   resetAuth: () => void;
 }
 
@@ -61,6 +64,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   grade: null,
   gradeClass: null,
   number: null,
+  kakaoEmail: null as string | null,
 
   setUserName: (userName) => set({ userName }),
   setSchoolName: (schoolName) => set({ schoolName }),
@@ -80,6 +84,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   setGradeAndClass: (grade, gradeClass) => set({ grade, gradeClass }),
   setStudentInfo: ({ studentId, grade, gradeClass, number }) =>
     set({ studentId, grade, gradeClass, number }),
+  setKakaoEmail: (email: string | null) => set({ kakaoEmail: email }),
+
   resetAuth: () => {
     sessionStorage.clear();
     set({
