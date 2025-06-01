@@ -269,18 +269,21 @@ export const ChangeButton = styled.button`
   }
 `;
 
-export const KakaoButton = styled.div`
+export const KakaoButton = styled.button<{ disabled?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  width: 20rem;
+  width: 23rem;
   height: 3rem;
+  border: 0;
   background: #fee500;
   border-radius: 0.75rem;
   padding: 0 1.5rem 0 1.5rem;
   margin: 0.5rem 0 2rem 0;
   cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
 
   svg {
     width: 1.5rem;
