@@ -607,7 +607,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     );
   }
 
-  if (role === "STUDENT" && isMobile) {
+  if ((role === "STUDENT" || role === "PARENT") && isMobile) {
     return (
       <MobileLayoutWrapper>
         <MobileHeader>
@@ -626,7 +626,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </LogoContainer>
           <UserArea data-testid="user-area">
             <div>
-              <p>{userName} 학생</p>
+              <p>
+                {userName} {role === "PARENT" ? "학생 부모님" : "학생"}
+              </p>
               <UserIconContainer
                 data-testid="user-icon"
                 id="userDropdown"
@@ -665,7 +667,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                             fill="black"
                           />
                         </svg>
-                        <p>{userName} 학생</p>
+                        <p>
+                          {userName}{" "}
+                          {role === "PARENT" ? "학생 부모님" : "학생"}
+                        </p>
                       </DropdownFlexContainer>
                       <UserDropdownButtons>
                         <UserDropdownItem onClick={() => setIsMyPageOpen(true)}>
@@ -776,13 +781,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               />
             </svg>
           </SidebarCloseButton>
-          {role === "STUDENT" ? (
+          {role === "STUDENT" || role === "PARENT" ? (
             <>
               <StudentImg src="/assets/img/photo.png" alt="image" />
               <StudentClass>
                 {grade}학년 {gradeClass}반
               </StudentClass>
-              <StudentName>{userName} 학생</StudentName>
+              <StudentName>
+                {" "}
+                {userName} {role === "PARENT" ? "학생 부모님" : "학생"}
+              </StudentName>
             </>
           ) : (
             <>
