@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ChangeButton,
   CloseButton,
@@ -19,6 +19,7 @@ import {
 import { useAuthStore } from "../stores/authStore";
 import axios from "../api/axiosInstance.ts";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+
 const DEFAULT_IMAGE_URL = "/assets/img/photo.png";
 
 interface MyPageProps {
@@ -124,9 +125,20 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
   };
 
   const handleKakaoLogin = () => {
-  if (!accessToken) return alert("로그인이 필요합니다.");
+    if (!accessToken) return alert("로그인이 필요합니다.");
     window.location.href = `http://3.38.130.125:3000/api/v1/auth/kakao/connect?token=${accessToken}`;
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const kakaoStatus = params.get("kakaoStatus");
+
+    if (kakaoStatus === "success") {
+      alert("카카오 계정 연동에 성공했습니다.");
+    } else if (kakaoStatus === "failure") {
+      alert("카카오 계정 연동에 실패했습니다.");
+    }
+  }, []);
 
   return (
     <Overlay data-testid="mypage-overlay" onClick={onClose}>
