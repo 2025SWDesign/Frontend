@@ -23,7 +23,10 @@
   },
   "include": [
     "playwright.config.ts",
-    "tests/**/*.ts",
     "vite.config.ts"
+  ],
+  "exclude": [
+    "tests",                
+    "**/*.spec.ts"           
   ]
 }
