@@ -77,7 +77,7 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
   // 파일 선택 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
+    if (file?.type?.startsWith("image/")) {
       setSelectedImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
