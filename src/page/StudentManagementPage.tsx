@@ -155,8 +155,6 @@ const StudentManagementPage: React.FC = () => {
         }
       );
 
-      console.log("학생 기본 정보 업데이트 응답:", response.data);
-
       // 업데이트된 데이터를 상태나 전역 스토어에도 반영
       const d = response.data.data;
       const updatedStudent: Student = {
@@ -258,8 +256,6 @@ const StudentManagementPage: React.FC = () => {
     setSemesterAttendance((prev) =>
       prev.map((rec) => (rec.date === date ? { ...rec, [field]: value } : rec))
     );
-
-    console.log(semesterAttendance);
   };
 
   // API: 특정 학생 학기 출석 조회 함수
@@ -287,7 +283,6 @@ const StudentManagementPage: React.FC = () => {
         params: { semester: semesterId },
       }
     );
-    console.log("학기 출석 데이터", response.data.data);
 
     return response.data.data.map((rec) => ({
       date: rec.date,
@@ -460,7 +455,6 @@ const StudentManagementPage: React.FC = () => {
     );
 
     const raw = response.data.data;
-    console.log("학생 출결 정보:", raw);
     const summaries: AttendanceSummary[] = Object.entries(raw).map(
       ([gradeStr, types]) => ({
         grade: `${gradeStr}학년`,
@@ -567,8 +561,6 @@ const StudentManagementPage: React.FC = () => {
       }
     );
 
-    console.log("반 출석 조회 데이터 :", response.data);
-
     // UI 에 필요한 형태로 변환
     return response.data.data.map((item) => ({
       studentId: item.studentRecord.studentId,
@@ -591,9 +583,6 @@ const StudentManagementPage: React.FC = () => {
     }[]
   ) => {
     const token = sessionStorage.getItem("accessToken");
-    console.log("date : ", date);
-    console.log("semester : ", semester);
-    console.log("attendanceList : ", attendanceList);
     const response = await axios.post<{
       status: number;
       message: string;
@@ -618,8 +607,6 @@ const StudentManagementPage: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-
-    console.log("반 출석 작성/수정 응답:", response.data);
     return response.data.data;
   };
 
@@ -639,8 +626,6 @@ const StudentManagementPage: React.FC = () => {
   const handleClassAttendanceOperation = async () => {
     try {
       const formattedDate = formatDateForApi(today);
-
-      console.log("classAttendnace : ", classAttendance);
       const payload = classAttendance
         .filter(
           (rec) =>
@@ -660,7 +645,6 @@ const StudentManagementPage: React.FC = () => {
                 : ("PARTIAL_ATTENDANCE" as const),
           reason: rec.absent || rec.late || rec.early || rec.partialAttendance,
         }));
-      console.log("payload :", payload);
 
       if (payload.length === 0) {
         alert("입력된 출석 정보가 없습니다.");
@@ -673,7 +657,6 @@ const StudentManagementPage: React.FC = () => {
         formattedDate,
         payload
       );
-      console.log("반 출석 작성/수정 :", savedData);
 
       const newClassAttendance: ClassAttendanceRecord[] = savedData.map(
         (item) => ({

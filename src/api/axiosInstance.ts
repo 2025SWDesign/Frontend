@@ -46,7 +46,6 @@ api.interceptors.response.use(
         setAuthTokens(accessToken, newRefreshToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        console.log("재시도 중:", originalRequest.url);
         return api(originalRequest);
       } catch (reissueError) {
         console.error("토큰 재발급 실패:", reissueError);

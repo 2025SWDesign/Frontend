@@ -117,11 +117,6 @@ const AdminAssignPage: React.FC = () => {
             `/school/${schoolId}/users/class/${cls.classId}/homeroom`
           ),
         ]);
-
-        console.log("반 학생", inClassRes.data.data);
-        console.log("추가 가능 학생", unassignedRes.data.data);
-        console.log("교사", homeroomRes.data.data);
-
         // ---------- 학생 ----------
         const mappedStudents = sortAndNumber(
           inClassRes.data.data.map((st: any) => mapStudent(st, cls.classId))
@@ -211,10 +206,6 @@ const AdminAssignPage: React.FC = () => {
     try {
       // 1. 반 학생 관리 저장
       if (addedStudentIds.length || removedStudentIds.length) {
-        console.log("반 학생 관리 저장", {
-          addedStudentIds,
-          removedStudentIds,
-        });
         await axiosInstance.patch(
           `/school/${schoolId}/users/class/${selectedClass.classId}/managestudent`,
           {
@@ -222,7 +213,6 @@ const AdminAssignPage: React.FC = () => {
             removedStudentIds,
           }
         );
-        console.log("반 학생 저장 완료");
       }
 
       // 2. 반 담임 관리 저장
@@ -233,7 +223,6 @@ const AdminAssignPage: React.FC = () => {
             newHomeroomTeacherId: homeroom.teacherId,
           }
         );
-        console.log("반 교사 저장 완료");
       }
 
       setInitialStudentIds(currentIds);

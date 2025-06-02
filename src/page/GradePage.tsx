@@ -105,7 +105,9 @@ const GradePage: React.FC = () => {
             number: item.number,
           })
         );
-        data.sort((a: StudentInfo, b: StudentInfo) => a.name.localeCompare(b.name, "ko"));
+        data.sort((a: StudentInfo, b: StudentInfo) =>
+          a.name.localeCompare(b.name, "ko")
+        );
         setClassStudents(data);
       }
     } catch (err) {
@@ -232,7 +234,8 @@ const GradePage: React.FC = () => {
   };
 
   const parseSemester = (semesterStr: string) => {
-    const match = semesterStr.match(/(\d)학년 (\d)학기/);
+    const regex = /(\d)학년 (\d)학기/;
+    const match = regex.exec(semesterStr);
     if (!match) return { schoolYear: 0, semester: 0 };
     return {
       schoolYear: Number(match[1]),
@@ -369,8 +372,8 @@ const GradePage: React.FC = () => {
                     return (
                       <tr key={student.studentId} data-testid="class-grade-row">
                         <td>{data?.name ?? student.name}</td>
-                        {subjects.map((subject, idx) => (
-                          <td key={idx}>{data?.scores[subject] ?? "-"}</td>
+                        {subjects.map((subject) => (
+                          <td key={student.studentId}>{data?.scores[subject] ?? "-"}</td>
                         ))}
                         <td>{data?.average ?? "-"}</td>
                       </tr>

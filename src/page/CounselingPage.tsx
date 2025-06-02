@@ -79,12 +79,11 @@ const CounselingPage: React.FC = () => {
             },
           }
         );
-        console.log("상담 내역 조회 응답:", response.data);
 
         if (response.data.status === 200) {
           setPosts(response.data.data);
         } else {
-          setError(response.data.message || "상담 내역 조회 실패");
+          setError(response.data.message ?? "상담 내역 조회 실패");
         }
       } catch (err) {
         console.error("API 호출 에러:", err);
@@ -144,7 +143,6 @@ const CounselingPage: React.FC = () => {
       navigate("/counseling/write", {
         state: { post: selectedPost, viewOnly: true },
       });
-      console.log(`게시물 ${id}로 이동, 데이터 전달:`, selectedPost);
     } else {
       console.error(`ID ${id}에 해당하는 게시물을 찾을 수 없습니다.`);
     }
@@ -163,7 +161,6 @@ const CounselingPage: React.FC = () => {
   };
 
   const handleWrite = () => {
-    console.log("글 작성 페이지로 이동");
     navigate("/counseling/write");
   };
 

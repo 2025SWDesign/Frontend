@@ -36,7 +36,6 @@ const MainContainer = styled.div`
 const GuideMessage = styled.div`
   height: 42.75rem;
   display: flex;
-
   justify-content: center;
   color: #000;
   font-family: "Noto Sans";
@@ -63,18 +62,21 @@ const MainPage: React.FC = () => {
     if (role === "ADMIN") navigate("/add", { replace: true });
   }, [role, navigate]);
 
+  let roleSuffix: string;
+  if (role === "TEACHER") {
+    roleSuffix = "선생님";
+  } else if (role === "PARENT") {
+    roleSuffix = "학생 부모님";
+  } else {
+    roleSuffix = "학생";
+  }
+
   return (
     <MainContainer>
       <h1>LearnBridge</h1>
       <Line />
       <GuideMessage>
-        {userName}{" "}
-        {role === "TEACHER"
-          ? "선생님"
-          : role === "PARENT"
-            ? "학생 부모님"
-            : "학생"}
-        , 환영합니다.
+        {userName} {roleSuffix}, 환영합니다.
       </GuideMessage>
     </MainContainer>
   );

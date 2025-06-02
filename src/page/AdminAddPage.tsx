@@ -42,7 +42,7 @@ const AdminAddPage: React.FC = () => {
     e.preventDefault();
     try {
       const token = sessionStorage.getItem("accessToken");
-      const response = await axios.post(
+      await axios.post(
         "api/v1/auth/sign-up",
         {
           ...stuForm,
@@ -55,7 +55,6 @@ const AdminAddPage: React.FC = () => {
         }
       );
       alert("학생 계정이 생성되었습니다!");
-      console.log(response.data);
       setStuForm({
         name: "",
         email: "",
@@ -74,8 +73,7 @@ const AdminAddPage: React.FC = () => {
     e.preventDefault();
     try {
       const token = sessionStorage.getItem("accessToken");
-      console.log(tchForm);
-      const response = await axios.post(
+      await axios.post(
         "api/v1/auth/sign-up",
         {
           ...tchForm,
@@ -88,7 +86,6 @@ const AdminAddPage: React.FC = () => {
         }
       );
       alert("교사 계정이 생성되었습니다!");
-      console.log(response.data);
       setTchForm({ name: "", email: "", subject: "과학" });
     } catch (error) {
       console.error("교사 계정 생성 실패:", error);

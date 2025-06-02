@@ -108,12 +108,10 @@ const FeedbackPage: React.FC = () => {
         ...feedbacks,
         [field]: e.target.value,
       });
-      // console.log(feedbacks);
     };
 
   const toggleEditMode = async () => {
     if (isEditing) {
-      // 저장 버튼을 눌렀을 때
       if (!selectedStudent || !schoolId) return;
 
       setIsLoading(true);
@@ -125,8 +123,6 @@ const FeedbackPage: React.FC = () => {
         setIsLoading(false);
         return;
       }
-
-      // 피드백 데이터 준비
       const feedbackData = [
         { category: "GRADE", content: feedbacks.GRADE },
         { category: "BEHAVIOR", content: feedbacks.BEHAVIOR },
@@ -135,7 +131,6 @@ const FeedbackPage: React.FC = () => {
       ];
 
       try {
-        // 인증 토큰을 포함한 헤더 설정
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -145,26 +140,18 @@ const FeedbackPage: React.FC = () => {
         let response;
 
         if (isAllEmptyOnEditStart) {
-          // 경우 1: 편집 모드 진입 시 모든 폼이 비어있음 - POST 요청
-          console.log(Array.isArray(feedbackData));
           response = await axios.post(
             `/api/v1/school/${schoolId}/feedback/students/${selectedStudent.studentId}?schoolYear=${schoolYear}`,
             { feedbacks: feedbackData },
             config
           );
-          // console.log("피드백 저장 응답:", response.data);
         } else {
-          // 경우 2: 편집 모드 진입 시 하나 이상의 폼이 채워져 있음 - PATCH 요청
-
-          /** ① 카테고리 영→한 매핑 */
           const catMap: Record<keyof typeof feedbacks, string> = {
             GRADE: "GRADE",
             BEHAVIOR: "BEHAVIOR",
             ATTENDANCE: "ATTENDANCE",
             ATTITUDE: "ATTITUDE",
           };
-
-          /** ② PATCH 전용 payload – updatedAt 포함 */
           const patched = (
             Object.keys(feedbacks) as (keyof typeof feedbacks)[]
           ).map((k) => ({
@@ -173,19 +160,14 @@ const FeedbackPage: React.FC = () => {
             updatedAt: feedbackTimes[k],
           }));
 
-          console.log("피드백 PATCH 데이터:", patched);
-
           response = await axios.patch(
             `/api/v1/school/${schoolId}/feedback/students/${selectedStudent.studentId}?schoolYear=${schoolYear}`,
             { feedbacks: patched },
             config
           );
         }
-        console.log("피드백 저장 응답:", response.data);
 
-        // 응답 처리
         if (response.data.status === 201 || response.data.status === 200) {
-          // 저장 성공 후 피드백 데이터 새로고침
           await fetchFeedbackData();
         } else {
           setError("피드백 저장에 실패했습니다.");
@@ -198,8 +180,6 @@ const FeedbackPage: React.FC = () => {
         setIsEditing(false);
       }
     } else {
-      // 수정 버튼을 눌렀을 때
-      // 모든 폼이 비어있는지 확인
       const isAllEmpty = Object.values(feedbacks).every(
         (value) => !value.trim()
       );
@@ -207,99 +187,109 @@ const FeedbackPage: React.FC = () => {
       setIsEditing(true);
     }
   };
+  
+  let mainContent: React.ReactNode;
+
+  if (!selectedStudent && role === "TEACHER") {
+    mainContent = (
+      <GuideMessage>
+        좌측 검색창에서 피드백을 조회할 학생을 검색하세요.
+      </GuideMessage>
+    );
+  } else {
+    const selector = (
+      <GradeSelect
+        value={schoolYear}
+        onChange={(e) => setSchoolYear(e.target.value)}
+      >
+        <option value="1">1학년</option>
+        <option value="2">2학년</option>
+        <option value="3">3학년</option>
+      </GradeSelect>
+    );
+
+    let feedbackContent: React.ReactNode;
+    if (isLoading) {
+      feedbackContent = <GuideMessage>데이터를 불러오는 중입니다...</GuideMessage>;
+    } else if (error) {
+      feedbackContent = <GuideMessage>{error}</GuideMessage>;
+    } else {
+      feedbackContent = (
+        <FeedbackContentContainer>
+          <ContentBox role={role}>
+            <ContentTitle>성적</ContentTitle>
+            <ContentForm
+              value={feedbacks.GRADE}
+              data-testid="feedback-form-grade"
+              onChange={handleChange("GRADE")}
+              disabled={!isEditing}
+              placeholder={isEditing ? "성적에 대한 피드백을 입력하세요" : ""}
+              role={role}
+            />
+          </ContentBox>
+
+          <ContentBox role={role}>
+            <ContentTitle>행동</ContentTitle>
+            <ContentForm
+              value={feedbacks.BEHAVIOR}
+              data-testid="feedback-form-behavior"
+              onChange={handleChange("BEHAVIOR")}
+              disabled={!isEditing}
+              placeholder={isEditing ? "행동에 대한 피드백을 입력하세요" : ""}
+              role={role}
+            />
+          </ContentBox>
+
+          <ContentBox role={role}>
+            <ContentTitle>출결</ContentTitle>
+            <ContentForm
+              value={feedbacks.ATTENDANCE}
+              data-testid="feedback-form-attendance"
+              onChange={handleChange("ATTENDANCE")}
+              disabled={!isEditing}
+              placeholder={isEditing ? "출결에 대한 피드백을 입력하세요" : ""}
+              role={role}
+            />
+          </ContentBox>
+
+          <ContentBox role={role}>
+            <ContentTitle>태도</ContentTitle>
+            <ContentForm
+              value={feedbacks.ATTITUDE}
+              data-testid="feedback-form-attitude"
+              onChange={handleChange("ATTITUDE")}
+              disabled={!isEditing}
+              placeholder={isEditing ? "태도에 대한 피드백을 입력하세요" : ""}
+              role={role}
+            />
+          </ContentBox>
+        </FeedbackContentContainer>
+      );
+    }
+
+    const teacherButton =
+      role === "TEACHER" && !error ? (
+        <ButtonContainer>
+          <EditButton onClick={toggleEditMode} disabled={isLoading}>
+            {isEditing ? "저장" : "수정"}
+          </EditButton>
+        </ButtonContainer>
+      ) : null;
+
+    mainContent = (
+      <>
+        {selector}
+        {feedbackContent}
+        {teacherButton}
+      </>
+    );
+  }
 
   return (
     <FeedbackContainer>
       <FeedbackHeader>피드백 내역</FeedbackHeader>
       <Line />
-      {selectedStudent || !(role === "TEACHER") ? (
-        <>
-          <GradeSelect
-            value={schoolYear}
-            onChange={(e) => setSchoolYear(e.target.value)}
-          >
-            <option value="1">1학년</option>
-            <option value="2">2학년</option>
-            <option value="3">3학년</option>
-          </GradeSelect>
-
-          {isLoading ? (
-            <GuideMessage>데이터를 불러오는 중입니다...</GuideMessage>
-          ) : error ? (
-            <GuideMessage>{error}</GuideMessage>
-          ) : (
-            <FeedbackContentContainer>
-              <ContentBox role={role}>
-                <ContentTitle>성적</ContentTitle>
-                <ContentForm
-                  value={feedbacks.GRADE}
-                  data-testid="feedback-form-grade"
-                  onChange={handleChange("GRADE")}
-                  disabled={!isEditing}
-                  placeholder={
-                    isEditing ? "성적에 대한 피드백을 입력하세요" : ""
-                  }
-                  role={role}
-                />
-              </ContentBox>
-
-              <ContentBox role={role}>
-                <ContentTitle>행동</ContentTitle>
-                <ContentForm
-                  value={feedbacks.BEHAVIOR}
-                  data-testid="feedback-form-behavior"
-                  onChange={handleChange("BEHAVIOR")}
-                  disabled={!isEditing}
-                  placeholder={
-                    isEditing ? "행동에 대한 피드백을 입력하세요" : ""
-                  }
-                  role={role}
-                />
-              </ContentBox>
-
-              <ContentBox role={role}>
-                <ContentTitle>출결</ContentTitle>
-                <ContentForm
-                  value={feedbacks.ATTENDANCE}
-                  data-testid="feedback-form-attendance"
-                  onChange={handleChange("ATTENDANCE")}
-                  disabled={!isEditing}
-                  placeholder={
-                    isEditing ? "출결에 대한 피드백을 입력하세요" : ""
-                  }
-                  role={role}
-                />
-              </ContentBox>
-
-              <ContentBox role={role}>
-                <ContentTitle>태도</ContentTitle>
-                <ContentForm
-                  value={feedbacks.ATTITUDE}
-                  data-testid="feedback-form-attitude"
-                  onChange={handleChange("ATTITUDE")}
-                  disabled={!isEditing}
-                  placeholder={
-                    isEditing ? "태도에 대한 피드백을 입력하세요" : ""
-                  }
-                  role={role}
-                />
-              </ContentBox>
-            </FeedbackContentContainer>
-          )}
-
-          {role === "TEACHER" && !error && (
-            <ButtonContainer>
-              <EditButton onClick={toggleEditMode} disabled={isLoading}>
-                {isEditing ? "저장" : "수정"}
-              </EditButton>
-            </ButtonContainer>
-          )}
-        </>
-      ) : (
-        <GuideMessage>
-          좌측 검색창에서 피드백을 조회할 학생을 검색하세요.
-        </GuideMessage>
-      )}
+      {mainContent}
     </FeedbackContainer>
   );
 };

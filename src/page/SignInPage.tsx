@@ -124,7 +124,6 @@ const SignInPage: React.FC = () => {
 
       const { accessToken, refreshToken, schoolId, classId } =
         response.data.data;
-      console.log("로그인 성공:", response.data);
 
       setAuthTokens(accessToken, refreshToken);
       setSchoolAndClass(Number(schoolId), classId ?? 0);
@@ -139,7 +138,7 @@ const SignInPage: React.FC = () => {
       navigate("/main");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || "로그인 실패");
+        alert(error.response?.data?.message ?? "로그인 실패");
       } else {
         alert("알 수 없는 에러 발생");
       }

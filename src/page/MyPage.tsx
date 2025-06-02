@@ -68,7 +68,6 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
         setNewPassword("");
         setConfirmPassword("");
         setShowPassword(false);
-        console.log("응답 결과:", response.data);
       }
     } catch (error) {
       console.error("비밀번호 변경 실패:", error);
@@ -155,7 +154,6 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
 
       if (response.data.status === 201) {
         alert("학부모 계정이 성공적으로 생성되었습니다.");
-        console.log("학부모 계정:", response.data.data);
       } else {
         alert("학부모 계정 생성에 실패했습니다.");
       }
@@ -193,9 +191,7 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
           <Section data-testid="photo-section">
             <SectionTitle>사진 변경</SectionTitle>
             <Line />
-            <label style={{ cursor: "pointer" }}>
-              사진
-              <input
+            <label style={{ cursor: "pointer" }}>사진<input
                 type="file"
                 accept="image/*"
                 style={{ display: "none" }}

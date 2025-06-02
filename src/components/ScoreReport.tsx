@@ -61,8 +61,8 @@ const ScoreReport: React.FC<ScoreReportProps> = ({
             </tr>
           </thead>
           <tbody>
-            {tableData.map((row, i) => (
-              <tr key={i}>
+            {tableData.map((row) => (
+              <tr key={row.subject}>
                 <td>{row.subject}</td>
                 <td>{row.score}</td>
                 <td>{row.grade}</td>

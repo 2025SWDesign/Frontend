@@ -43,7 +43,7 @@ export const TableHeader = styled.th<{ width?: string }>`
   border: 0.0625rem solid #ddd;
   text-align: center;
   font-weight: bold;
-  width: ${(props) => props.width || "auto"};
+  width: ${(props) => props.width ?? "auto"};
 
   &.hideOnMobile {
     @media (max-width: 768px) {
