@@ -475,7 +475,7 @@ const GradePage: React.FC = () => {
               </tbody>
             </table>
           </GradeTable>
-          {role !== "STUDENT" && (
+          {role === "TEACHER" && (
             <ButtonArea>
               {isEditing ? (
                 <>
