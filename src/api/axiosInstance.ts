@@ -14,7 +14,8 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: unknown) =>
+    Promise.reject(error instanceof Error ? error : new Error(String(error)))
 );
 
 // accessToken 만료 시 refreshToken으로 재발급
@@ -53,11 +54,17 @@ api.interceptors.response.use(
         resetAuth();
         sessionStorage.clear();
         window.location.href = "/";
-        return Promise.reject(reissueError);
+        return Promise.reject(
+          reissueError instanceof Error
+            ? reissueError
+            : new Error(String(reissueError))
+        );
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(
+      error instanceof Error ? error : new Error(String(error))
+    );
   }
 );
 
