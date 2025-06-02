@@ -106,7 +106,8 @@ export const ContentTitle = styled.div`
 
   ${media.mobile} {
     font-size: 1.1rem;
-    padding: 0.8rem 
+    padding: 0.8rem;
+  }
 `;
 
 export const ContentForm = styled.textarea<FeedbackPageProps>`
