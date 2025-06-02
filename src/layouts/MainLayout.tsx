@@ -163,6 +163,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const setKakaoEmail = useAuthStore((state) => state.setKakaoEmail);
   const accessToken = useAuthStore((state) => state.accessToken);
 
+  const setExtraInfo = useStudentStore((s) => s.setExtraInfo);
+
   // 모바일 용
   const isMobile = useMobile();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -184,6 +186,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           Parents = [],
           school,
           kakaoEmail,
+          email,
         } = response.data.data;
         setUserName(name);
         setRole(role);
@@ -207,7 +210,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             grade: student.grade,
             gradeClass: student.gradeClass,
             number: student.number,
-            img: "",
+            img: student.photo,
+          });
+          setExtraInfo({
+            email: email,
+            phonenumber: student.phonenumber,
+            homenumber: student.homenumber,
+            address: student.address,
           });
         } else if (role === "PARENT") {
           const firstChild = Parents.Student[0];
@@ -223,7 +232,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             grade: firstChild.grade,
             gradeClass: firstChild.gradeClass,
             number: firstChild.number,
-            img: "",
+            img: firstChild.photo,
+          });
+          setExtraInfo({
+            email: email,
+            phonenumber: firstChild.phonenumber,
+            homenumber: firstChild.homenumber,
+            address: firstChild.address,
           });
         }
       } catch (err) {
@@ -244,6 +259,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     setStudentInfo,
     setSelectedStudent,
     setKakaoEmail,
+    setExtraInfo,
   ]);
 
   // 반 학생 목록 가져오기
@@ -352,6 +368,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       );
 
       if (response.data.status === 200) {
+        console.log(response.data);
         const studentData = response.data.data;
         // API 응답을 selectedStudent 형식에 맞게 변환
         const formattedStudent: Student = {
@@ -362,6 +379,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           number: studentData.number,
           img: studentData.user.photo ?? "/assets/img/photo.png", // 사진이 없는 경우 기본 이미지 사용
         };
+
+        setExtraInfo({
+          email: studentData.user.email,
+          phonenumber: studentData.phonenumber,
+          homenumber: studentData.homenumber,
+          address: studentData.address,
+        });
 
         setSelectedStudent(formattedStudent);
 
@@ -783,7 +807,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </SidebarCloseButton>
           {role === "STUDENT" || role === "PARENT" ? (
             <>
-              <StudentImg src="/assets/img/photo.png" alt="image" />
+              <StudentImg src={"/assets/img/photo.png"} alt="image" />
               <StudentClass>
                 {grade}학년 {gradeClass}반
               </StudentClass>
@@ -796,7 +820,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <>
               {selectedStudent && (
                 <>
-                  <StudentImg src="/assets/img/photo.png" alt="image" />
+                  <StudentImg src={"/assets/img/photo.png"} alt="image" />
                   <StudentClass>
                     {selectedStudent.grade}학년 {selectedStudent.gradeClass}반
                   </StudentClass>
@@ -1174,7 +1198,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <SideBar>
           {role === "STUDENT" || role === "PARENT" ? (
             <>
-              <StudentImg src="/assets/img/photo.png" alt="image" />
+              <StudentImg src={"/assets/img/photo.png"} alt="image" />
               <StudentClass>
                 {grade}학년 {gradeClass}반
               </StudentClass>
@@ -1186,7 +1210,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <>
               {selectedStudent && (
                 <>
-                  <StudentImg src="/assets/img/photo.png" alt="image" />
+                  <StudentImg src={"/assets/img/photo.png"} alt="image" />
                   <StudentClass>
                     {selectedStudent.grade}학년 {selectedStudent.gradeClass}반
                   </StudentClass>

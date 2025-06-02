@@ -33,7 +33,8 @@ export const BoardTable = styled.table`
 
   ${media.mobile} {
     width: 97%;
-    margin-top : 0.5rem;
+    margin-top: 0.5rem;
+  }
 `;
 
 export const TableHeader = styled.th<{ width?: string }>`
@@ -58,7 +59,7 @@ export const TableCell = styled.td<{ isBold?: boolean }>`
   text-align: center;
   font-weight: ${(props) => (props.isBold ? "bold" : "normal")};
 
-   &.hideOnMobile {
+  &.hideOnMobile {
     @media (max-width: 768px) {
       display: none;
     }
@@ -67,6 +68,7 @@ export const TableCell = styled.td<{ isBold?: boolean }>`
   ${media.mobile} {
     font-size: 0.875rem;
     height: 2.5rem;
+  }
 `;
 
 export const TableRow = styled.tr`
