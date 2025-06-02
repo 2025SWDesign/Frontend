@@ -1,15 +1,6 @@
 import { test, expect, Route } from "@playwright/test";
 
 // --------- 공통 헬퍼 함수 ---------
-
-/**
- * 로그인 후 학생 관리 페이지로 이동.
- * @param page Playwright Page 객체
- * @param baseURL 테스트할 애플리케이션의 베이스 URL
- * @param userId 로그인할 아이디
- * @param password 로그인할 비밀번호
- * @param preSearchForTeacher teacher 역할일 때, "김민준" 검색 후 클릭 여부
- */
 async function loginAndGoStudentManage(
   page: any,
   baseURL: string | undefined,
@@ -52,14 +43,6 @@ async function loginAndGoStudentManage(
   await expect(page).toHaveURL("/student-manage");
 }
 
-/**
- * 첫 번째 학생 행을 클릭해 상세 화면으로 전환
- * @param page Playwright Page 객체
- */
-async function selectFirstStudent(page: any) {
-  await page.locator('[data-testid="student-list"] tbody tr').first().click();
-}
-
 async function verifyStudentDetailSections(page: any, flag: boolean) {
   if (flag) await expect(page.getByText("학생 기본정보 수정")).toBeVisible();
   await expect(page.getByText("해당 학기 출석")).toBeVisible();
@@ -67,10 +50,6 @@ async function verifyStudentDetailSections(page: any, flag: boolean) {
   await expect(page.getByText("특기 사항")).toBeVisible();
 }
 
-/**
- * 학생 기본정보 입력란 초기값 확인 및 수정 후 적용 확인
- * @param page Playwright Page 객체
- */
 async function verifyBasicInfoEdit(page: any) {
   // 초기값 확인
   await expect(page.getByTestId("basicinfo-name-input")).toHaveValue("김민준");
@@ -189,10 +168,6 @@ async function verifySemesterAttendanceEdit(page: any) {
   );
 }
 
-/**
- * 학생 출결 정보 테이블 렌더링 및 요약값 검증
- * @param page Playwright Page 객체
- */
 async function verifyAttendanceSummary(page: any) {
   // 섹션 제목 확인
   await expect(page.getByText("학생 출결 정보")).toBeVisible();
@@ -225,10 +200,6 @@ async function verifyAttendanceSummary(page: any) {
   }
 }
 
-/**
- * 특기 사항 편집 후 저장 시 입력된 내용이 전송되는지 검증
- * @param page Playwright Page 객체
- */
 async function verifySpecialNotesEdit(page: any) {
   const textarea = page.getByTestId("specialnotes-textarea");
   const button = page.getByTestId("specialnotes-button");
@@ -245,7 +216,7 @@ async function verifySpecialNotesEdit(page: any) {
   let sentPayload: any = null;
   await page.route(
     "**/api/v1/school/**/student-record/extra-info/students/**",
-    (route) => {
+    (route : Route) => {
       sentPayload = route.request().postDataJSON();
       return route.fulfill({
         status: 200,
@@ -305,7 +276,7 @@ test.describe("homeroom teacher - class", () => {
     let sentPayload: any = null;
     await page.route(
       "**/api/v1/school/**/student-record/attendance/class/**",
-      (route) => {
+      (route : Route) => {
         sentPayload = route.request().postDataJSON();
         return route.fulfill({
           status: 200,

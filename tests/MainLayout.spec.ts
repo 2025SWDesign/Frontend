@@ -10,9 +10,13 @@ const credentials = {
 };
 
 // 공통 유틸: 로그인 수행
-async function loginAs(page: Page, role: keyof typeof credentials) {
+async function loginAs(
+  page: Page,
+   role: keyof typeof credentials,
+   baseURL: string | undefined,
+  ) {
   const { id, pw } = credentials[role];
-  await page.goto(page.context()._options.baseURL ?? "http://localhost:5173");
+  await page.goto(baseURL ?? "http://localhost:5173");
   await page.getByText("이메일로 로그인").click();
 
   const schoolInput = page.getByPlaceholder("학교명을 검색하세요");
@@ -63,8 +67,8 @@ async function verifyStudentSearch(page: Page, waitMs: number) {
 }
 
 test.describe("homeroom teacher", () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAs(page, "homeroom");
+  test.beforeEach(async ({ page, baseURL }) => {
+    await loginAs(page, "homeroom", baseURL);
 
     // 학생 리스트 뜰 때까지 대기
     await page.waitForSelector(
@@ -108,8 +112,8 @@ test.describe("homeroom teacher", () => {
 });
 
 test.describe("teacher", () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAs(page, "teacher");
+  test.beforeEach(async ({ page, baseURL }) => {
+    await loginAs(page, "teacher", baseURL);
   });
 
   test("헤더와 로고, 사용자 영역이 렌더링된다", async ({ page }) => {
@@ -135,8 +139,8 @@ test.describe("teacher", () => {
 });
 
 test.describe("parent", () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAs(page, "parent");
+  test.beforeEach(async ({ page, baseURL }) => {
+    await loginAs(page, "parent", baseURL);
   });
 
   test("헤더와 로고, 사용자 영역이 렌더링된다", async ({ page }) => {
@@ -155,8 +159,8 @@ test.describe("parent", () => {
 });
 
 test.describe("student", () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAs(page, "student");
+  test.beforeEach(async ({ page, baseURL }) => {
+    await loginAs(page, "student", baseURL);
   });
 
   test("헤더와 로고, 사용자 영역이 렌더링된다", async ({ page }) => {
