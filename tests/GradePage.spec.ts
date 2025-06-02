@@ -101,7 +101,7 @@ test.describe("homeroom teacher", () => {
     // 2) 차트 내 모든 <text> 엘리먼트에서 텍스트 수집 (Element[] 타입)
     const chartLabels = await page.$$eval(
       '[data-testid="grade-chart-box"] text',
-      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+      (els: any[]) => els.map((el) => el.textContent?.trim() ?? "")
     );
     const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
 
@@ -217,7 +217,7 @@ test.describe("homeroom teacher", () => {
     // 2) 차트 내 <text> 요소에서 숫자 레이블만 추출
     const chartLabels = await page.$$eval(
       '[data-testid="grade-chart-box"] text',
-      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+      (els: any[]) => els.map((el) => el.textContent?.trim() ?? "")
     );
     const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
 
@@ -388,7 +388,7 @@ test.describe("teacher", () => {
     // 2) 차트 내 모든 <text> 엘리먼트에서 텍스트 수집 (Element[] 타입)
     const chartLabels = await page.$$eval(
       '[data-testid="grade-chart-box"] text',
-      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+      (els: any[]) => els.map((el) => el.textContent?.trim() ?? "")
     );
     const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
 
@@ -543,7 +543,7 @@ test.describe("teacher", () => {
     // 2) 차트 내 <text> 요소에서 숫자 레이블만 추출
     const chartLabels = await page.$$eval(
       '[data-testid="grade-chart-box"] text',
-      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+      (els: any[]) => els.map((el) => el.textContent?.trim() ?? "")
     );
     const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
 
@@ -707,7 +707,7 @@ test.describe("parent", () => {
     // 2) 차트 내 모든 <text> 엘리먼트에서 텍스트 수집 (Element[] 타입)
     const chartLabels = await page.$$eval(
       '[data-testid="grade-chart-box"] text',
-      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+      (els: any[]) => els.map((el) => el.textContent?.trim() ?? "")
     );
     const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
 
@@ -792,7 +792,7 @@ test.describe("parent", () => {
     // 2) 차트 내 <text> 요소에서 숫자 레이블만 추출
     const chartLabels = await page.$$eval(
       '[data-testid="grade-chart-box"] text',
-      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+      (els: any[]) => els.map((el) => el.textContent?.trim() ?? "")
     );
     const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
 
@@ -895,7 +895,7 @@ test.describe("student", () => {
     // 2) 차트 내 모든 <text> 엘리먼트에서 텍스트 수집 (Element[] 타입)
     const chartLabels = await page.$$eval(
       '[data-testid="grade-chart-box"] text',
-      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+      (els: any[]) => els.map((el) => el.textContent?.trim() ?? "")
     );
     const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
 
@@ -980,7 +980,7 @@ test.describe("student", () => {
     // 2) 차트 내 <text> 요소에서 숫자 레이블만 추출
     const chartLabels = await page.$$eval(
       '[data-testid="grade-chart-box"] text',
-      (els: any[]) => els.map((el) => el.textContent?.trim() || "")
+      (els: any[]) => els.map((el) => el.textContent?.trim() ?? "")
     );
     const numericLabels = chartLabels.filter((txt) => /^\d+$/.test(txt));
 

@@ -94,36 +94,6 @@ test.describe("all", () => {
     await expect(page).toHaveURL(/\/main$/);
   });
 
-  // test("카카오 로그인 버튼 클릭 시 올바른 OAuth 엔드포인트로 리다이렉트 호출", async ({
-  //   page,
-  // }) => {
-  //   // 1) 브라우저에 init script 주입: 전역변수와 assign 훼이크
-  //   await page.addInitScript(() => {
-  //     // 브라우저 컨텍스트에서 실행되므로 globalThis는 window와 같습니다
-  //     (globalThis as any).__redirectedHref = null;
-  //     const originalAssign = globalThis.location.assign.bind(
-  //       globalThis.location
-  //     );
-  //     globalThis.location.assign = (href: string) => {
-  //       (globalThis as any).__redirectedHref = href;
-  //       // 실제 네비게이션을 방지하려면 주석 처리:
-  //       // originalAssign(href);
-  //     };
-  //   });
-
-  //   // 2) 페이지 로드
-  //   await page.goto("/");
-
-  //   // 3) 카카오 로그인 버튼 클릭
-  //   await page.getByText("카카오로 로그인").click();
-
-  //   // 4) 리다이렉트된 URL 읽어 와서 검증
-  //   const href = await page.evaluate(
-  //     () => (globalThis as any).__redirectedHref
-  //   );
-  //   expect(href).toBe("http://3.38.130.125:3000/api/v1/auth/kakao/sign-in");
-  // });
-
   test("검색 결과에 보이는 모든 학교명에 '인천'이 포함되어야 한다", async ({
     page,
   }) => {

@@ -430,14 +430,9 @@ const SignInPage: React.FC = () => {
           <SecondaryArea>
             <div>
               <p>비밀번호를 잊으셨나요?</p>
-              <a
-                href="#"
-                role="button"
-                tabIndex={0}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setMode("forgotPassword");
-                }}
+              <button
+                type="button"
+                onClick={() => setMode("forgotPassword")}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     setMode("forgotPassword");
@@ -445,7 +440,7 @@ const SignInPage: React.FC = () => {
                 }}
               >
                 비밀번호 찾기
-              </a>
+              </button>
             </div>
           </SecondaryArea>
         );
@@ -456,22 +451,17 @@ const SignInPage: React.FC = () => {
             <SecondaryArea>
               <div>
                 <p>비밀번호를 잊으셨나요?</p>
-                <a
-                  href="#"
-                  role="button" // 스크린리더에 “버튼”으로 읽힘
-                  tabIndex={0} // 키보드 포커스 가능
-                  onClick={(e) => {
-                    e.preventDefault(); // # 이동 방지
-                    setMode("forgotPassword");
-                  }}
+                <button
+                  type="button"
+                  onClick={() => setMode("forgotPassword")}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      setMode("forgotPassword"); // 키보드도 동일 동작
+                      setMode("forgotPassword");
                     }
                   }}
                 >
                   비밀번호 찾기
-                </a>
+                </button>
               </div>
             </SecondaryArea>
           </>
@@ -482,23 +472,18 @@ const SignInPage: React.FC = () => {
             <Line />
             <SecondaryArea>
               <div>
-                <p>비밀번호가 기억나셨나요?</p>
-                <a
-                  href="#"
-                  role="button" // 스크린리더에서 “버튼”으로 인식
-                  tabIndex={0} // 키보드 포커스 가능
-                  onClick={(e) => {
-                    e.preventDefault(); // #로 스크롤 이동 막기
-                    setMode("selectSignIn");
-                  }}
+                <p>비밀번호가 기억나셨나요?</p>+{" "}
+                <button
+                  type="button"
+                  onClick={() => setMode("selectSignIn")}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      setMode("selectSignIn"); // 키보드 Enter/Space도 동일 동작
+                      setMode("selectSignIn");
                     }
                   }}
                 >
                   로그인 하기
-                </a>
+                </button>
               </div>
             </SecondaryArea>
           </>

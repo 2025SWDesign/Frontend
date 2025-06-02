@@ -63,7 +63,7 @@ test.describe("admin", () => {
     // (3) 저장 요청(PATCH) 캡처
     let diffPayload: Record<string, unknown> | null = null;
     await page.route("**/managestudent", async (route) => {
-      diffPayload = JSON.parse(route.request().postData() || "{}");
+      diffPayload = JSON.parse(route.request().postData() ?? "{}");
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -128,7 +128,7 @@ test.describe("admin", () => {
     // PATCH 캡처
     let teacherPayload: Record<string, unknown> | null = null;
     await page.route("**/manageteacher", async (route) => {
-      teacherPayload = JSON.parse(route.request().postData() || "{}");
+      teacherPayload = JSON.parse(route.request().postData() ?? "{}");
       await route.fulfill({ status: 200, body: "{}" });
     });
 
@@ -208,7 +208,7 @@ test.describe("admin", () => {
     let resetBody: any = null;
     await page.route("**/users/class", async (route) => {
       if (route.request().method() === "POST") {
-        resetBody = JSON.parse(route.request().postData() || "{}");
+        resetBody = JSON.parse(route.request().postData() ?? "{}");
         await route.fulfill({
           status: 201,
           body: JSON.stringify({ status: 201 }),

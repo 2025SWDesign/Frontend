@@ -353,7 +353,7 @@ export const SecondaryArea = styled.div`
     color: black;
   }
 
-  a {
+  a, button {
     font-size: 1rem;
     margin: 0.1rem;
     color: #146c94;
@@ -364,7 +364,7 @@ export const SecondaryArea = styled.div`
     p {
       font-size: 0.75rem;
     }
-    a {
+    a, button {
       font-size: 0.75rem;
     }
   }
