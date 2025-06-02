@@ -1,26 +1,33 @@
-import { test, expect } from "@playwright/test";
+// tests/AdminLayout.spec.ts
+import { test, expect, Page } from "@playwright/test";
+
+// 역할별 로그인 정보
+const credentials = {
+  admin: { id: "202500001", pw: "admin1234" },
+};
+
+async function loginAsAdmin(
+  page: Page,
+  baseURL: string | undefined,
+) {
+  const { id, pw } = credentials.admin;
+  await page.goto(baseURL ?? "http://localhost:5173");
+  await page.getByText("이메일로 로그인").click();
+
+  const schoolInput = page.getByPlaceholder("학교명을 검색하세요");
+  await expect(schoolInput).toBeVisible();
+  await schoolInput.fill("인천");
+  await page.waitForTimeout(350);
+  await page.getByText("인천중학교").click();
+
+  await page.getByPlaceholder("아이디를 입력하세요").fill(id);
+  await page.getByPlaceholder("비밀번호를 입력하세요").fill(pw);
+  await page.getByRole("button", { name: "로그인" }).click();
+}
 
 test.describe("admin", () => {
   test.beforeEach(async ({ page, baseURL }) => {
-    // 앱 진입 (baseURL: playwright.config.ts에 설정된 URL)
-    await page.goto(baseURL ?? "http://localhost:5173");
-
-    // 이메일 로그인 모드로 전환
-    await page.getByText("이메일로 로그인").click();
-
-    // 학교명 검색 & 선택 (디바운스 고려)
-    const schoolInput = page.getByPlaceholder("학교명을 검색하세요");
-    await expect(schoolInput).toBeVisible();
-    await schoolInput.fill("인천");
-    await page.waitForTimeout(350); // 디바운스 시간 대기
-    await page.getByText("인천중학교").click();
-
-    // 아이디/비번 입력
-    await page.getByPlaceholder("아이디를 입력하세요").fill("202500001");
-    await page.getByPlaceholder("비밀번호를 입력하세요").fill("admin1234");
-
-    // 로그인 버튼 클릭
-    await page.getByRole("button", { name: "로그인" }).click();
+    await loginAsAdmin(page, baseURL);
   });
 
   test("학생·교사 폼 렌더링 확인", async ({ page }) => {
@@ -56,8 +63,8 @@ test.describe("admin", () => {
     await page.getByTestId("stu-homephone").fill("01021234567");
 
     const [dialog] = await Promise.all([
-      page.waitForEvent("dialog"), 
-      page.keyboard.press("Enter"), 
+      page.waitForEvent("dialog"),
+      page.keyboard.press("Enter"),
     ]);
 
     expect(dialog.message()).toContain("학생 계정이 생성되었습니다");
