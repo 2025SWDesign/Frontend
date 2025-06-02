@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Page = styled.div`
   padding: 2rem 3rem;
@@ -20,7 +20,7 @@ export const Column = styled.section`
 
   h2 {
     margin: 0 0 1.5rem 0;
-    font-family: 'Inter';
+    font-family: "Inter";
     font-size: 1.5rem;
     font-weight: 700;
   }
@@ -28,7 +28,7 @@ export const Column = styled.section`
 
 /* 폼 공통 스타일 */
 export const Form = styled.form`
- margin-top: 2rem;
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -36,9 +36,9 @@ export const Form = styled.form`
 `;
 
 export const Label = styled.label`
-  font-family: 'Inter';
+  font-family: "Inter";
   font-size: 1.3rem;
-  font-weight: 600; 
+  font-weight: 600;
 `;
 
 export const Input = styled.input`
@@ -46,7 +46,7 @@ export const Input = styled.input`
   padding: 0 0.75rem;
   border: 1px solid #b9b9b9;
   border-radius: 0.375rem;
-  font-family: 'Inter';
+  font-family: "Inter";
   font-size: 1.175rem;
 `;
 
@@ -56,7 +56,7 @@ export const Select = styled.select`
   border: 1px solid #b9b9b9;
   border-radius: 0.375rem;
   background: #fff;
-  font-family: 'Inter';
+  font-family: "Inter";
   font-size: 0.875rem;
 `;
 
@@ -68,7 +68,7 @@ export const SubmitButton = styled.button`
   border-radius: 0.375rem;
   background: #365f86;
   color: #fff;
-  font-family: 'Inter';
+  font-family: "Inter";
   font-size: 0.875rem;
   cursor: pointer;
 

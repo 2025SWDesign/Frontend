@@ -16,7 +16,7 @@ import { useStudentStore } from "../stores/studentStore";
 const StudentInfoPage: React.FC = () => {
   const role = useAuthStore((state) => state.role);
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
-
+  const info = useStudentStore((s) => s.extraInfo);
 
   return (
     <StdInfoContainer>
@@ -29,18 +29,24 @@ const StudentInfoPage: React.FC = () => {
       ) : (
         <StdInfoContent>
           <Table>
-            <TableRow>
-              <HeaderCell>전화번호</HeaderCell>
-              <DataCell>010-1234-5678</DataCell>
-            </TableRow>
-            <TableRow>
-              <HeaderCell>집주소</HeaderCell>
-              <DataCell>인천광역시 연수구 신송로 312-1</DataCell>
-            </TableRow>
-            <TableRow>
-              <HeaderCell>부모님 연락처</HeaderCell>
-              <DataCell>010-1234-5678</DataCell>
-            </TableRow>
+            <tbody>
+              <TableRow>
+                <HeaderCell>이메일</HeaderCell>
+                <DataCell>{info?.email}</DataCell>
+              </TableRow>
+              <TableRow>
+                <HeaderCell>전화번호</HeaderCell>
+                <DataCell>{info?.phonenumber}</DataCell>
+              </TableRow>
+              <TableRow>
+                <HeaderCell>부모님 연락처</HeaderCell>
+                <DataCell>{info?.homenumber}</DataCell>
+              </TableRow>
+              <TableRow>
+                <HeaderCell>집주소</HeaderCell>
+                <DataCell>{info?.address}</DataCell>
+              </TableRow>
+            </tbody>
           </Table>
         </StdInfoContent>
       )}
