@@ -193,7 +193,15 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
           <Section data-testid="photo-section">
             <SectionTitle>사진 변경</SectionTitle>
             <Line />
-            <label>사진</label>
+            <label style={{ cursor: "pointer" }}>
+              사진
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+              />
+            </label>
             <ImageArea>
               <input
                 data-testid="file-input"
@@ -218,9 +226,10 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
         <Section data-testid="password-section">
           <SectionTitle>비밀번호 변경</SectionTitle>
           <Line />
-          <label>기존 비밀번호</label>
+          <label htmlFor="input-current-password">기존 비밀번호</label>
           <InputArea>
             <input
+              id="input-current-password"
               data-testid="input-current-password"
               type={showPassword ? "text" : "password"}
               placeholder="영문+숫자"
@@ -234,9 +243,10 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </ToggleButton>
           </InputArea>
-          <label>변경 비밀번호</label>
+          <label htmlFor="input-new-password">변경 비밀번호</label>
           <InputArea>
             <input
+              id="input-new-password"
               data-testid="input-new-password"
               type={showPassword ? "text" : "password"}
               placeholder="영문+숫자"
@@ -247,9 +257,10 @@ const MyPage: React.FC<MyPageProps> = ({ onClose }) => {
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </ToggleButton>
           </InputArea>
-          <label>변경 비밀번호 확인</label>
+          <label htmlFor="input-confirm-password">변경 비밀번호 확인</label>
           <InputArea>
             <input
+              id="input-confirm-password"
               data-testid="input-confirm-password"
               type={showPassword ? "text" : "password"}
               placeholder="영문+숫자"
