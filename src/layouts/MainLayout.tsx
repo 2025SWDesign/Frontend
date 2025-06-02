@@ -176,7 +176,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         const response = await axiosInstance.get(
           `/school/${schoolId}/users/me`
         );
-        console.log("유저 정보 불러오기 성공:", response.data);
         const {
           name,
           role,
@@ -257,8 +256,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         `/school/${schoolId}/class/${classId}/students`
       );
 
-      console.log("반 학생 목록 조회", response.data);
-
       if (response.data.status === 200) {
         // API 응답 구조에 맞게 데이터 변환
         let studentsData = response.data.data.map(
@@ -277,7 +274,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             img: "/assets/img/photo.png", // 기본 이미지 경로 설정
           })
         );
-        // console.log("반 학생:", studentsData);
 
         studentsData.sort((a: Student, b: Student) =>
           a.name.localeCompare(b.name, "ko")
@@ -311,7 +307,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         const response = await axiosInstance.get(
           `/school/${schoolId}/search/student?name=${searchQuery}`
         );
-        console.log("학생 검색", response.data);
         const studentsData = response.data.data.map(
           (item: {
             email: string;
@@ -331,7 +326,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             img: "/assets/img/photo.png", // 기본 이미지 경로 설정
           })
         );
-        console.log("검색한 학생들", studentsData);
         setStudents(studentsData);
       } else if (isHomeroom) {
         // 검색어가 없고 담임인 경우, 전체 반 학생 목록을 다시 불러옴
@@ -352,7 +346,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     try {
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
-      console.log("학생 상세정보 조회", studentId);
 
       const response = await axiosInstance.get(
         `/school/${schoolId}/students/${studentId}`
@@ -367,7 +360,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           grade: studentData.grade,
           gradeClass: studentData.gradeClass,
           number: studentData.number,
-          img: studentData.user.photo || "/assets/img/photo.png", // 사진이 없는 경우 기본 이미지 사용
+          img: studentData.user.photo ?? "/assets/img/photo.png", // 사진이 없는 경우 기본 이미지 사용
         };
 
         setSelectedStudent(formattedStudent);
@@ -405,8 +398,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       const token = sessionStorage.getItem("accessToken");
       if (!token || !schoolId) return;
 
-      const response = await axiosInstance.post(`/auth/sign-out`, {});
-      console.log("로그아웃 성공:", response.data);
+      await axiosInstance.post(`/auth/sign-out`, {});
       navigate("/");
     } catch (error) {
       console.error("로그아웃 실패:", error);
@@ -426,7 +418,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         `/school/${schoolId}/notifications`
       );
       setNotifications(response.data.notification);
-      console.log(response.data);
     } catch (err) {
       console.error("알림 불러오기 실패:", err);
     }
@@ -511,6 +502,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
     navigate("/main");
   };
+
+  let roleSuffix: string;
+  if (role === "TEACHER") {
+    roleSuffix = "선생님";
+  } else if (role === "PARENT") {
+    roleSuffix = "학생 부모님";
+  } else {
+    roleSuffix = "학생";
+  }
 
   /* ------------------------------------------------------------------
       Admin
@@ -628,7 +628,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <UserArea data-testid="user-area">
             <div>
               <p>
-                {userName} {role === "PARENT" ? "학생 부모님" : "학생"}
+                {userName} {roleSuffix}
               </p>
               <UserIconContainer
                 data-testid="user-icon"
@@ -669,8 +669,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           />
                         </svg>
                         <p>
-                          {userName}{" "}
-                          {role === "PARENT" ? "학생 부모님" : "학생"}
+                          {userName}{roleSuffix}
                         </p>
                       </DropdownFlexContainer>
                       <UserDropdownButtons>
@@ -790,7 +789,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </StudentClass>
               <StudentName>
                 {" "}
-                {userName} {role === "PARENT" ? "학생 부모님" : "학생"}
+                {userName} {roleSuffix}
               </StudentName>
             </>
           ) : (
@@ -844,9 +843,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   </thead>
                   <tbody>
                     {students.length > 0 ? (
-                      students.map((student, index) => (
+                      students.map((student) => (
                         <tr
-                          key={index}
+                          key={student.studentId}
                           onClick={() => {
                             fetchStudentDetails(student.studentId);
                           }}
@@ -1054,12 +1053,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <UserArea data-testid="user-area">
           <div>
             <p>
-              {userName}{" "}
-              {role === "TEACHER"
-                ? "선생님"
-                : role === "PARENT"
-                  ? "학생 부모님"
-                  : "학생"}
+              {userName} {roleSuffix}
             </p>
             <UserIconContainer
               data-testid="user-icon"
@@ -1100,12 +1094,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         />
                       </svg>
                       <p>
-                        {userName}{" "}
-                        {role === "TEACHER"
-                          ? "선생님"
-                          : role === "PARENT"
-                            ? "학생 부모님"
-                            : "학생"}
+                        {userName} {roleSuffix}
                       </p>
                     </DropdownFlexContainer>
                     <UserDropdownButtons>
@@ -1190,7 +1179,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 {grade}학년 {gradeClass}반
               </StudentClass>
               <StudentName>
-                {userName} {role === "PARENT" ? "학생 부모님" : "학생"}
+                {userName} {roleSuffix}
               </StudentName>
             </>
           ) : (
@@ -1244,9 +1233,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   </thead>
                   <tbody>
                     {students.length > 0 ? (
-                      students.map((student, index) => (
+                      students.map((student) => (
                         <tr
-                          key={index}
+                          key={student.studentId}
                           onClick={() => {
                             fetchStudentDetails(student.studentId);
                           }}

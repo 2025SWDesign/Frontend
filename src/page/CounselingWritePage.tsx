@@ -94,8 +94,7 @@ const CounselingWritePage: React.FC = () => {
 
     try {
       const token = sessionStorage.getItem("accessToken"); // 토큰 가져오기
-      console.log(selectedStudent?.studentId);
-      const response = await axios.post(
+      await axios.post(
         `/api/v1/school/${schoolId}/consultation/students/${selectedStudent?.studentId}`,
         requestData,
         {
@@ -104,7 +103,6 @@ const CounselingWritePage: React.FC = () => {
           },
         }
       );
-      console.log("상담 기록 저장 성공:", response.data);
       handleGoBack();
     } catch (err) {
       console.error("상담 기록 저장 실패:", err);

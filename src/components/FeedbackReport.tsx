@@ -56,19 +56,19 @@ const FeedbackReport: React.FC<FeedbackReportProps> = ({
 
       <FeedbackArea>
         <FeedbackTitle>성적</FeedbackTitle>
-        <FeedbackContent>{feedbacks.GRADE || "내용 없음"}</FeedbackContent>
+        <FeedbackContent>{feedbacks.GRADE ?? "내용 없음"}</FeedbackContent>
       </FeedbackArea>
       <FeedbackArea>
         <FeedbackTitle>행동</FeedbackTitle>
-        <FeedbackContent>{feedbacks.BEHAVIOR || "내용 없음"}</FeedbackContent>
+        <FeedbackContent>{feedbacks.BEHAVIOR ?? "내용 없음"}</FeedbackContent>
       </FeedbackArea>
       <FeedbackArea>
         <FeedbackTitle>출결</FeedbackTitle>
-        <FeedbackContent>{feedbacks.ATTENDANCE || "내용 없음"}</FeedbackContent>
+        <FeedbackContent>{feedbacks.ATTENDANCE ?? "내용 없음"}</FeedbackContent>
       </FeedbackArea>
       <FeedbackArea>
         <FeedbackTitle>태도</FeedbackTitle>
-        <FeedbackContent>{feedbacks.ATTITUDE || "내용 없음"}</FeedbackContent>
+        <FeedbackContent>{feedbacks.ATTITUDE ?? "내용 없음"}</FeedbackContent>
       </FeedbackArea>
     </MainContainer>
   );
