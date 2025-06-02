@@ -80,6 +80,9 @@ interface ClassAttendanceRecord {
   partialAttendance: string;
 }
 
+type AttendanceStatus = "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+type AbsenceReason = "무단" | "질병" | "기타";
+
 const StudentManagementPage: React.FC = () => {
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
   const schoolId = useAuthStore((state) => state.schoolId);
@@ -93,10 +96,10 @@ const StudentManagementPage: React.FC = () => {
 
   // 학생 기본 정보 상태
   const [basicInfo, setBasicInfo] = useState({
-    name: selectedStudent?.name || "",
-    grade: selectedStudent?.grade || "",
-    class: selectedStudent?.gradeClass || "",
-    number: selectedStudent?.number || "",
+    name: selectedStudent?.name ?? "",
+    grade: selectedStudent?.grade ?? "",
+    class: selectedStudent?.gradeClass ?? "",
+    number: selectedStudent?.number ?? "",
   });
 
   // 상태관리
@@ -163,7 +166,7 @@ const StudentManagementPage: React.FC = () => {
         grade: d.grade,
         gradeClass: d.gradeClass,
         number: d.number,
-        img: d.user.photo || "",
+        img: d.user.photo ?? "",
       };
       setSelectedStudent(updatedStudent);
     } catch (err) {
@@ -271,7 +274,7 @@ const StudentManagementPage: React.FC = () => {
         attendanceId: number;
         studentRecordId: number;
         date: string;
-        type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+        type: AttendanceStatus;
         reason: string;
         createdAt: string;
         updatedAt: string;
@@ -336,7 +339,7 @@ const StudentManagementPage: React.FC = () => {
           attendanceId: number;
           studentRecordId: number;
           date: string;
-          type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+          type: AttendanceStatus;
           reason: string;
           createdAt: string;
           updatedAt: string;
@@ -443,10 +446,10 @@ const StudentManagementPage: React.FC = () => {
       data: Record<
         string,
         {
-          ABSENCE?: Record<"무단" | "질병" | "기타", number>;
-          LATE?: Record<"무단" | "질병" | "기타", number>;
-          EARLY?: Record<"무단" | "질병" | "기타", number>;
-          PARTIAL_ATTENDANCE?: Record<"무단" | "질병" | "기타", number>;
+          ABSENCE?: Record<AbsenceReason, number>;
+          LATE?: Record<AbsenceReason, number>;
+          EARLY?: Record<AbsenceReason, number>;
+          PARTIAL_ATTENDANCE?: Record<AbsenceReason, number>;
         }
       >;
     }>(
@@ -544,7 +547,7 @@ const StudentManagementPage: React.FC = () => {
       message: string;
       data: Array<{
         date: string;
-        type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+        type: AttendanceStatus;
         reason: string;
         studentRecord: {
           studentId: number;
@@ -578,7 +581,7 @@ const StudentManagementPage: React.FC = () => {
     date: string,
     attendanceList: {
       studentId: number;
-      type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+      type: AttendanceStatus;
       reason: string;
     }[]
   ) => {
@@ -591,7 +594,7 @@ const StudentManagementPage: React.FC = () => {
         studentRecordId: number;
         studentRecord: { studentId: number };
         date: string;
-        type: "ABSENCE" | "LATE" | "EARLY" | "PARTIAL_ATTENDANCE";
+        type: AttendanceStatus;
         reason: string;
         createdAt: string;
         updatedAt: string;
@@ -634,17 +637,30 @@ const StudentManagementPage: React.FC = () => {
             rec.early !== "" ||
             rec.partialAttendance !== ""
         )
-        .map((rec) => ({
-          studentId: rec.studentId,
-          type: rec.absent
-            ? ("ABSENCE" as const)
-            : rec.late
-              ? ("LATE" as const)
-              : rec.early
-                ? ("EARLY" as const)
-                : ("PARTIAL_ATTENDANCE" as const),
-          reason: rec.absent || rec.late || rec.early || rec.partialAttendance,
-        }));
+        .map((rec) => {
+          let type: AttendanceStatus;
+          let reason: string;
+
+          if (rec.absent) {
+            type = "ABSENCE";
+            reason = rec.absent;
+          } else if (rec.late) {
+            type = "LATE";
+            reason = rec.late;
+          } else if (rec.early) {
+            type = "EARLY";
+            reason = rec.early;
+          } else {
+            type = "PARTIAL_ATTENDANCE";
+            reason = rec.partialAttendance;
+          }
+
+          return {
+            studentId: rec.studentId,
+            type,
+            reason,
+          };
+        });
 
       if (payload.length === 0) {
         alert("입력된 출석 정보가 없습니다.");
@@ -689,10 +705,10 @@ const StudentManagementPage: React.FC = () => {
     if (selectedStudent) {
       // 기본 정보 동기화
       setBasicInfo({
-        name: selectedStudent.name || "",
-        grade: selectedStudent.grade || "",
-        class: selectedStudent.gradeClass || "",
-        number: selectedStudent.number || "",
+        name: selectedStudent.name ?? "",
+        grade: selectedStudent.grade ?? "",
+        class: selectedStudent.gradeClass ?? "",
+        number: selectedStudent.number ?? "",
       });
 
       const baseRecords: AttendanceRecord[] = semesterDates.map((date) => ({
@@ -722,7 +738,9 @@ const StudentManagementPage: React.FC = () => {
           );
 
           const completeSummary: AttendanceSummary[] = [1, 2, 3].map((g) => {
-            const found = rawSummary.find((s) => s.grade === `${g}학년`);
+            const found = rawSummary.find(
+              (s) => String(s.grade) === `${g}학년`
+            );
             return (
               found || {
                 grade: `${g}학년`,
@@ -871,7 +889,7 @@ const StudentManagementPage: React.FC = () => {
         학생부 관리
       </StudentManagementHeader>
       <Line />
-      {selectedStudent || !(role == "TEACHER") ? (
+      {selectedStudent ? (
         <>
           {/* 학생 기본정보 수정 섹션 */}
           {role === "TEACHER" && (
@@ -948,30 +966,34 @@ const StudentManagementPage: React.FC = () => {
                         data-testid="semester-attendance-cell"
                         className="total"
                       >
-                        {
-                          totals[
-                            category === "결석"
-                              ? "absent"
-                              : category === "지각"
-                                ? "late"
-                                : category === "조퇴"
-                                  ? "early"
-                                  : "partialAttendance"
-                          ]
-                        }
+                        {(() => {
+                          let key: keyof typeof totals;
+                          if (category === "결석") {
+                            key = "absent";
+                          } else if (category === "지각") {
+                            key = "late";
+                          } else if (category === "조퇴") {
+                            key = "early";
+                          } else {
+                            key = "partialAttendance";
+                          }
+                          return totals[key];
+                        })()}
                       </AttendanceCell>
                       {semesterDates.map((date) => {
                         const record = semesterAttendance.find(
                           (r) => r.date === date
                         );
-                        const field =
-                          category === "결석"
-                            ? "absent"
-                            : category === "지각"
-                              ? "late"
-                              : category === "조퇴"
-                                ? "early"
-                                : "partialAttendance";
+                        let field: keyof AttendanceRecord;
+                        if (category === "결석") {
+                          field = "absent";
+                        } else if (category === "지각") {
+                          field = "late";
+                        } else if (category === "조퇴") {
+                          field = "early";
+                        } else {
+                          field = "partialAttendance";
+                        }
                         return (
                           <AttendanceCell
                             key={`${category}-${date}`}
@@ -982,7 +1004,7 @@ const StudentManagementPage: React.FC = () => {
                               handleSemesterAttendanceInput(
                                 date,
                                 field,
-                                e.currentTarget.textContent || ""
+                                e.currentTarget.textContent ?? ""
                               )
                             }
                           >
@@ -1037,8 +1059,8 @@ const StudentManagementPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {attendanceSummaryData.map((row, rowIndex) => (
-                  <tr key={rowIndex} data-testid="attendance-summary-row">
+                {attendanceSummaryData.map((row) => (
+                  <tr key={row.grade} data-testid="attendance-summary-row">
                     <SummaryCell data-testid="attendance-summary-grade-cell">
                       {row.grade}
                     </SummaryCell>
@@ -1123,7 +1145,6 @@ const StudentManagementPage: React.FC = () => {
             {formattedDate} - 반 출석 관리
             <SectionNote>[1: 무단 2:질병 3:기타(사유)]</SectionNote>
           </ClassSectionTitle>
-          
 
           {classStudents.length > 0 ? (
             <>
@@ -1153,15 +1174,21 @@ const StudentManagementPage: React.FC = () => {
                   </thead>
                   <tbody>
                     {classStudents.map((stu) => {
-                      const rec: ClassAttendanceRecord = classAttendance.find(
-                        (r) => r.studentId === stu.studentId
-                      ) ?? {
-                        studentId: stu.studentId,
-                        absent: "",
-                        late: "",
-                        early: "",
-                        partialAttendance: "",
-                      };
+                      let rec: ClassAttendanceRecord | undefined =
+                        classAttendance.find(
+                          (r) => r.studentId === stu.studentId
+                        );
+
+                      if (!rec) {
+                        rec = {
+                          studentId: stu.studentId,
+                          absent: "",
+                          late: "",
+                          early: "",
+                          partialAttendance: "",
+                        };
+                      }
+
                       return (
                         <tr key={stu.studentId} data-testid="class-student-row">
                           <ClassAttendanceCell data-testid="class-attendance-cell-number">
@@ -1178,7 +1205,7 @@ const StudentManagementPage: React.FC = () => {
                               handleAttendanceInput(
                                 stu.studentId,
                                 "absent",
-                                e.currentTarget.textContent || ""
+                                e.currentTarget.textContent ?? ""
                               )
                             }
                           >
@@ -1192,7 +1219,7 @@ const StudentManagementPage: React.FC = () => {
                               handleAttendanceInput(
                                 stu.studentId,
                                 "late",
-                                e.currentTarget.textContent || ""
+                                e.currentTarget.textContent ?? ""
                               )
                             }
                           >
@@ -1206,7 +1233,7 @@ const StudentManagementPage: React.FC = () => {
                               handleAttendanceInput(
                                 stu.studentId,
                                 "early",
-                                e.currentTarget.textContent || ""
+                                e.currentTarget.textContent ?? ""
                               )
                             }
                           >
@@ -1220,7 +1247,7 @@ const StudentManagementPage: React.FC = () => {
                               handleAttendanceInput(
                                 stu.studentId,
                                 "partialAttendance",
-                                e.currentTarget.textContent || ""
+                                e.currentTarget.textContent ?? ""
                               )
                             }
                           >
