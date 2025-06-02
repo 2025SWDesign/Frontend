@@ -90,7 +90,7 @@ async function verifyChartLabelsMatchScores(page: any) {
     '[data-testid="grade-chart-box"] text',
     (els: any[]) => els.map(el => el.textContent?.trim() ?? "")
   );
-  const numericLabels = chartLabels.filter(txt => /^\d+$/.test(txt));
+  const numericLabels = chartLabels.filter((txt : string) => /^\d+$/.test(txt));
 
   for (const score of expectedScores) {
     expect(numericLabels).toContain(score);
@@ -163,7 +163,7 @@ async function verifySubjectModeChartLabels(page: any) {
     '[data-testid="grade-chart-box"] text',
     (els: any[]) => els.map(el => el.textContent?.trim() ?? "")
   );
-  const numericLabels = chartLabels.filter(txt => /^\d+$/.test(txt));
+  const numericLabels = chartLabels.filter((txt: string) => /^\d+$/.test(txt));
 
   for (const score of expectedScores) {
     expect(numericLabels).toContain(score);

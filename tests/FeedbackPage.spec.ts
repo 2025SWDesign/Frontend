@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Route } from "@playwright/test";
 
 // 공통: 로그인 후 피드백 페이지 진입 (학생 검색/선택 옵션 포함)
 async function loginAndGoFeedback(
@@ -78,7 +78,7 @@ async function verifyEditAndSave(page: any) {
   await page.getByTestId("feedback-form-attitude").fill(inputData.ATTITUDE);
 
   // API 목(mock) 처리
-  await page.route("**/api/v1/school/**/feedback/students/**", (route) => {
+  await page.route("**/api/v1/school/**/feedback/students/**", (route : Route) => {
     const req = route.request();
     if (req.method() === "GET") {
       return route.fulfill({
