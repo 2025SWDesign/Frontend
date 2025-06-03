@@ -7,12 +7,6 @@ import {
   StudentManagementContainer,
   StudentManagementHeader,
   Line,
-  BasicInfoSection,
-  InfoRow,
-  InfoContent,
-  InfoLabel,
-  InfoInput,
-  UpdateButton,
   SemesterAttendanceSection,
   SectionTitle,
   SectionNote,
@@ -891,51 +885,6 @@ const StudentManagementPage: React.FC = () => {
       <Line />
       {selectedStudent ? (
         <>
-          {/* 학생 기본정보 수정 섹션 */}
-          {role === "TEACHER" && (
-            <BasicInfoSection>
-              <SectionTitle>학생 기본정보 수정</SectionTitle>
-              <InfoRow>
-                <InfoContent>
-                  <InfoLabel>이름</InfoLabel>
-                  <InfoInput
-                    data-testid="basicinfo-name-input"
-                    type="text"
-                    onChange={handleBasicInfoChange("name")}
-                    value={basicInfo.name}
-                  />
-                  <InfoLabel>학년</InfoLabel>
-                  <InfoInput
-                    data-testid="basicinfo-grade-input"
-                    type="text"
-                    onChange={handleBasicInfoChange("grade")}
-                    value={basicInfo.grade}
-                  />
-                  <InfoLabel>반</InfoLabel>
-                  <InfoInput
-                    data-testid="basicinfo-class-input"
-                    type="text"
-                    onChange={handleBasicInfoChange("class")}
-                    value={basicInfo.class}
-                  />
-                  <InfoLabel>번호</InfoLabel>
-                  <InfoInput
-                    data-testid="basicinfo-number-input"
-                    type="text"
-                    onChange={handleBasicInfoChange("number")}
-                    value={basicInfo.number}
-                  />
-                  <UpdateButton
-                    data-testid="basicinfo-apply-button"
-                    onClick={handleUpdateBasicInfo}
-                  >
-                    적용
-                  </UpdateButton>
-                </InfoContent>
-              </InfoRow>
-            </BasicInfoSection>
-          )}
-
           {/* 해당 학기 출석 섹션 */}
           <SemesterAttendanceSection
             data-testid="semester-attendance-section"
@@ -1028,7 +977,7 @@ const StudentManagementPage: React.FC = () => {
           </SemesterAttendanceSection>
 
           {/* 출결 정보 테이블 */}
-          <StudentAttendanceSection>
+          <StudentAttendanceSection role={role}>
             <SectionTitle>학생 출결 정보</SectionTitle>
             <AttendanceSummaryTable data-testid="attendance-summary-table">
               <thead>

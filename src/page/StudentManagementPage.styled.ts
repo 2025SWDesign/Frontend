@@ -54,67 +54,11 @@ export const SectionNote = styled.span`
   margin-left: 0.2rem;
 `;
 
-// 학생 기본정보 수정 섹션
-export const BasicInfoSection = styled.section`
-  height: 3.5rem;
-  display: flex;
-  margin-left: 2.5rem;
-`;
-
-export const InfoRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  height: 2rem;
-  gap: 1rem;
-  width: 50rem;
-  margin-left: 1rem;
-`;
-
-export const InfoContent = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.7rem;
-  align-items: center;
-`;
-
-export const InfoLabel = styled.label`
-  font-weight: bold;
-  min-width: 1rem;
-`;
-
-export const InfoInput = styled.input`
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 4rem;
-`;
-
-export const UpdateButton = styled.button`
-  background-color: #146c94;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 0.25rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-
-  &:hover {
-    opacity: 0.9;
-  }
-`;
-
 // 해당 학기 출석 섹션
 export const SemesterAttendanceSection = styled.section<StudentManagementPageProps>`
   margin-left: 2.5rem;
+  margin-top: 1.5rem;
   width: 78rem;
-
-  ${(props) =>
-    props.role !== "TEACHER" &&
-    `
-    margin-bottom: 2rem;
-    margin-top: 1.5rem;
-  `}
 
   ${media.mobile} {
     width: 90%;
@@ -199,9 +143,16 @@ export const AttendanceCell = styled.td`
 `;
 
 // 학생 출결 정보 섹션
-export const StudentAttendanceSection = styled.section`
+export const StudentAttendanceSection = styled.section<StudentManagementPageProps>`
+  margin-top: 2rem;
   margin-left: 2.5rem;
   margin-bottom: 1rem;
+
+  ${(props) =>
+    props.role === "TEACHER" &&
+    `
+    margin-top: 0rem;
+  `}
 
   ${media.mobile} {
     margin-left: 1rem;
@@ -270,12 +221,7 @@ export const SpecialNotesSection = styled.section<StudentManagementPageProps>`
   display: flex;
   margin-left: 2.5rem;
   margin-bottom: 1rem;
-
-  ${(props) =>
-    props.role !== "TEACHER" &&
-    `  
-    margin-top: 2rem;
-  `}
+  margin-top: 2rem;
 
   ${media.mobile} {
     margin-left: 1rem;
@@ -285,7 +231,7 @@ export const SpecialNotesSection = styled.section<StudentManagementPageProps>`
 
 export const NotesForm = styled.textarea<StudentManagementPageProps>`
   width: 76rem;
-  height: 5rem;
+  height: 10rem;
   padding: 1rem;
   border: 1px solid #e0e0e0;
   border-radius: 0.5rem;
@@ -305,7 +251,7 @@ export const NotesForm = styled.textarea<StudentManagementPageProps>`
   ${(props) =>
     props.role !== "TEACHER" &&
     `
-    height: 8rem;
+    height: 12rem;
   `}
 
   ${media.mobile} {
