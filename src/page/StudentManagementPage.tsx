@@ -7,12 +7,6 @@ import {
   StudentManagementContainer,
   StudentManagementHeader,
   Line,
-  BasicInfoSection,
-  InfoRow,
-  InfoContent,
-  InfoLabel,
-  InfoInput,
-  UpdateButton,
   SemesterAttendanceSection,
   SectionTitle,
   SectionNote,
@@ -37,15 +31,6 @@ import {
   ClassSectionTitle,
   GuideMessage,
 } from "./StudentManagementPage.styled";
-
-interface Student {
-  studentId: number;
-  name: string;
-  grade: number;
-  gradeClass: number;
-  number: number;
-  img: string;
-}
 
 interface AttendanceRecord {
   date: string;
@@ -87,20 +72,10 @@ const StudentManagementPage: React.FC = () => {
   const selectedStudent = useStudentStore((state) => state.selectedStudent);
   const schoolId = useAuthStore((state) => state.schoolId);
   const classId = useAuthStore((state) => state.classId);
-  const setSelectedStudent = useStudentStore(
-    (state) => state.setSelectedStudent
-  );
   const role = useAuthStore((state) => state.role);
   const isHomeroom = useAuthStore((state) => state.isHomeroom);
   const classStudents = useAuthStore((state) => state.classStudents);
 
-  // 학생 기본 정보 상태
-  const [basicInfo, setBasicInfo] = useState({
-    name: selectedStudent?.name ?? "",
-    grade: selectedStudent?.grade ?? "",
-    class: selectedStudent?.gradeClass ?? "",
-    number: selectedStudent?.number ?? "",
-  });
 
   // 상태관리
   const [specialNotes, setSpecialNotes] = useState(""); // 특기사항
@@ -126,53 +101,6 @@ const StudentManagementPage: React.FC = () => {
     const m = new Date().getMonth() + 1;
     return m >= 3 && m < 9 ? 1 : 2;
   })();
-
-  // 기본 정보 변경 핸들러
-  const handleBasicInfoChange =
-    (field: keyof typeof basicInfo) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setBasicInfo({
-        ...basicInfo,
-        [field]: e.target.value,
-      });
-    };
-
-  // 기본 정보 업데이트 API
-  const handleUpdateBasicInfo = async () => {
-    if (!selectedStudent) return;
-
-    try {
-      const token = sessionStorage.getItem("accessToken");
-      const response = await axios.patch(
-        `/api/v1/school/${schoolId}/students/${selectedStudent.studentId}`,
-        {
-          name: basicInfo.name,
-          grade: Number(basicInfo.grade), // 숫자로 변환
-          gradeClass: Number(basicInfo.class), // 기본정보 객체의 `class` → API의 `gradeClass`
-          number: Number(basicInfo.number),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      // 업데이트된 데이터를 상태나 전역 스토어에도 반영
-      const d = response.data.data;
-      const updatedStudent: Student = {
-        studentId: d.studentId,
-        name: d.user.name,
-        grade: d.grade,
-        gradeClass: d.gradeClass,
-        number: d.number,
-        img: d.user.photo ?? "",
-      };
-      setSelectedStudent(updatedStudent);
-    } catch (err) {
-      console.error("기본 정보 업데이트 실패:", err);
-    }
-  };
 
   // 특기사항 변경 핸들러
   const handleSpecialNotesChange = (
@@ -703,13 +631,6 @@ const StudentManagementPage: React.FC = () => {
   useEffect(() => {
     // 1) 학생 데이터 로드
     if (selectedStudent) {
-      // 기본 정보 동기화
-      setBasicInfo({
-        name: selectedStudent.name ?? "",
-        grade: selectedStudent.grade ?? "",
-        class: selectedStudent.gradeClass ?? "",
-        number: selectedStudent.number ?? "",
-      });
 
       const baseRecords: AttendanceRecord[] = semesterDates.map((date) => ({
         date,
@@ -891,51 +812,6 @@ const StudentManagementPage: React.FC = () => {
       <Line />
       {selectedStudent ? (
         <>
-          {/* 학생 기본정보 수정 섹션 */}
-          {role === "TEACHER" && (
-            <BasicInfoSection>
-              <SectionTitle>학생 기본정보 수정</SectionTitle>
-              <InfoRow>
-                <InfoContent>
-                  <InfoLabel>이름</InfoLabel>
-                  <InfoInput
-                    data-testid="basicinfo-name-input"
-                    type="text"
-                    onChange={handleBasicInfoChange("name")}
-                    value={basicInfo.name}
-                  />
-                  <InfoLabel>학년</InfoLabel>
-                  <InfoInput
-                    data-testid="basicinfo-grade-input"
-                    type="text"
-                    onChange={handleBasicInfoChange("grade")}
-                    value={basicInfo.grade}
-                  />
-                  <InfoLabel>반</InfoLabel>
-                  <InfoInput
-                    data-testid="basicinfo-class-input"
-                    type="text"
-                    onChange={handleBasicInfoChange("class")}
-                    value={basicInfo.class}
-                  />
-                  <InfoLabel>번호</InfoLabel>
-                  <InfoInput
-                    data-testid="basicinfo-number-input"
-                    type="text"
-                    onChange={handleBasicInfoChange("number")}
-                    value={basicInfo.number}
-                  />
-                  <UpdateButton
-                    data-testid="basicinfo-apply-button"
-                    onClick={handleUpdateBasicInfo}
-                  >
-                    적용
-                  </UpdateButton>
-                </InfoContent>
-              </InfoRow>
-            </BasicInfoSection>
-          )}
-
           {/* 해당 학기 출석 섹션 */}
           <SemesterAttendanceSection
             data-testid="semester-attendance-section"
@@ -1028,7 +904,7 @@ const StudentManagementPage: React.FC = () => {
           </SemesterAttendanceSection>
 
           {/* 출결 정보 테이블 */}
-          <StudentAttendanceSection>
+          <StudentAttendanceSection role={role}>
             <SectionTitle>학생 출결 정보</SectionTitle>
             <AttendanceSummaryTable data-testid="attendance-summary-table">
               <thead>

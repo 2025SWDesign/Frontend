@@ -43,8 +43,8 @@ async function loginAndGoStudentManage(
   await expect(page).toHaveURL("/student-manage");
 }
 
-async function verifyStudentDetailSections(page: any, flag: boolean) {
-  if (flag) await expect(page.getByText("학생 기본정보 수정")).toBeVisible();
+async function verifyStudentDetailSections(page: any) {
+  await expect(page.getByText("학생 기본정보 수정")).toBeVisible();
   await expect(page.getByText("해당 학기 출석")).toBeVisible();
   await expect(page.getByText("학생 출결 정보")).toBeVisible();
   await expect(page.getByText("특기 사항")).toBeVisible();
@@ -339,7 +339,7 @@ test.describe("homeroom teacher - student", () => {
   });
 
   test("좌측 학생 클릭 시 화면 전환한다", async ({ page }) => {
-    await verifyStudentDetailSections(page, true);
+    await verifyStudentDetailSections(page);
   });
 
   test("기본정보 입력란에 초기값이 보이고, 수정 후 적용된다", async ({
@@ -387,7 +387,7 @@ test.describe("teacher: full-suite", () => {
 
   test("좌측 학생 클릭 시 화면 전환한다", async ({ page }) => {
     // teacher는 미리 검색된 상태이므로 바로 상세 확인
-    await verifyStudentDetailSections(page, true);
+    await verifyStudentDetailSections(page);
   });
 
   test("기본정보 입력란에 초기값이 보이고, 수정 후 적용된다", async ({
@@ -427,7 +427,7 @@ test.describe("parent", () => {
   });
 
   test("좌측 학생 클릭 시 화면 전환한다", async ({ page }) => {
-    await verifyStudentDetailSections(page, false);
+    await verifyStudentDetailSections(page);
   });
 
   test("학생 출결 정보 테이블 렌더링 및 요약값 검증", async ({ page }) => {
@@ -443,7 +443,7 @@ test.describe("student", () => {
   });
 
   test("좌측 학생 클릭 시 화면 전환한다", async ({ page }) => {
-    await verifyStudentDetailSections(page, false);
+    await verifyStudentDetailSections(page);
   });
 
   test("학생 출결 정보 테이블 렌더링 및 요약값 검증", async ({ page }) => {
