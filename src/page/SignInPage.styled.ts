@@ -359,6 +359,8 @@ export const SecondaryArea = styled.div`
     color: #146c94;
     font-weight: 700;
     text-decoration: underline;
+    border: 0;
+    background: none;
   }
   ${media.mobile} {
     p {
